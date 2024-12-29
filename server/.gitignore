@@ -1,3 +1,6 @@
 .env
 node_modules
 dist
+chaindrive.db
+chaindrive.db-shm
+chaindrive.db-wal
