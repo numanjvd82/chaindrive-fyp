@@ -6,6 +6,7 @@
   "scripts": {
     "start": "node dist/index.js",
     "dev": "nodemon src/index.ts",
+    "debug": "node --inspect src/index.ts",
     "build": "tsc"
   },
   "keywords": [],
@@ -13,13 +14,16 @@
   "license": "ISC",
   "dependencies": {
     "better-sqlite3": "^11.7.0",
+    "cookie-parser": "^1.4.7",
     "cors": "^2.8.5",
     "dotenv": "^16.4.7",
     "express": "^4.21.2",
-    "helmet": "^8.0.0"
+    "helmet": "^8.0.0",
+    "zod": "^3.24.1"
   },
   "devDependencies": {
     "@types/better-sqlite3": "^7.6.12",
+    "@types/cookie-parser": "^1.4.8",
     "@types/cors": "^2.8.17",
     "@types/express": "^5.0.0",
     "@types/helmet": "^4.0.0",
