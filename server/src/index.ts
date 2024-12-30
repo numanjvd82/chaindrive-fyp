@@ -18,7 +18,12 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(cookieParser());
 app.use(helmet());
-app.use(cors());
+app.use(
+  cors({
+    origin: process.env.CLIENT_URL,
+    credentials: true,
+  })
+);
 app.use(errorLogger);
 
 // Logging (development environment only)
@@ -27,13 +32,13 @@ if (process.env.NODE_ENV === "development") {
 }
 
 // Server health check
-app.get("/", (req: Request, res: Response) => {
-  res.send("Welcome to the typescript server");
+app.get("/api/health", (req: Request, res: Response) => {
+  res.status(200).json({ message: "Server is running" });
 });
 
-app.use("/auth", router.auth);
+app.use("/api/auth", router.auth);
 
-app.use("/dashboard", ensureAuthenticated, (req, res) => {
+app.use("/api/dashboard", ensureAuthenticated, (req, res) => {
   // @ts-expect-error Property 'userId' does not exist on type 'Request'
   res.status(200).json({ message: `Welcome, user ${req.userId}` });
 });

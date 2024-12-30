@@ -1,11 +1,11 @@
 import { NextFunction, Request, Response } from "express";
 import { sessionModel } from "../models/session";
 
-export const ensureAuthenticated = (
+export const ensureAuthenticated = async (
   req: Request,
   res: Response,
   next: NextFunction
-): void => {
+) => {
   const sessionId = req.cookies && req.cookies.sessionId;
 
   if (!sessionId) {
@@ -14,7 +14,7 @@ export const ensureAuthenticated = (
   }
 
   // Query session from the database
-  const session = sessionModel.findOne(sessionId);
+  const session = await sessionModel.findOne(sessionId);
 
   if (!session) {
     res.status(401).json({ error: "Session expired or invalid" });
