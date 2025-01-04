@@ -6,7 +6,10 @@ import { sql } from "../../utils/utils";
 export const signUpSchema = z.object({
   first_name: z.string(),
   last_name: z.string(),
-  email: z.string().email(),
+  email: z
+    .string()
+    .email()
+    .transform((v) => v.toLowerCase()),
   password: z.string().min(8).max(32),
   role: z.enum(["owner", "renter"]),
 });

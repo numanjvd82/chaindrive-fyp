@@ -4,7 +4,7 @@ import { findOne } from "./findOne";
 
 export type Session = {
   id: string;
-  user_id: string;
+  user_id: number;
   session_id: string;
   data: Record<string, unknown>;
   expires_at: Date;

@@ -11,9 +11,8 @@ export const loginSchema = signUpSchema.pick({
 });
 
 export const login = async (req: Request, res: Response) => {
-  const { email, password } = req.body;
-
   try {
+    const { email, password } = loginSchema.parse(req.body);
     const user = await userModel.findOneByEmail(email);
 
     if (!user) {
@@ -42,8 +41,8 @@ export const login = async (req: Request, res: Response) => {
     });
 
     res.status(200).json({ message: "Logged in successfully" });
-  } catch (error) {
+  } catch (error: any) {
     console.error(error);
-    res.status(500).json({ error: "Internal server error" });
+    res.status(500).json({ error: error.message });
   }
 };
