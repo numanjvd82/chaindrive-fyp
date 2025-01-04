@@ -1,15 +1,15 @@
+import { useQueryClient } from "react-query";
 import { useNavigate } from "react-router-dom";
-import { useUser } from "../hooks/useUser";
 import { axiosInstance } from "../lib/axios";
 
 export const LogoutButton = () => {
-  const { setUser } = useUser();
+  const queryClient = useQueryClient();
   const navigate = useNavigate();
 
   const handleLogout = async () => {
     try {
       await axiosInstance.post("/api/auth/logout", {});
-      setUser(null); // Clear user context
+      queryClient.setQueryData("user", null); // Clear user data
       navigate("/login");
     } catch (err) {
       console.error(err);
