@@ -6,7 +6,7 @@ import { axiosInstance } from "../lib/axios";
 
 const Login = () => {
   const navigate = useNavigate();
-  const { fetchUser } = useUser();
+  const { refetch } = useUser();
   const [form, setForm] = useState({ email: "", password: "" });
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -17,13 +17,11 @@ const Login = () => {
     e.preventDefault();
     try {
       await axiosInstance.post("/api/auth/login", form);
-      const user = await fetchUser(); // Fetch and update user context
-      if (!user) {
-        toast.error("Invalid credentials");
-      }
+      refetch(); // Fetch and update user context
       navigate("/");
     } catch (err) {
       console.error(err);
+      toast.error("Invalid credentials");
     }
   };
 
