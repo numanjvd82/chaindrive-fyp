@@ -5,16 +5,22 @@ import { User } from "../lib/types";
 
 export const UserProvider = ({ children }: { children: React.ReactNode }) => {
   const [user, setUser] = useState<User | null>(null);
+  const [loading, setLoading] = useState(true);
 
   const fetchUser = async () => {
+    setLoading(true);
     try {
-      const { data } = await axiosInstance.get<User>("/api/auth/me");
+      const { data } = await axiosInstance.get<User>("/api/auth/me", {
+        withCredentials: true,
+      });
       setUser(data);
-      return data;
+      return user;
     } catch (err) {
-      console.error(err);
+      console.error("Error fetching user:", err);
       setUser(null);
       return null;
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -23,7 +29,7 @@ export const UserProvider = ({ children }: { children: React.ReactNode }) => {
   }, []);
 
   return (
-    <UserContext.Provider value={{ user, setUser, fetchUser }}>
+    <UserContext.Provider value={{ user, setUser, fetchUser, loading }}>
       {children}
     </UserContext.Provider>
   );

@@ -18,7 +18,7 @@ const Login = () => {
       await axiosInstance.post("/api/auth/login", form);
       const user = await fetchUser(); // Fetch and update user context
       if (user) {
-        navigate(user.role === "renter" ? "/renter-profile" : "/owner-profile");
+        navigate("/");
       }
     } catch (err) {
       console.error(err);
