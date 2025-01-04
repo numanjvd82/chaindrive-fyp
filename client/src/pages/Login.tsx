@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
+import { toast } from "react-toastify";
 import { useUser } from "../hooks/useUser";
 import { axiosInstance } from "../lib/axios";
 
@@ -17,9 +18,10 @@ const Login = () => {
     try {
       await axiosInstance.post("/api/auth/login", form);
       const user = await fetchUser(); // Fetch and update user context
-      if (user) {
-        navigate("/");
+      if (!user) {
+        toast.error("Invalid credentials");
       }
+      navigate("/");
     } catch (err) {
       console.error(err);
     }

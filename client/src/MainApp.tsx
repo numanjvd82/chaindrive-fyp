@@ -1,5 +1,6 @@
 import { useEffect } from "react";
 import { Route, Routes, useLocation, useNavigate } from "react-router-dom";
+import { ToastContainer } from "react-toastify";
 import { useUser } from "./hooks/useUser";
 import Login from "./pages/Login";
 import OwnerProfile from "./pages/OwnerProfile";
@@ -43,10 +44,19 @@ const MainApp: React.FC = () => {
   const navigate = useNavigate();
 
   useEffect(() => {
-    if (!loading && !user) {
+    if (!loading && !user && location.pathname !== "/login") {
       navigate("/login");
     }
-  }, [loading, user, navigate]);
+
+    if (!loading && user) {
+      const currentRoute = ROUTES.find(
+        (route) => route.link === location.pathname
+      );
+      if (currentRoute?.roles && !currentRoute.roles.includes(user.role)) {
+        navigate("/");
+      }
+    }
+  }, [loading, user, navigate, location]);
 
   if (loading) {
     return <div>Loading...</div>;
@@ -54,8 +64,10 @@ const MainApp: React.FC = () => {
 
   return (
     <>
+      <ToastContainer />
+
       <Routes>
-        {ROUTES.map(({ component, link, roles }) => (
+        {ROUTES.map(({ component, link }) => (
           <Route key={link} path={link} element={component} />
         ))}
       </Routes>
