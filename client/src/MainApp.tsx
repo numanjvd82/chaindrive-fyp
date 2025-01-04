@@ -1,40 +1,42 @@
-import { useEffect } from "react";
+import React, { Suspense, useEffect } from "react";
 import { Route, Routes, useLocation, useNavigate } from "react-router-dom";
 import { ToastContainer } from "react-toastify";
+import Splash from "./components/Splash";
 import { useUser } from "./hooks/useUser";
-import Login from "./pages/Login";
-import OwnerProfile from "./pages/OwnerProfile";
-import RenterProfile from "./pages/RenterProfile";
-import SignUp from "./pages/Signup";
 
-type Route = {
-  link: string;
-  component: React.ReactNode;
-  roles?: string[];
-};
+const LoginPage = React.lazy(() => import("./pages/Login"));
+const NotFoundPage = React.lazy(() => import("./pages/NotFound"));
+const NotAuthorizedPage = React.lazy(() => import("./pages/NotAuthorized"));
+const OwnerProfilePage = React.lazy(() => import("./pages/OwnerProfile"));
+const RenterProfilePage = React.lazy(() => import("./pages/RenterProfile"));
+const SignupPage = React.lazy(() => import("./pages/Signup"));
 
-const ROUTES: Route[] = [
+const ROUTES = [
   {
     link: "/",
     component: <div>Home</div>,
   },
   {
     link: "/renter-profile",
-    component: <RenterProfile />,
+    component: <RenterProfilePage />,
     roles: ["renter"],
   },
   {
     link: "/signup",
-    component: <SignUp />,
+    component: <SignupPage />,
   },
   {
     link: "/login",
-    component: <Login />,
+    component: <LoginPage />,
   },
   {
     link: "/owner-profile",
-    component: <OwnerProfile />,
+    component: <OwnerProfilePage />,
     roles: ["owner"],
+  },
+  {
+    link: "/not-authorized",
+    component: <NotAuthorizedPage />,
   },
 ];
 
@@ -44,7 +46,12 @@ const MainApp: React.FC = () => {
   const navigate = useNavigate();
 
   useEffect(() => {
-    if (!loading && !user && location.pathname !== "/login") {
+    if (
+      !loading &&
+      !user &&
+      location.pathname !== "/login" &&
+      location.pathname !== "not-authorized"
+    ) {
       navigate("/login");
     }
 
@@ -53,25 +60,26 @@ const MainApp: React.FC = () => {
         (route) => route.link === location.pathname
       );
       if (currentRoute?.roles && !currentRoute.roles.includes(user.role)) {
-        navigate("/");
+        navigate("/not-authorized");
       }
     }
   }, [loading, user, navigate, location]);
 
   if (loading) {
-    return <div>Loading...</div>;
+    return <Splash />;
   }
 
   return (
-    <>
+    <Suspense fallback={<Splash />}>
       <ToastContainer />
 
       <Routes>
         {ROUTES.map(({ component, link }) => (
           <Route key={link} path={link} element={component} />
         ))}
+        <Route path="*" element={<NotFoundPage />} />
       </Routes>
-    </>
+    </Suspense>
   );
 };
 

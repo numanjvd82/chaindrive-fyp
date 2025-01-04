@@ -1,10 +1,11 @@
 import { LogoutButton } from "../components/LogoutButton";
+import Splash from "../components/Splash";
 import { useUser } from "../hooks/useUser";
 
 const OwnerProfile = () => {
   const { user } = useUser();
 
-  if (!user) return <p>Loading...</p>;
+  if (!user) return <Splash />;
 
   return (
     <div>
