@@ -25,13 +25,15 @@ export const useUser = () => {
       } catch (err: any) {
         if (err.response?.status === 401) {
           queryClient.setQueryData("user", null);
+          // queryClient.removeQueries("user");
         }
         return null;
       }
     },
     {
-      refetchInterval: periodicUserFetchTime, // Periodically refetch every 5 minutes
+      refetchInterval: periodicUserFetchTime,
       refetchOnWindowFocus: true,
+      staleTime: periodicUserFetchTime,
     }
   );
 

@@ -45,13 +45,10 @@ const MainApp: React.FC = () => {
   const location = useLocation();
   const navigate = useNavigate();
 
+  const noRedirectPaths = ["/login", "/signup", "/not-authorized"];
+
   useEffect(() => {
-    if (
-      !loading &&
-      !user &&
-      location.pathname !== "/login" &&
-      location.pathname !== "not-authorized"
-    ) {
+    if (!loading && !user && !noRedirectPaths.includes(location.pathname)) {
       navigate("/login");
     }
 
@@ -63,7 +60,7 @@ const MainApp: React.FC = () => {
         navigate("/not-authorized");
       }
     }
-  }, [loading, user, navigate, location]);
+  }, [loading, user, navigate, location.pathname]);
 
   if (loading) {
     return <Splash />;
