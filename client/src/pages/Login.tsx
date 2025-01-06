@@ -26,8 +26,11 @@ const Login = () => {
     reset,
     handleSubmit,
     register,
-    formState: { errors, isDirty, isValid },
-  } = useForm<LoginForm>({ resolver: zodResolver(loginSchema) });
+    formState: { errors, isDirty, isValid, isSubmitting },
+  } = useForm<LoginForm>({
+    resolver: zodResolver(loginSchema),
+    mode: "onTouched",
+  });
   const navigate = useNavigate();
   const { refetch } = useUser();
 
@@ -55,29 +58,40 @@ const Login = () => {
         <Input
           type="text"
           placeholder="User name or email address"
+          error={errors.email?.message}
           {...register("email")}
         />
-        <div className="text-red-500 text-sm">{errors.email?.message}</div>
-        <div className="relative mb-4">
-          <Input
-            type="password"
-            placeholder="Your password"
-            {...register("password")}
-          />
-          <span className="absolute right-3 top-3 text-gray-500 cursor-pointer">
-            Hide
-          </span>
-        </div>
-        <div className="text-red-500 text-sm">{errors.password?.message}</div>
+        <Input
+          type="password"
+          placeholder="Your password"
+          error={errors.password?.message}
+          {...register("password")}
+        />
         <div className="mb-4 text-right">
-          <a href="#" className="text-sm text-blue-500 hover:underline">
+          <a href="#" className="text-sm text-primary hover:underline">
             Forget your password?
           </a>
         </div>
-        <Button disabled={!isDirty || !isValid} text="Login" type="submit" />
+        <div
+          className="
+            flex
+            items-center
+            justify-center
+            w-full
+            mt-4
+        "
+        >
+          <Button
+            disabled={!isDirty || !isValid}
+            isLoading={isSubmitting}
+            text="Login"
+            type="submit"
+            size="lg"
+          />
+        </div>
         <div className="text-center mt-4 text-sm text-gray-600">
           Don’t have an account?{" "}
-          <Link to="/signup" className="text-blue-500 hover:underline">
+          <Link to="/signup" className="text-primary hover:underline">
             Sign up
           </Link>
         </div>
