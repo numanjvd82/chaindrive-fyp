@@ -1,4 +1,5 @@
 import React, { forwardRef, useState } from "react";
+import { FaEye, FaEyeSlash } from "react-icons/fa";
 
 interface InputProps extends React.InputHTMLAttributes<HTMLInputElement> {
   error?: string; // Pass error messages directly
@@ -28,7 +29,7 @@ const Input = forwardRef<HTMLInputElement, InputProps>(
               onClick={togglePasswordVisibility}
               className="absolute right-3 top-3 text-gray-500 cursor-pointer select-none"
             >
-              {showPassword ? "Hide" : "Show"}
+              {showPassword ? <FaEyeSlash /> : <FaEye />}
             </span>
           )}
         </div>
