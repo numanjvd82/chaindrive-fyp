@@ -2,17 +2,26 @@ import React, { forwardRef, useState } from "react";
 import { FaEye, FaEyeSlash } from "react-icons/fa";
 
 interface InputProps extends React.InputHTMLAttributes<HTMLInputElement> {
-  error?: string; // Pass error messages directly
+  label?: string;
+  error?: string;
 }
 
 const Input = forwardRef<HTMLInputElement, InputProps>(
-  ({ error, type, ...props }, ref) => {
+  ({ label, error, type, ...props }, ref) => {
     const [showPassword, setShowPassword] = useState(type !== "password");
 
     const togglePasswordVisibility = () => setShowPassword((prev) => !prev);
 
     return (
       <div className="mb-4">
+        {label && (
+          <label
+            htmlFor={props.id}
+            className="block mb-1 text-sm font-medium text-gray-700"
+          >
+            {label}
+          </label>
+        )}
         <div className="relative">
           <input
             ref={ref}
