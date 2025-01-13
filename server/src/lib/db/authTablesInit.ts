@@ -21,6 +21,35 @@ CREATE TABLE IF NOT EXISTS Users (
 `
   ).run();
 
+  db.prepare(
+    sql`
+CREATE TABLE IF NOT EXISTS PersonalInfo (
+  id INTEGER PRIMARY KEY AUTOINCREMENT,
+  user_id INTEGER NOT NULL,
+  phone TEXT NOT NULL,
+  address TEXT NOT NULL,
+  city TEXT NOT NULL,
+  state TEXT NOT NULL,
+  zip TEXT NOT NULL,
+  FOREIGN KEY(user_id) REFERENCES Users(id) ON DELETE CASCADE
+);
+`
+  ).run();
+
+  db.prepare(
+    sql`
+CREATE TABLE IF NOT EXISTS KycInfo (
+  id INTEGER PRIMARY KEY AUTOINCREMENT,
+  user_id INTEGER NOT NULL,
+  dob TEXT NOT NULL,
+  id_card_front BLOB NOT NULL,
+  id_card_back BLOB NOT NULL,
+  selfie BLOB NOT NULL,
+  FOREIGN KEY(user_id) REFERENCES Users(id) ON DELETE CASCADE
+);
+`
+  ).run();
+
   // Create Sessions table
   db.prepare(
     sql`

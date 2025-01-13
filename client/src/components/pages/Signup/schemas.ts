@@ -1,33 +1,71 @@
 import { z } from "zod";
 
-const roleSelectionSchema = z.object({
+// Role selection schema
+export const roleSelectionSchema = z.object({
   role: z
     .enum(["renter", "owner"], { required_error: "Role is required" })
     .default("renter"),
 });
 
-const personalInfoSchema = z.object({
-  firstName: z
+// Updated personal information schema
+export const personalInfoSchema = z
+  .object({
+    firstName: z
+      .string()
+      .nonempty("First name is required")
+      .min(2, "First name must be at least 2 characters long"),
+    lastName: z
+      .string()
+      .nonempty("Last name is required")
+      .min(2, "Last name must be at least 2 characters long"),
+    email: z
+      .string()
+      .nonempty({ message: "Email is required" })
+      .email("Invalid email address"),
+    phone: z
+      .string()
+      .nonempty("Phone number is required")
+      .regex(/^\d{11}$/, "Phone number must be 11 digits long")
+      .refine(
+        (phone) => phone.startsWith("0"),
+        "Phone number must start with '0'"
+      )
+      .transform((phone) => `92${phone.slice(1)}`),
+    password: z
+      .string()
+      .nonempty("Password is required")
+      .min(8, "Password must be at least 8 characters long"),
+    confirmPassword: z
+      .string()
+      .nonempty({ message: "Confirm password is required" }),
+  })
+  .superRefine((data, ctx) => {
+    if (data.password !== data.confirmPassword) {
+      return ctx.addIssue({
+        code: z.ZodIssueCode.custom,
+        message: "Passwords do not match",
+        path: ["confirmPassword"],
+      });
+    }
+  });
+
+// KYC information schema
+export const kycInfoSchema = z.object({
+  dob: z
     .string()
-    .nonempty()
-    .min(2, "First name must be at least 2 characters long"),
-  lastName: z
-    .string()
-    .nonempty()
-    .min(2, "Last name must be at least 2 characters long"),
-  email: z
-    .string()
-    .nonempty({ message: "Email is Required" })
-    .email("Invalid email address"),
+    .nonempty("Date of birth is required")
+    .regex(/^\d{2}-\d{2}-\d{4}$/, "Date of birth must be in DD-MM-YYYY format"),
+  idCardFront: z.any(),
+  idCardBack: z.any(),
+  selfie: z.any(),
+  address: z.string().nonempty("Address is required"),
+  city: z.string().nonempty("City is required"),
+  state: z.string().nonempty("State is required"),
 });
 
-export const combinedSchema = z
-  .object({
-    role: roleSelectionSchema.shape.role,
-    firstName: personalInfoSchema.shape.firstName,
-    lastName: personalInfoSchema.shape.lastName,
-    email: personalInfoSchema.shape.email,
-  })
-  .partial(); // Fields will be validated step-by-step.
+// Updated combined schema
+export const combinedSchema = roleSelectionSchema
+  .merge(personalInfoSchema._def.schema)
+  .merge(kycInfoSchema);
 
 export type FormData = z.infer<typeof combinedSchema>;

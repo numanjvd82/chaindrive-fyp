@@ -10,7 +10,7 @@ const NotAuthorized: React.FC = () => {
       </p>
       <Link
         to="/"
-        className="mt-6 px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600"
+        className="mt-6 px-4 py-2 bg-primary text-white rounded hover:brightness-125"
       >
         Return to Home
       </Link>
