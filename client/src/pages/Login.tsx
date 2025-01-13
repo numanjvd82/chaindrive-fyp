@@ -1,12 +1,12 @@
+import Button from "@/components/Button";
+import Input from "@/components/Input";
+import { useUser } from "@/hooks/useUser";
+import { axiosInstance } from "@/lib/axios";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { SubmitHandler, useForm } from "react-hook-form";
 import { Link, useNavigate } from "react-router-dom";
 import { toast } from "react-toastify";
 import { z } from "zod";
-import Button from "../components/Button";
-import Input from "../components/Input";
-import { useUser } from "../hooks/useUser";
-import { axiosInstance } from "../lib/axios";
 
 const loginSchema = z.object({
   email: z
