@@ -28,23 +28,29 @@ export const signUp = async (req: Request, res: Response) => {
 
   if (!idCardFront || !idCardBack || !selfie) {
     res.status(400).json({ message: "All files are required" });
+    return;
   }
 
-  await userModel.createOne({
-    role,
-    firstName,
-    lastName,
-    email,
-    password,
-    phone,
-    dob,
-    address,
-    city,
-    state,
-    idCardFront,
-    idCardBack,
-    selfie,
-  });
+  try {
+    await userModel.createOne({
+      role,
+      firstName,
+      lastName,
+      email,
+      password,
+      phone,
+      dob,
+      address,
+      city,
+      state,
+      idCardFront,
+      idCardBack,
+      selfie,
+    });
 
-  res.status(201).json({ message: "User created successfully" });
+    res.status(201).json({ message: "User created successfully" });
+  } catch (error: any) {
+    console.error("Error in signUp controller:", error.message); // Log the error
+    res.status(500).json({ message: error.message || "Internal Server Error" });
+  }
 };

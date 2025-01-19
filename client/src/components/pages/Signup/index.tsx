@@ -82,10 +82,12 @@ const MultiStepForm: React.FC = () => {
           "Content-Type": "multipart/form-data",
         },
       });
-      toast.success("Signup successful");
-      setTimeout(() => {
-        navigate("/login");
-      }, 2000);
+      toast.success(
+        "Account created successfully! You will be redirected to login page.",
+        {
+          onClose: () => navigate("/login"),
+        }
+      );
     } catch (err: any) {
       toast.error(err.response.data.message);
     }

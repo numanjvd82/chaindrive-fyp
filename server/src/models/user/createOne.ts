@@ -60,32 +60,38 @@ export const createOne = async (input: z.infer<typeof signUpSchema>) => {
       throw new Error("Email already exists");
     }
 
-    // Hash password and insert the user into the database
+    // Hash password
     const { hash, salt } = hashPassword(parsedUser.password);
 
-    const tx = sqliteInstance.transaction(async () => {
-      const stmt = sqliteInstance.prepare(
-        sql`INSERT INTO users (email, password_hash, salt, role) VALUES (?, ?, ?, ?)`
+    // Begin transaction
+    const tx = sqliteInstance.transaction(() => {
+      // Insert user into `users` table
+      const userInsertStmt = sqliteInstance.prepare(
+        sql`
+INSERT INTO users 
+(email, password_hash, salt, role) 
+VALUES (?, ?, ?, ?)`
       );
+      userInsertStmt.run(parsedUser.email, hash, salt, parsedUser.role);
 
-      stmt.run(parsedUser.email, hash, salt, parsedUser.role);
-
-      // Get the user ID
+      // Get the inserted user's ID
       const user = sqliteInstance
         .prepare(sql`SELECT id FROM users WHERE email = ?`)
         .get(parsedUser.email) as PartialUser | undefined;
       if (!user) {
-        throw new Error("User not found");
+        throw new Error("User not found after insertion");
       }
 
       const userId = user.id;
 
-      // Insert the user's personal information
-      const stmtPersonalInfo = sqliteInstance.prepare(
-        sql`INSERT INTO PersonalInfo (user_id, first_name, last_name, phone, address, city, state) VALUES (?, ?, ?, ?, ?, ?, ?)`
+      // Insert user's personal information into `PersonalInfo` table
+      const personalInfoStmt = sqliteInstance.prepare(
+        sql`
+INSERT INTO PersonalInfo 
+(user_id, first_name, last_name, phone, address, city, state) 
+VALUES (?, ?, ?, ?, ?, ?, ?)`
       );
-
-      stmtPersonalInfo.run(
+      personalInfoStmt.run(
         userId,
         parsedUser.firstName,
         parsedUser.lastName,
@@ -95,24 +101,27 @@ export const createOne = async (input: z.infer<typeof signUpSchema>) => {
         parsedUser.state
       );
 
-      // Insert the user's KYC information
-      const stmtKycInfo = sqliteInstance.prepare(
-        sql`INSERT INTO KycInfo (user_id, dob, id_card_front, id_card_back, selfie) VALUES (?, ?, ?, ?, ?)`
+      // Insert user's KYC information into `KycInfo` table
+      const kycInfoStmt = sqliteInstance.prepare(
+        sql`
+INSERT INTO KycInfo 
+(user_id, dob, id_card_front, id_card_back, selfie) 
+VALUES (?, ?, ?, ?, ?)`
       );
-
-      stmtKycInfo.run(
+      kycInfoStmt.run(
         userId,
-        parsedUser.dob && new Date(parsedUser.dob).toISOString(),
+        new Date(parsedUser.dob).toISOString(),
         parsedUser.idCardFront,
         parsedUser.idCardBack,
         parsedUser.selfie
       );
-
-      return true;
     });
 
     tx();
+
+    return true;
   } catch (error: any) {
-    throw error;
+    console.error("Transaction failed:", error.message);
+    throw new Error(error.message);
   }
 };

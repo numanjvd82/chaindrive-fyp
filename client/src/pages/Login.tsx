@@ -1,6 +1,6 @@
 import Button from "@/components/Button";
 import Input from "@/components/Input";
-import { useUser } from "@/hooks/useUser";
+import useUser from "@/hooks/useUser";
 import { axiosInstance } from "@/lib/axios";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { SubmitHandler, useForm } from "react-hook-form";
