@@ -1,9 +1,17 @@
 export type User = {
   id: number;
-  first_name: string;
-  last_name: string;
+  role: "renter" | "owner";
+  firstName: string;
+  lastName: string;
   email: string;
-  role: "owner" | "renter";
-  created_at: Date;
-  updated_at: Date;
+  phone: string;
+  dob: string;
+  address: string;
+  city: string;
+  state: string;
+  idCardFront: string;
+  idCardBack: string;
+  selfie: string;
+  createdAt: Date;
+  updatedAt: Date;
 };

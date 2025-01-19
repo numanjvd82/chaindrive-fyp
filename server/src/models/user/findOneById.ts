@@ -35,7 +35,7 @@ export const findOneById = async (id: z.infer<typeof idSchema>) => {
       .prepare(SQL_QUERY)
       .all(id)
       .map((row: any) => {
-        return {
+        const changedRow = {
           ...row,
           firstName: row.first_name,
           lastName: row.last_name,
@@ -45,6 +45,15 @@ export const findOneById = async (id: z.infer<typeof idSchema>) => {
           createdAt: new Date(row.created_at),
           updatedAt: new Date(row.updated_at),
         };
+
+        delete changedRow.first_name;
+        delete changedRow.last_name;
+        delete changedRow.created_at;
+        delete changedRow.updated_at;
+        delete changedRow.id_card_front;
+        delete changedRow.id_card_back;
+
+        return changedRow;
       })[0] as User;
 
     if (!user) {
