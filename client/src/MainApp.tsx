@@ -1,6 +1,6 @@
 import React, { Suspense, useEffect } from "react";
 import { Route, Routes, useLocation, useNavigate } from "react-router-dom";
-import { ToastContainer } from "react-toastify";
+import { toast, ToastContainer } from "react-toastify";
 import Header from "./components/Header";
 import Splash from "./components/Splash";
 import useUser from "./hooks/useUser";
@@ -9,7 +9,7 @@ const LoginPage = React.lazy(() => import("./pages/Login"));
 const NotFoundPage = React.lazy(() => import("./pages/NotFound"));
 const NotAuthorizedPage = React.lazy(() => import("./pages/NotAuthorized"));
 const OwnerProfilePage = React.lazy(() => import("./pages/OwnerProfile"));
-const RenterProfilePage = React.lazy(() => import("./pages/RenterProfile"));
+const RenterDashboardPage = React.lazy(() => import("./pages/RenterDashboard"));
 const SignupPage = React.lazy(() => import("./pages/Signup"));
 
 const ROUTES = [
@@ -18,8 +18,8 @@ const ROUTES = [
     component: <div>Home</div>,
   },
   {
-    link: "/renter-profile",
-    component: <RenterProfilePage />,
+    link: "/renter-dashboard",
+    component: <RenterDashboardPage />,
     roles: ["renter"],
   },
   {
@@ -50,7 +50,9 @@ const MainApp: React.FC = () => {
 
   useEffect(() => {
     if (!loading && !user && !noRedirectPaths.includes(location.pathname)) {
-      navigate("/login");
+      toast.error("You're session has expired. Please login again.", {
+        onClose: () => navigate("/login"),
+      });
     }
 
     if (!loading && user) {

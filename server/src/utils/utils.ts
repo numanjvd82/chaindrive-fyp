@@ -1,5 +1,5 @@
 export const sql = String.raw;
-export const sessionExpiry = 1000 * 60 * 5; // 5 minutes
+export const sessionExpiry = 1000 * 60 * 60; // 1 hour
 
 export const convertFiletoBuffer = async (
   file: File

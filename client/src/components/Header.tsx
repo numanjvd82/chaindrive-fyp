@@ -5,6 +5,7 @@ import React from "react";
 import { FaRegBell, FaRegCommentDots } from "react-icons/fa";
 import { useQueryClient } from "react-query";
 import { Link, useNavigate } from "react-router-dom";
+import Button from "./Button";
 import Dropdown from "./Dropdown";
 
 const Header: React.FC = () => {
@@ -61,25 +62,25 @@ const Header: React.FC = () => {
               />
             }
           >
-            <Link
-              to="/profile"
-              className="block px-4 py-2 text-gray-600 hover:bg-gray-100"
-            >
-              Profile
-            </Link>
-            <Link
-              to="/settings"
-              className="block px-4 py-2 text-gray-600 hover:bg-gray-100"
-            >
-              Settings
-            </Link>
-            <Link
-              to="/logout"
-              className="block px-4 py-2 text-gray-600 hover:bg-gray-100"
-              onClick={handleLogout}
-            >
-              Logout
-            </Link>
+            <div className="flex flex-col space-y-2">
+              <Link
+                to="/profile"
+                className="block px-4 py-2 text-gray-600 hover:bg-gray-100"
+              >
+                Profile
+              </Link>
+              <Link
+                to="/settings"
+                className="block px-4 py-2 text-gray-600 hover:bg-gray-100"
+              >
+                Settings
+              </Link>
+              <Button
+                variant="secondary"
+                text="Logout"
+                onClick={handleLogout}
+              />
+            </div>
           </Dropdown>
         </div>
       </nav>

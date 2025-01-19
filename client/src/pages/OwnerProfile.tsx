@@ -1,6 +1,6 @@
 import { LogoutButton } from "../components/LogoutButton";
 import Splash from "../components/Splash";
-import { useUser } from "../hooks/useUser";
+import useUser from "../hooks/useUser";
 
 const OwnerProfile = () => {
   const { user } = useUser();
@@ -9,7 +9,7 @@ const OwnerProfile = () => {
 
   return (
     <div>
-      <h1>Welcome, {user.first_name}!</h1>
+      <h1>Welcome, {user.firstName}!</h1>
       <p>Email: {user.email}</p>
       <p>Role: {user.role}</p>
 

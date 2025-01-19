@@ -39,7 +39,10 @@ const Login = () => {
       await axiosInstance.post("/api/auth/login", data);
       const user = await refetch(); // Fetch and update user context
       if (user.data) {
-        navigate("/");
+        const role = user.data.role;
+        const path =
+          role === "renter" ? "/renter-dashboard" : "/owner-dashboard";
+        navigate(path);
       }
     } catch (err) {
       console.error(err);
