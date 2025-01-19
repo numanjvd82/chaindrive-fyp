@@ -23,13 +23,7 @@ export const getCurrentUser = async (req: Request, res: Response) => {
       return;
     }
 
-    res.status(200).json({
-      id: user.id,
-      first_name: user.first_name,
-      last_name: user.last_name,
-      email: user.email,
-      role: user.role,
-    });
+    res.status(200).json({ user });
   } catch (error) {
     console.error("Error fetching current user:", error);
     res.status(500).json({ error: "Internal server error" });

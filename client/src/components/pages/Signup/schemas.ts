@@ -29,8 +29,7 @@ export const personalInfoSchema = z
       .refine(
         (phone) => phone.startsWith("0"),
         "Phone number must start with '0'"
-      )
-      .transform((phone) => `92${phone.slice(1)}`),
+      ),
     password: z
       .string()
       .nonempty("Password is required")
@@ -54,7 +53,7 @@ export const kycInfoSchema = z.object({
   dob: z
     .string()
     .nonempty("Date of birth is required")
-    .regex(/^\d{2}-\d{2}-\d{4}$/, "Date of birth must be in DD-MM-YYYY format"),
+    .regex(/^\d{4}-\d{2}-\d{2}$/, "Date of birth must be in YYYY-MM-DD format"),
   idCardFront: z.any(),
   idCardBack: z.any(),
   selfie: z.any(),
@@ -68,4 +67,4 @@ export const combinedSchema = roleSelectionSchema
   .merge(personalInfoSchema._def.schema)
   .merge(kycInfoSchema);
 
-export type FormData = z.infer<typeof combinedSchema>;
+export type FormValues = z.infer<typeof combinedSchema>;

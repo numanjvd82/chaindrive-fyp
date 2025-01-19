@@ -11,6 +11,12 @@ const KycVerification = () => {
     console.log("Submitted");
     closeModal();
   };
+
+  const handleCancel = () => {
+    console.log("Cancelled");
+    closeModal();
+  };
+
   return (
     <div className="p-6 bg-white rounded-lg shadow-md">
       <h2 className="text-xl font-semibold mb-2">KYC Verification</h2>
@@ -26,7 +32,7 @@ const KycVerification = () => {
           openModal={openModal}
           closeModal={closeModal}
           handleConfirm={handleConfirm}
-          handleCancel={closeModal}
+          handleCancel={handleCancel}
         />
       </div>
     </div>

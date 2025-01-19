@@ -10,7 +10,7 @@ const fetchUser = async () => {
   return data;
 };
 
-export const useUser = () => {
+const useUser = () => {
   const queryClient = useQueryClient();
 
   const {
@@ -39,3 +39,5 @@ export const useUser = () => {
 
   return { user, loading, refetch };
 };
+
+export default useUser;

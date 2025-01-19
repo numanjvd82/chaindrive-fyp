@@ -1,5 +1,6 @@
 import { AnimatePresence, motion } from "motion/react";
 import React from "react";
+import { createPortal } from "react-dom";
 import { FaTimes } from "react-icons/fa";
 
 interface DialogModalProps {
@@ -19,11 +20,11 @@ const DialogModal: React.FC<DialogModalProps> = ({
   children,
   footer,
 }) => {
-  return (
+  return createPortal(
     <AnimatePresence>
       {isOpen && (
         <motion.div
-          className="fixed overflow-auto inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50"
+          className="fixed overflow-auto inset-0 z-[1000] flex items-center justify-center bg-black bg-opacity-50"
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           exit={{ opacity: 0 }}
@@ -67,7 +68,8 @@ const DialogModal: React.FC<DialogModalProps> = ({
           </motion.div>
         </motion.div>
       )}
-    </AnimatePresence>
+    </AnimatePresence>,
+    document.body
   );
 };
 

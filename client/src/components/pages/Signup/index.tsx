@@ -1,19 +1,23 @@
+import { axiosInstance } from "@/lib/axios";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { motion } from "motion/react";
 import React, { useState } from "react";
 import { FormProvider, useForm } from "react-hook-form";
+import { useNavigate } from "react-router-dom";
+import { toast } from "react-toastify";
 import Button from "../../Button";
 import KycVerification from "./KycVerification";
 import { PersonalInformation } from "./PersonalInfo";
 import { ReviewSection } from "./ReviewSection";
 import { RoleSelection } from "./RoleSelection";
-import { combinedSchema, FormData } from "./schemas";
+import { combinedSchema, FormValues } from "./schemas";
 
 const MAX_STEPS = 4;
 
 const MultiStepForm: React.FC = () => {
+  const navigate = useNavigate();
   const [step, setStep] = useState(1);
-  const methods = useForm<FormData>({
+  const methods = useForm<FormValues>({
     resolver: zodResolver(combinedSchema),
     defaultValues: {
       role: "renter",
@@ -59,8 +63,32 @@ const MultiStepForm: React.FC = () => {
 
   const prevStep = () => setStep((prev) => prev - 1);
 
-  const onSubmit = (data: FormData) => {
-    console.log("Submitted Data:", data);
+  const onSubmit = async (form: FormValues) => {
+    const formData = new FormData();
+    // Append files
+    formData.append("idCardFront", form.idCardFront);
+    formData.append("idCardBack", form.idCardBack);
+    formData.append("selfie", form.selfie);
+
+    // Append other form fields
+    Object.entries(form).forEach(([key, value]) => {
+      if (key !== "idCardFront" && key !== "idCardBack" && key !== "selfie") {
+        formData.append(key, value as string);
+      }
+    });
+    try {
+      await axiosInstance.post("/api/auth/signup", formData, {
+        headers: {
+          "Content-Type": "multipart/form-data",
+        },
+      });
+      toast.success("Signup successful");
+      setTimeout(() => {
+        navigate("/login");
+      }, 2000);
+    } catch (err: any) {
+      toast.error(err.response.data.message);
+    }
   };
 
   return (
@@ -79,7 +107,9 @@ const MultiStepForm: React.FC = () => {
       }}
     >
       <FormProvider {...methods}>
-        <h1 className="text-3xl font-semibold mb-6">Signup (Step {step}/3)</h1>
+        <h1 className="text-3xl font-semibold mb-6">
+          Signup (Step {step}/{MAX_STEPS})
+        </h1>
         <form
           onSubmit={methods.handleSubmit(onSubmit)}
           className="space-y-6 max-w-lg w-full"
@@ -102,7 +132,13 @@ const MultiStepForm: React.FC = () => {
                 />
               )}
             </div>
-            {step === MAX_STEPS && <Button text="Submit" type="submit" />}
+            {step === MAX_STEPS && (
+              <Button
+                disabled={methods.formState.isSubmitting}
+                text="Submit"
+                type="submit"
+              />
+            )}
           </div>
         </form>
       </FormProvider>

@@ -1,17 +1,48 @@
 import { z } from "zod";
 import { sqliteInstance } from "../../lib/db/sqlite";
+import { PartialUser } from "../../lib/types";
 import { hashPassword } from "../../utils/cryptoUtils";
 import { sql } from "../../utils/utils";
 
 export const signUpSchema = z.object({
-  first_name: z.string(),
-  last_name: z.string(),
+  role: z
+    .enum(["renter", "owner"], { required_error: "Role is required" })
+    .default("renter"),
+  firstName: z
+    .string()
+    .nonempty("First name is required")
+    .min(2, "First name must be at least 2 characters long"),
+  lastName: z
+    .string()
+    .nonempty("Last name is required")
+    .min(2, "Last name must be at least 2 characters long"),
   email: z
     .string()
-    .email()
-    .transform((v) => v.toLowerCase()),
-  password: z.string().min(8).max(32),
-  role: z.enum(["owner", "renter"]),
+    .nonempty({ message: "Email is required" })
+    .email("Invalid email address"),
+  phone: z
+    .string()
+    .nonempty("Phone number is required")
+    .regex(/^\d{11}$/, "Phone number must be 11 digits long")
+    .refine(
+      (phone) => phone.startsWith("0"),
+      "Phone number must start with '0'"
+    )
+    .transform((phone) => `92${phone.slice(1)}`),
+  password: z
+    .string()
+    .nonempty("Password is required")
+    .min(8, "Password must be at least 8 characters long"),
+  dob: z
+    .string()
+    .nonempty("Date of birth is required")
+    .regex(/^\d{4}-\d{2}-\d{2}$/, "Date of birth must be in YYYY-MM-DD format"),
+  idCardFront: z.any(),
+  idCardBack: z.any(),
+  selfie: z.any(),
+  address: z.string().nonempty("Address is required"),
+  city: z.string().nonempty("City is required"),
+  state: z.string().nonempty("State is required"),
 });
 
 export const createOne = async (input: z.infer<typeof signUpSchema>) => {
@@ -32,20 +63,55 @@ export const createOne = async (input: z.infer<typeof signUpSchema>) => {
     // Hash password and insert the user into the database
     const { hash, salt } = hashPassword(parsedUser.password);
 
-    const stmt = sqliteInstance.prepare(
-      sql`INSERT INTO users (first_name, last_name, email, password_hash, salt, role) VALUES (?, ?, ?, ?, ?, ?)`
-    );
+    const tx = sqliteInstance.transaction(async () => {
+      const stmt = sqliteInstance.prepare(
+        sql`INSERT INTO users (email, password_hash, salt, role) VALUES (?, ?, ?, ?)`
+      );
 
-    stmt.run(
-      parsedUser.first_name,
-      parsedUser.last_name,
-      parsedUser.email,
-      hash,
-      salt,
-      parsedUser.role
-    );
+      stmt.run(parsedUser.email, hash, salt, parsedUser.role);
 
-    return true;
+      // Get the user ID
+      const user = sqliteInstance
+        .prepare(sql`SELECT id FROM users WHERE email = ?`)
+        .get(parsedUser.email) as PartialUser | undefined;
+      if (!user) {
+        throw new Error("User not found");
+      }
+
+      const userId = user.id;
+
+      // Insert the user's personal information
+      const stmtPersonalInfo = sqliteInstance.prepare(
+        sql`INSERT INTO PersonalInfo (user_id, first_name, last_name, phone, address, city, state) VALUES (?, ?, ?, ?, ?, ?, ?)`
+      );
+
+      stmtPersonalInfo.run(
+        userId,
+        parsedUser.firstName,
+        parsedUser.lastName,
+        parsedUser.phone,
+        parsedUser.address,
+        parsedUser.city,
+        parsedUser.state
+      );
+
+      // Insert the user's KYC information
+      const stmtKycInfo = sqliteInstance.prepare(
+        sql`INSERT INTO KycInfo (user_id, dob, id_card_front, id_card_back, selfie) VALUES (?, ?, ?, ?, ?)`
+      );
+
+      stmtKycInfo.run(
+        userId,
+        parsedUser.dob && new Date(parsedUser.dob).toISOString(),
+        parsedUser.idCardFront,
+        parsedUser.idCardBack,
+        parsedUser.selfie
+      );
+
+      return true;
+    });
+
+    tx();
   } catch (error: any) {
     throw error;
   }

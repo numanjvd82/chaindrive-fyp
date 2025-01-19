@@ -9,8 +9,6 @@ export function authTablesInit(db: Database) {
     sql`
 CREATE TABLE IF NOT EXISTS Users (
   id INTEGER PRIMARY KEY AUTOINCREMENT,
-  first_name TEXT NOT NULL,
-  last_name TEXT NOT NULL,
   email TEXT UNIQUE NOT NULL,
   password_hash TEXT NOT NULL,
   salt TEXT NOT NULL,
@@ -26,11 +24,12 @@ CREATE TABLE IF NOT EXISTS Users (
 CREATE TABLE IF NOT EXISTS PersonalInfo (
   id INTEGER PRIMARY KEY AUTOINCREMENT,
   user_id INTEGER NOT NULL,
+  first_name TEXT NOT NULL,
+  last_name TEXT NOT NULL,
   phone TEXT NOT NULL,
   address TEXT NOT NULL,
   city TEXT NOT NULL,
   state TEXT NOT NULL,
-  zip TEXT NOT NULL,
   FOREIGN KEY(user_id) REFERENCES Users(id) ON DELETE CASCADE
 );
 `
@@ -41,7 +40,7 @@ CREATE TABLE IF NOT EXISTS PersonalInfo (
 CREATE TABLE IF NOT EXISTS KycInfo (
   id INTEGER PRIMARY KEY AUTOINCREMENT,
   user_id INTEGER NOT NULL,
-  dob TEXT NOT NULL,
+  dob TIMESTAMP NOT NULL,
   id_card_front BLOB NOT NULL,
   id_card_back BLOB NOT NULL,
   selfie BLOB NOT NULL,

@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { FieldValues, UseFormRegister } from "react-hook-form";
+import { FieldValues, useFormContext, UseFormRegister } from "react-hook-form";
 import { FaTimes, FaUpload } from "react-icons/fa";
 import { truncateFile } from "../lib/utils";
 
@@ -18,6 +18,7 @@ export const FileInput: React.FC<FileInputProps> = ({
   fieldName,
   ...props
 }) => {
+  const { setValue } = useFormContext();
   const [preview, setPreview] = useState<string | null>(null);
   const [fileName, setFileName] = useState<string>("Select File");
 
@@ -27,17 +28,18 @@ export const FileInput: React.FC<FileInputProps> = ({
     if (file) {
       setPreview(URL.createObjectURL(file));
       setFileName(truncateFile(file.name));
-      if (preview) URL.revokeObjectURL(preview);
     } else {
       resetFile();
     }
+
+    onChange?.(e);
   };
 
   const resetFile = () => {
     if (preview) URL.revokeObjectURL(preview);
     setPreview(null);
     setFileName("Select File");
-    onChange?.({ target: { files: null } } as any);
+    setValue(fieldName, null);
   };
 
   return (

@@ -2,7 +2,7 @@ import React, { Suspense, useEffect } from "react";
 import { Route, Routes, useLocation, useNavigate } from "react-router-dom";
 import { ToastContainer } from "react-toastify";
 import Splash from "./components/Splash";
-import { useUser } from "./hooks/useUser";
+import useUser from "./hooks/useUser";
 
 const LoginPage = React.lazy(() => import("./pages/Login"));
 const NotFoundPage = React.lazy(() => import("./pages/NotFound"));

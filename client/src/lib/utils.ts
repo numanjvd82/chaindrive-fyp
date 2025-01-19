@@ -1,4 +1,4 @@
-export const periodicUserFetchTime = 1000 * 60 * 2; // 2 minutes
+export const periodicUserFetchTime = 1000 * 60 * 5; // 5 minutes
 
 export const truncateFile = (name: string, maxLength: number = 15) => {
   if (name.length > maxLength) {

@@ -3,8 +3,8 @@ import Checkbox from "../../Checkbox";
 import { FormData } from "./schemas";
 
 export const ReviewSection: React.FC = () => {
-  const { watch } = useFormContext<FormData>();
-  const data = watch();
+  const { getValues } = useFormContext<FormData>();
+  const data = getValues();
 
   return (
     <div className="p-6 bg-white rounded-lg shadow-md">
@@ -20,7 +20,7 @@ export const ReviewSection: React.FC = () => {
         <div>
           <h3 className="font-bold">Personal Information</h3>
           <p>
-            {data.firstName} {data.lastName} - {data.email}
+            {data.firstName} {data.lastName}
           </p>
         </div>
         <div>
