@@ -6,6 +6,7 @@ export default {
       colors: {
         primary: "#1572D3",
         error: "#ef4444",
+        accent: "#E8EDF2",
       },
       fontFamily: {
         sans: ["Poppins", "sans-serif"],

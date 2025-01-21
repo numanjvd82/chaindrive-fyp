@@ -1,6 +1,6 @@
 import React, { Suspense, useEffect } from "react";
 import { Route, Routes, useLocation, useNavigate } from "react-router-dom";
-import { toast, ToastContainer } from "react-toastify";
+import { ToastContainer } from "react-toastify";
 import Header from "./components/Header";
 import Splash from "./components/Splash";
 import useUser from "./hooks/useUser";
@@ -8,19 +8,15 @@ import useUser from "./hooks/useUser";
 const LoginPage = React.lazy(() => import("./pages/Login"));
 const NotFoundPage = React.lazy(() => import("./pages/NotFound"));
 const NotAuthorizedPage = React.lazy(() => import("./pages/NotAuthorized"));
-const OwnerProfilePage = React.lazy(() => import("./pages/OwnerProfile"));
+const OwnerDashboardPage = React.lazy(() => import("./pages/OwnerDashboard"));
 const RenterDashboardPage = React.lazy(() => import("./pages/RenterDashboard"));
 const SignupPage = React.lazy(() => import("./pages/Signup"));
+const ProfilePage = React.lazy(() => import("./pages/Profile"));
 
 const ROUTES = [
   {
     link: "/",
     component: <div>Home</div>,
-  },
-  {
-    link: "/renter-dashboard",
-    component: <RenterDashboardPage />,
-    roles: ["renter"],
   },
   {
     link: "/signup",
@@ -31,9 +27,19 @@ const ROUTES = [
     component: <LoginPage />,
   },
   {
-    link: "/owner-profile",
-    component: <OwnerProfilePage />,
+    link: "/renter-dashboard",
+    component: <RenterDashboardPage />,
+    roles: ["renter"],
+  },
+  {
+    link: "/owner-dashboard",
+    component: <OwnerDashboardPage />,
     roles: ["owner"],
+  },
+  {
+    link: "/profile",
+    component: <ProfilePage />,
+    roles: ["owner", "renter"],
   },
   {
     link: "/not-authorized",
@@ -50,15 +56,18 @@ const MainApp: React.FC = () => {
 
   useEffect(() => {
     if (!loading && !user && !noRedirectPaths.includes(location.pathname)) {
-      toast.error("You're session has expired. Please login again.", {
-        onClose: () => navigate("/login"),
-      });
+      navigate("/login");
     }
 
     if (!loading && user) {
       const currentRoute = ROUTES.find(
         (route) => route.link === location.pathname
       );
+      if (location.pathname === "/") {
+        navigate(
+          user.role === "owner" ? "/owner-dashboard" : "/renter-dashboard"
+        );
+      }
       if (currentRoute?.roles && !currentRoute.roles.includes(user.role)) {
         navigate("/not-authorized");
       }
@@ -71,7 +80,7 @@ const MainApp: React.FC = () => {
 
   return (
     <Suspense fallback={<Splash />}>
-      <ToastContainer />
+      <ToastContainer pauseOnFocusLoss={false} pauseOnHover={false} />
 
       <Header />
       <Routes>

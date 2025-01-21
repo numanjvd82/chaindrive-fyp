@@ -5,7 +5,6 @@ import React from "react";
 import { FaRegBell, FaRegCommentDots } from "react-icons/fa";
 import { useQueryClient } from "react-query";
 import { Link, useNavigate } from "react-router-dom";
-import Button from "./Button";
 import Dropdown from "./Dropdown";
 
 const Header: React.FC = () => {
@@ -35,17 +34,12 @@ const Header: React.FC = () => {
 
       <nav className="hidden sm:flex items-center space-x-6">
         <Link
-          to="/dashboard"
+          to={user.role === "owner" ? "/owner-dashboard" : "/renter-dashboard"}
           className="font-semibold text-gray-600 hover:text-primary"
         >
           Dashboard
         </Link>
-        <Link
-          to="/bookings"
-          className="font-semibold text-gray-600 hover:text-primary"
-        >
-          Bookings
-        </Link>
+
         <div className="flex items-center space-x-4">
           <span className="bg-gray-200 cursor-pointer p-2 rounded-xl transition duration-300 ease-in-out hover:text-primary hover:bg-gray-300">
             <FaRegCommentDots className="text-xl" />
@@ -71,15 +65,11 @@ const Header: React.FC = () => {
               </Link>
               <Link
                 to="/settings"
-                className="block px-4 py-2 text-gray-600 hover:bg-gray-100"
-              >
-                Settings
-              </Link>
-              <Button
-                variant="secondary"
-                text="Logout"
                 onClick={handleLogout}
-              />
+                className="block px-4 py-2 bg-primary text-white transition-all hover:brightness-110"
+              >
+                Logout
+              </Link>
             </div>
           </Dropdown>
         </div>
