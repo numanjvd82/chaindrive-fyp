@@ -2,11 +2,29 @@ import Button from "@/components/Button";
 import { AccountInfo } from "@/components/pages/Profile/AccountInfo";
 import IdCardImages from "@/components/pages/Profile/IdCardImages";
 import KycVerificationStatus from "@/components/pages/Profile/KycVerificationStatus";
+import PaymentModal from "@/components/pages/Profile/PaymentModal";
 import Splash from "@/components/Splash";
 import useUser from "@/hooks/useUser";
+import { useState } from "react";
+import { FormProvider, useForm } from "react-hook-form";
 
 const ProfilePage: React.FC = () => {
+  const methods = useForm<any>();
   const { user, loading } = useUser();
+  const [isOpen, setIsOpen] = useState(false);
+  const openModal = () => setIsOpen(true);
+  const closeModal = () => setIsOpen(false);
+
+  const handleConfirm = async () => {
+    console.log("Submitted");
+    window.alert("Payment method added successfully!");
+    closeModal();
+  };
+
+  const handleCancel = () => {
+    console.log("Cancelled");
+    closeModal();
+  };
 
   if (loading) {
     return <Splash />;
@@ -39,13 +57,25 @@ const ProfilePage: React.FC = () => {
       {/* Add Payment Method Section */}
       <div className="p-6 bg-accent rounded-lg shadow-md">
         <h2 className="text-xl font-bold">Add Payment Method</h2>
-        <p className="text-gray-600 mt-2">
+        <p className="text-gray-600 my-2">
           To make transactions, please add a payment method.
         </p>
-        <button className="mt-4 px-4 py-2 text-white bg-blue-600 rounded-md shadow hover:bg-blue-500 focus:outline-none">
-          Add Payment
-        </button>
+        <Button
+          text="Add Payment Method"
+          onClick={openModal}
+          variant="primary"
+        />
       </div>
+
+      <FormProvider {...methods}>
+        <PaymentModal
+          isOpen={isOpen}
+          setIsOpen={setIsOpen}
+          closeModal={closeModal}
+          handleConfirm={handleConfirm}
+          handleCancel={handleCancel}
+        />
+      </FormProvider>
     </div>
   );
 };
