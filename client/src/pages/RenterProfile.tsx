@@ -1,23 +1,33 @@
-import { LogoutButton } from "../components/LogoutButton";
-import Splash from "../components/Splash";
-import { useUser } from "../hooks/useUser";
+import Footer from "../components/Footer";
+import Navbar from "../components/Navbar";
+import SearchBar from "../components/renterDashboard/SearchBar";
+import SearchData from "../components/renterDashboard/SearchData";
+
+const handleSearch2 = (filters: Record<string, string>) => {
+  console.log("Search filters:", filters);
+  // Perform search or API call with filters
+};
 
 const RenterProfile = () => {
-  const { user } = useUser();
+  // const { user } = useUser();
 
-  if (!user) return <Splash />;
+  // if (!user) return <Splash />;
 
   return (
     <div>
-      <h1>Welcome, {user.first_name}!</h1>
+      {/* <h1>Welcome, {user.first_name}!</h1>
       <p>Email: {user.email}</p>
       <p>Role: {user.role}</p>
 
-      {user.role === "renter" && <p>Renter-specific content here...</p>}
+      {user.role === "renter" && <p>Renter-specific content here...</p>} */}
 
-      <a href="/owner-profile">Owner Profile</a>
+      {/* <a href="/owner-profile">Owner Profile</a> */}
+      {/* <LogoutButton /> */}
 
-      <LogoutButton />
+    <Navbar />
+    <SearchBar onSearch={handleSearch2}/>
+    <SearchData />
+    <Footer />
     </div>
   );
 };

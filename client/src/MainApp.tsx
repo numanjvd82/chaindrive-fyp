@@ -1,14 +1,9 @@
 import React, { Suspense, useEffect } from "react";
 import { Route, Routes, useLocation, useNavigate } from "react-router-dom";
 import { ToastContainer } from "react-toastify";
-import HeroSection from "./components/HeroSection";
-import HowItWork from "./components/HowItWork";
-import MainSearch from "./components/MainSearch";
-import Navbar from "./components/Navbar";
-import PopularRenterDeals from "./components/PopularRenterDeals";
 import Splash from "./components/Splash";
-import WhyChooseUs from "./components/WhyChooseUs";
 import { useUser } from "./hooks/useUser";
+import Home from "./pages/Home";
 
 const LoginPage = React.lazy(() => import("./pages/Login"));
 const NotFoundPage = React.lazy(() => import("./pages/NotFound"));
@@ -17,24 +12,13 @@ const OwnerProfilePage = React.lazy(() => import("./pages/OwnerProfile"));
 const RenterProfilePage = React.lazy(() => import("./pages/RenterProfile"));
 const SignupPage = React.lazy(() => import("./pages/Signup"));
 
-const handleSearch = (location: string, pickupDate: string, returnDate: string) => {
-  console.log("Search Details:", { location, pickupDate, returnDate });
-};
-
 const ROUTES = [
   {
     link: "/",
-    component: <>
-    <Navbar />,
-    <HeroSection />
-    <MainSearch onSearch={handleSearch}/>
-    <HowItWork />
-    <WhyChooseUs />
-    <PopularRenterDeals />
-    </>
+    component: <Home />
   },
   {
-    link: "/renter-profile",
+    link: "/renter-profile", 
     component: <RenterProfilePage />,
     roles: ["renter"],
   },
