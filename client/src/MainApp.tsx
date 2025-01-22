@@ -12,11 +12,12 @@ const OwnerDashboardPage = React.lazy(() => import("./pages/OwnerDashboard"));
 const RenterDashboardPage = React.lazy(() => import("./pages/RenterDashboard"));
 const SignupPage = React.lazy(() => import("./pages/Signup"));
 const ProfilePage = React.lazy(() => import("./pages/Profile"));
+const HomePage = React.lazy(() => import("./pages/Homepage"));
 
 const ROUTES = [
   {
     link: "/",
-    component: <div>Home</div>,
+    component: <HomePage />,
   },
   {
     link: "/signup",
@@ -56,6 +57,9 @@ const MainApp: React.FC = () => {
 
   useEffect(() => {
     if (!loading && !user && !noRedirectPaths.includes(location.pathname)) {
+      if (location.pathname === "/") {
+        return;
+      }
       navigate("/login");
     }
 
