@@ -4,7 +4,7 @@
 @tailwind components;
 @tailwind utilities;
 
-*,
+/* *,
 *::before,
 *::after {
   box-sizing: border-box;
@@ -60,4 +60,4 @@ h6 {
 #root,
 #__next {
   isolation: isolate;
-}
+} */

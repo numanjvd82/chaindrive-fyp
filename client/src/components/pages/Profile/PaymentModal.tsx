@@ -2,6 +2,8 @@ import Button from "@/components/Button";
 import DialogModal from "@/components/DialogModal";
 import Divider from "@/components/Divider";
 import Input from "@/components/Input";
+import { useWallet } from "@/hooks/useWallet";
+import { useState } from "react";
 import { useFormContext } from "react-hook-form";
 
 interface PaymentModalProps {
@@ -19,6 +21,15 @@ const PaymentModal: React.FC<PaymentModalProps> = ({
   handleConfirm,
 }) => {
   const { register } = useFormContext();
+  const { connectWallet, account } = useWallet();
+  const [disabled, setDisabled] = useState(false);
+
+  const handleConnectWallet = async () => {
+    setDisabled(true);
+    await connectWallet();
+    setDisabled(false);
+  };
+
   return (
     <DialogModal
       isOpen={isOpen}
@@ -44,10 +55,28 @@ const PaymentModal: React.FC<PaymentModalProps> = ({
             {...register("easypaisaNumber")}
           />
         </div>
-        <Divider />
-        <div className="text-center">
-          <Button text="Connect Metamask Wallet" variant="primary" />
-        </div>
+
+        {!account ? (
+          <>
+            <Divider />
+            <div className="text-center">
+              <Button
+                onClick={async () => await handleConnectWallet()}
+                text="Connect Metamask Wallet"
+                disabled={disabled}
+                variant="primary"
+              />
+            </div>
+          </>
+        ) : (
+          <div className="flex flex-col items-center w-full">
+            <Divider />
+            <p className="text-gray-600 text-sm">
+              <p>You're MetaMask Wallet is Connected:</p>
+              <b>{account}</b>
+            </p>
+          </div>
+        )}
       </div>
     </DialogModal>
   );
