@@ -67,7 +67,7 @@ export const WalletProvider = ({ children }: { children: React.ReactNode }) => {
         window.location.reload();
       });
     }
-  }, []);
+  }, [user]);
 
   return (
     <WalletContext.Provider
