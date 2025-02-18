@@ -30,6 +30,8 @@ const PaymentModal: React.FC<PaymentModalProps> = ({
     setDisabled(false);
   };
 
+  console.log(account);
+
   return (
     <DialogModal
       isOpen={isOpen}
@@ -38,8 +40,12 @@ const PaymentModal: React.FC<PaymentModalProps> = ({
       description="You can either connect your Metamask wallet or add your EasyPaisa number."
       footer={
         <div className="flex justify-end gap-4">
-          <Button text="Cancel" onClick={handleCancel} variant="secondary" />
-          <Button text="Add" onClick={handleConfirm} variant="primary" />
+          <Button onClick={handleCancel} variant="secondary">
+            Cancel
+          </Button>
+          <Button onClick={handleConfirm} variant="primary">
+            Add
+          </Button>
         </div>
       }
     >
@@ -62,17 +68,19 @@ const PaymentModal: React.FC<PaymentModalProps> = ({
             <div className="text-center">
               <Button
                 onClick={async () => await handleConnectWallet()}
-                text="Connect Metamask Wallet"
                 disabled={disabled}
                 variant="primary"
-              />
+              >
+                Connect Metamask Wallet
+              </Button>
             </div>
           </>
         ) : (
           <div className="flex flex-col items-center w-full">
             <Divider />
             <p className="text-gray-600 text-sm">
-              <p>You're MetaMask Wallet is Connected:</p>
+              <span>You're MetaMask Wallet is Connected:</span>
+              <br />
               <b>{account}</b>
             </p>
           </div>

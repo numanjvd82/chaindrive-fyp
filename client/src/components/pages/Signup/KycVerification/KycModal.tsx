@@ -66,14 +66,10 @@ const KycModal: React.FC<KycModalProps> = ({
 
   const Footer = () => (
     <div className="flex justify-end space-x-4">
+      <Button type="button" variant="secondary" onClick={handleCancel}>
+        Cancel
+      </Button>
       <Button
-        type="button"
-        text="Cancel"
-        variant="secondary"
-        onClick={handleCancel}
-      />
-      <Button
-        text="Confirm"
         type="button"
         variant="primary"
         onClick={() => {

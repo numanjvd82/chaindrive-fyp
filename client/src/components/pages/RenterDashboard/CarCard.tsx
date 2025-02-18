@@ -81,7 +81,9 @@ export const CarCard: React.FC<CarProps> = ({
           <span className="text-sm text-gray-500"> /day</span>
         </p>
       </div>
-      <Button text="Rent Now →" onClick={onRentClick} className="mt-4 w-full" />
+      <Button onClick={onRentClick} className="mt-4 w-full">
+        Rent Now →
+      </Button>
     </div>
   );
 };

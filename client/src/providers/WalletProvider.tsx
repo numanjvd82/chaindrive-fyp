@@ -1,4 +1,5 @@
 import { WalletContext } from "@/contexts/WalletContext";
+import useUser from "@/hooks/useUser";
 import { ethers } from "ethers";
 import { useEffect, useState } from "react";
 import { toast } from "react-toastify";
@@ -7,6 +8,7 @@ export const WalletProvider = ({ children }: { children: React.ReactNode }) => {
   const [account, setAccount] = useState<string | null>(null);
   const [provider, setProvider] = useState<ethers.BrowserProvider | null>(null);
   const [signer, setSigner] = useState<ethers.Signer | null>(null);
+  const { user } = useUser();
 
   // Function to connect MetaMask
   const connectWallet = async () => {
@@ -39,6 +41,7 @@ export const WalletProvider = ({ children }: { children: React.ReactNode }) => {
 
   // Auto-connect on page load if already connected
   useEffect(() => {
+    if (!user) return;
     if (window.ethereum) {
       window.ethereum
         .request({ method: "eth_accounts" })

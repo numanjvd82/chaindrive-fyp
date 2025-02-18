@@ -48,9 +48,9 @@ const ProfilePage: React.FC = () => {
       <div className="p-6 bg-accent rounded-lg shadow-md space-y-4">
         <h2 className="text-xl font-bold">Actions</h2>
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-          <Button text="View Bookings" variant="primary" />
-          <Button text="Edit Profile" variant="secondary" />
-          <Button text="Change Password" variant="secondary" />
+          <Button variant="primary">View Bookings</Button>
+          <Button variant="secondary">Edit Profile</Button>
+          <Button variant="secondary">Change Password</Button>
         </div>
       </div>
 
@@ -60,11 +60,9 @@ const ProfilePage: React.FC = () => {
         <p className="text-gray-600 my-2">
           To make transactions, please add a payment method.
         </p>
-        <Button
-          text="Add Payment Method"
-          onClick={openModal}
-          variant="primary"
-        />
+        <Button onClick={openModal} variant="primary">
+          Add Payment Method
+        </Button>
       </div>
 
       <FormProvider {...methods}>

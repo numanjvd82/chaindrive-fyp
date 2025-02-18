@@ -1,21 +1,20 @@
 import clsx from "clsx"; // Use clsx for conditional class management
-import React from "react";
+import React, { PropsWithChildren } from "react";
 import Loader from "./Loader";
 
 interface ButtonProps {
-  text: string;
   onClick?: () => void;
   type?: "button" | "submit";
   variant?: "primary" | "secondary" | "link";
   size?: "sm" | "md" | "lg";
   isLoading?: boolean; // Loading state
   className?: string; // Custom classes
+  children?: React.ReactNode;
 }
 
 const Button: React.FC<
-  ButtonProps & React.ButtonHTMLAttributes<HTMLButtonElement>
+  PropsWithChildren<ButtonProps & React.ButtonHTMLAttributes<HTMLButtonElement>>
 > = ({
-  text,
   onClick,
   type = "button",
   variant = "primary",
@@ -56,7 +55,7 @@ const Button: React.FC<
       disabled={isLoading || rest.disabled} // Disable button if loading
       {...rest}
     >
-      {isLoading ? <Loader /> : text}
+      {isLoading ? <Loader /> : rest.children}
     </button>
   );
 };

@@ -1,6 +1,7 @@
 import { useQueryClient } from "react-query";
 import { useNavigate } from "react-router-dom";
 import { axiosInstance } from "../lib/axios";
+import Button from "./Button";
 
 export const LogoutButton = () => {
   const queryClient = useQueryClient();
@@ -16,5 +17,5 @@ export const LogoutButton = () => {
     }
   };
 
-  return <button onClick={handleLogout}>Logout</button>;
+  return <Button onClick={handleLogout}>Logout</Button>;
 };

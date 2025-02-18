@@ -123,23 +123,20 @@ const MultiStepForm: React.FC = () => {
           <div className="flex justify-between">
             <div className="flex space-x-4">
               {step > 1 && (
-                <Button text="Back" variant="secondary" onClick={prevStep} />
+                <Button variant="secondary" onClick={prevStep}>
+                  Back
+                </Button>
               )}
               {step < MAX_STEPS && (
-                <Button
-                  text="Continue"
-                  variant="primary"
-                  type="button"
-                  onClick={nextStep}
-                />
+                <Button variant="primary" type="button" onClick={nextStep}>
+                  Continue
+                </Button>
               )}
             </div>
             {step === MAX_STEPS && (
-              <Button
-                disabled={methods.formState.isSubmitting}
-                text="Submit"
-                type="submit"
-              />
+              <Button disabled={methods.formState.isSubmitting} type="submit">
+                Submit
+              </Button>
             )}
           </div>
         </form>

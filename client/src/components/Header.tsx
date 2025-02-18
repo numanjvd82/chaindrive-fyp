@@ -27,7 +27,7 @@ const Header: React.FC = () => {
   };
 
   return (
-    <header className="flex justify-between items-center p-4 bg-white shadow-md">
+    <header className="flex justify-between items-center h-16 p-4 bg-white shadow-md">
       <div className="flex items-center space-x-2">
         <img src={logo} alt="Chaindrive Logo" className="h-15 w-15" />
       </div>
@@ -41,9 +41,12 @@ const Header: React.FC = () => {
         </Link>
 
         <div className="flex items-center space-x-4">
-          <span className="bg-gray-200 cursor-pointer p-2 rounded-xl transition duration-300 ease-in-out hover:text-primary hover:bg-gray-300">
+          <Link
+            to="/chat"
+            className="bg-gray-200 cursor-pointer p-2 rounded-xl transition duration-300 ease-in-out hover:text-primary hover:bg-gray-300"
+          >
             <FaRegCommentDots className="text-xl" />
-          </span>
+          </Link>
           <span className="bg-gray-200 cursor-pointer p-2 rounded-xl transition duration-300 ease-in-out hover:text-primary hover:bg-gray-300">
             <FaRegBell className="text-xl" />
           </span>

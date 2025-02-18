@@ -25,7 +25,9 @@ const KycVerification = () => {
         <p className="text-gray-600 mb-4">
           Upload a copy of your ID card (front and back) and a selfie
         </p>
-        <Button text="Start KYC" onClick={openModal} variant="primary" />
+        <Button onClick={openModal} variant="primary">
+          Start KYC
+        </Button>
         <KycModal
           isOpen={isOpen}
           setIsOpen={setIsOpen}

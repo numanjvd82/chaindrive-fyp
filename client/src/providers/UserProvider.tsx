@@ -17,8 +17,6 @@ export const UserProvider = ({ children }: { children: React.ReactNode }) => {
       setUser(data);
       return user;
     } catch (err: any) {
-      console.error("Error fetching user:", err);
-
       // Handle session expiration
       if (err.response?.status === 401) {
         setUser(null);

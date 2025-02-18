@@ -87,10 +87,11 @@ const Login = () => {
           <Button
             disabled={!isDirty || !isValid}
             isLoading={isSubmitting}
-            text="Login"
             type="submit"
             size="lg"
-          />
+          >
+            Login
+          </Button>
         </div>
         <div className="text-center mt-4 text-sm text-gray-600">
           Don’t have an account?{" "}

@@ -13,6 +13,7 @@ const RenterDashboardPage = React.lazy(() => import("./pages/RenterDashboard"));
 const SignupPage = React.lazy(() => import("./pages/Signup"));
 const ProfilePage = React.lazy(() => import("./pages/Profile"));
 const HomePage = React.lazy(() => import("./pages/Homepage"));
+const Chat = React.lazy(() => import("./pages/Chat"));
 
 const ROUTES = [
   {
@@ -40,6 +41,11 @@ const ROUTES = [
   {
     link: "/profile",
     component: <ProfilePage />,
+    roles: ["owner", "renter"],
+  },
+  {
+    link: "/chat",
+    component: <Chat />,
     roles: ["owner", "renter"],
   },
   {
