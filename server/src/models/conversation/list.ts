@@ -1,7 +1,7 @@
 import { z } from "zod";
 import { sqliteInstance } from "../../lib/db/sqlite";
 import { Conversation } from "../../lib/types";
-import { sql } from "../../utils/utils";
+import { convertBufferToBase64, sql } from "../../utils/utils";
 
 export const listConversationSchema = z.number().int().positive();
 
@@ -46,7 +46,7 @@ export const listConversations = async (input: listConversationInput) => {
           id: conversation.id,
           otherUserId: conversation.other_user_id,
           name: conversation.name,
-          avatar: conversation.avatar,
+          avatar: convertBufferToBase64(conversation.avatar),
           lastMessage: conversation.last_message,
           lastSeen: new Date(conversation.last_seen),
         };
