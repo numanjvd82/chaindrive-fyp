@@ -1,5 +1,6 @@
 import Button from "@/components/Button";
 import { Conversation } from "@/lib/types";
+import { truncateText } from "@/lib/utils";
 import { AnimatePresence, motion } from "framer-motion";
 import { FiSearch } from "react-icons/fi";
 import { IoCloseSharp } from "react-icons/io5";
@@ -29,7 +30,7 @@ export const ChatSidebar: React.FC<Props> = ({
           animate={{ x: 0, opacity: 1 }}
           exit={{ x: -300, opacity: 0 }}
           transition={{ type: "spring", stiffness: 100, damping: 15 }}
-          className="min-w-[250px] "
+          className="w-[250px]"
         >
           {/* Sidebar Header */}
           <div className="flex justify-between items-center h-16 p-4 border-b relative">
@@ -69,7 +70,7 @@ export const ChatSidebar: React.FC<Props> = ({
                   <div className="flex-1">
                     <h3 className="font-semibold">{convo.name}</h3>
                     <p className="text-sm text-gray-500 truncate">
-                      {convo.lastMessage}
+                      {truncateText(convo.lastMessage!, 15)}
                     </p>
                   </div>
                   <span className="text-xs text-gray-400">

@@ -2,7 +2,8 @@ import Button from "@/components/Button";
 import Input from "@/components/Input";
 import { ChatSidebar } from "@/components/pages/Chat/ChatSidebar";
 import useListConversations from "@/hooks/useListConversations";
-import { Conversation } from "@/lib/types";
+import useMessages from "@/hooks/useMessages";
+import { Conversation, Message } from "@/lib/types";
 import { AnimatePresence, motion } from "framer-motion";
 import { useEffect, useState } from "react";
 import { FaBars } from "react-icons/fa";
@@ -10,9 +11,22 @@ import { IoSendSharp } from "react-icons/io5";
 
 const Chat = () => {
   const [newMessage, setNewMessage] = useState("");
-  const { conversations, isLoading } = useListConversations();
   const [selectedChat, setSelectedChat] = useState<Conversation | null>(null);
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
+  const [messages, setMessages] = useState<Message[]>([]);
+  const { conversations, isLoading: isConversationsLoading } =
+    useListConversations();
+  const { isLoading: isMessagesLoading, messages: storedMessages } =
+    useMessages(selectedChat?.id || null);
+
+  useEffect(() => {
+    if (!selectedChat) return;
+    if (isMessagesLoading || !storedMessages || storedMessages.length === 0)
+      return;
+    if (selectedChat) {
+      setMessages(storedMessages);
+    }
+  }, [selectedChat, isMessagesLoading, storedMessages]);
 
   useEffect(() => {
     if (!conversations || conversations.length === 0) return;
@@ -31,11 +45,11 @@ const Chat = () => {
             animate={{ x: 0 }}
             exit={{ x: -250 }}
             transition={{ duration: 0.3 }}
-            className="bg-white shadow-lg border-t border-r border-b"
+            className=" bg-white shadow-lg border-t border-r border-b "
           >
             <ChatSidebar
               conversations={conversations || []}
-              isLoading={isLoading}
+              isLoading={isConversationsLoading}
               selectedChat={selectedChat!}
               setSelectedChat={setSelectedChat}
               isSidebarOpen={isSidebarOpen}
@@ -45,7 +59,6 @@ const Chat = () => {
         )}
       </AnimatePresence>
 
-      {/* Chat Window */}
       <motion.div
         className={`flex flex-1 flex-col transition-all duration-300`}
       >
@@ -83,17 +96,31 @@ const Chat = () => {
 
             {/* Chat Messages */}
             <div className="flex-1 p-4 overflow-y-auto">
-              <div className="flex justify-start mb-4">
-                <div className="bg-gray-200 p-3 rounded-lg max-w-xs">
-                  Hey there! I saw your pitch for my job. I'd love to talk more
-                  about it. Are you available for a quick chat tomorrow?
-                </div>
-              </div>
-              <div className="flex justify-end mb-4">
-                <div className="bg-blue-500 text-white p-3 rounded-lg max-w-xs">
-                  Hi
-                </div>
-              </div>
+              {isMessagesLoading ? (
+                <p>Loading...</p>
+              ) : (
+                messages.map((message) => (
+                  <div
+                    key={message.id}
+                    className={`flex flex-col gap-1 ${
+                      message.senderId === 1 ? "items-end" : "items-start"
+                    }`}
+                  >
+                    <p
+                      className={`p-2 rounded-lg ${
+                        message.senderId === 1
+                          ? "bg-blue-500 text-white"
+                          : "bg-gray-200"
+                      }`}
+                    >
+                      {message.message}
+                    </p>
+                    <span className="text-xs text-gray-500">
+                      {new Date(message.createdAt!).toLocaleTimeString("en-PK")}
+                    </span>
+                  </div>
+                ))
+              )}
             </div>
 
             {/* Message Input */}

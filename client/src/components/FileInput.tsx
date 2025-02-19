@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import { FieldValues, useFormContext, UseFormRegister } from "react-hook-form";
 import { FaTimes, FaUpload } from "react-icons/fa";
-import { truncateFile } from "../lib/utils";
+import { truncateText } from "../lib/utils";
 
 interface FileInputProps extends React.InputHTMLAttributes<HTMLInputElement> {
   label?: string;
@@ -27,7 +27,7 @@ export const FileInput: React.FC<FileInputProps> = ({
 
     if (file) {
       setPreview(URL.createObjectURL(file));
-      setFileName(truncateFile(file.name));
+      setFileName(truncateText(file.name));
     } else {
       resetFile();
     }

@@ -34,3 +34,12 @@ export interface Conversation {
   lastMessage: string | null;
   lastSeen: Date;
 }
+
+export interface Message {
+  id: number;
+  conversationId: number;
+  senderId: number;
+  message: string;
+  isRead: boolean;
+  createdAt: Date;
+}

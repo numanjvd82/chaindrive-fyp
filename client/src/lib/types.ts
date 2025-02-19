@@ -27,9 +27,9 @@ export interface Conversation {
 
 export interface Message {
   id: number;
-  senderId: string;
-  receiverId: string;
+  conversationId: number;
+  senderId: number;
   message: string;
-  isRead: number;
-  createdAt: string;
+  isRead: boolean;
+  createdAt?: Date;
 }

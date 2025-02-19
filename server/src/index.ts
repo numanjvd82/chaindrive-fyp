@@ -5,12 +5,11 @@ import express, { Request, Response } from "express";
 import helmet from "helmet";
 import http from "http";
 import morgan from "morgan";
-import { connectDb, sqliteInstance } from "./lib/db/sqlite";
+import { connectDb } from "./lib/db/sqlite";
 import socketServer from "./lib/socketServer";
 import errorLogger from "./middlewares/errorLogger";
 import { ensureAuthenticated } from "./middlewares/session";
 import router from "./routes";
-import { sql } from "./utils/utils";
 
 dotenv.config();
 
@@ -48,32 +47,7 @@ app.use("/api/auth", router.auth);
 app.use(ensureAuthenticated);
 
 app.use("/api/conversations", router.conversation);
-
-app.get("/api/messages/:userId/:receiverId", (req: Request, res: Response) => {
-  const { user_id, receiver_id } = req.query;
-  if (!user_id || !receiver_id) {
-    res.status(400).json({ error: "User ID and Receiver ID required" });
-    return;
-  }
-
-  const messages = sqliteInstance
-    .prepare(
-      sql`SELECT * FROM messages WHERE (sender_id = ? AND receiver_id = ?) OR (sender_id = ? AND receiver_id = ?) ORDER BY created_at`
-    )
-    .all(user_id, receiver_id, receiver_id, user_id)
-    .map((message: any) => {
-      return {
-        id: message.id,
-        senderId: message.sender_id,
-        receiverId: message.receiver_id,
-        message: message.message,
-        isRead: message.is_read,
-        createdAt: message.created_at,
-      };
-    });
-
-  res.status(200).json(messages);
-});
+app.use("/api/messages", router.message);
 
 const PORT = process.env.PORT || 3000;
 
