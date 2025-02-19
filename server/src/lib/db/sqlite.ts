@@ -10,6 +10,7 @@ function getDbInstance() {
       verbose: console.log,
     });
     sqliteInstance.pragma("journal_mode = WAL");
+    sqliteInstance.pragma("foreign_keys = ON");
   }
   return sqliteInstance;
 }
