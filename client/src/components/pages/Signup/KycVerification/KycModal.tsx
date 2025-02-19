@@ -102,7 +102,9 @@ const KycModal: React.FC<KycModalProps> = ({
           if (hasErrors) return;
           handleConfirm?.();
         }}
-      />
+      >
+        Ok
+      </Button>
     </div>
   );
 

@@ -25,3 +25,12 @@ export type User = {
   createdAt: Date;
   updatedAt: Date;
 };
+
+export interface Conversation {
+  id: number;
+  otherUserId: number;
+  name: string;
+  avatar: string;
+  lastMessage: string | null;
+  lastSeen: Date;
+}

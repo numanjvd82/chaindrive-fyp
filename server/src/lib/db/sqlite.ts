@@ -1,5 +1,6 @@
 import Database, { Database as DbType } from "better-sqlite3";
 import { authTablesInit } from "./authTablesInit";
+import { chatTablesInit } from "./chatTablesInit";
 
 export let sqliteInstance: DbType;
 
@@ -19,6 +20,7 @@ export function connectDb() {
     process.stdout.write("Connected to database\n");
 
     authTablesInit(db);
+    chatTablesInit(db);
 
     console.log("Database schema created successfully.");
   } catch (err) {

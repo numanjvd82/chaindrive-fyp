@@ -1,9 +1,11 @@
 import React, { Suspense, useEffect } from "react";
 import { Route, Routes, useLocation, useNavigate } from "react-router-dom";
 import { ToastContainer } from "react-toastify";
+import io from "socket.io-client";
 import Header from "./components/Header";
 import Splash from "./components/Splash";
 import useUser from "./hooks/useUser";
+import { SERVER_BASE_URL } from "./lib/axios";
 
 const LoginPage = React.lazy(() => import("./pages/Login"));
 const NotFoundPage = React.lazy(() => import("./pages/NotFound"));
@@ -14,6 +16,8 @@ const SignupPage = React.lazy(() => import("./pages/Signup"));
 const ProfilePage = React.lazy(() => import("./pages/Profile"));
 const HomePage = React.lazy(() => import("./pages/Homepage"));
 const Chat = React.lazy(() => import("./pages/Chat"));
+
+export const socket = io(SERVER_BASE_URL);
 
 const ROUTES = [
   {
