@@ -1,32 +1,26 @@
 import Button from "@/components/Button";
 import Input from "@/components/Input";
 import { ChatSidebar } from "@/components/pages/Chat/ChatSidebar";
+import useChatSocket from "@/hooks/useChatSocket";
 import useListConversations from "@/hooks/useListConversations";
-import useMessages from "@/hooks/useMessages";
-import { Conversation, Message } from "@/lib/types";
+import useUser from "@/hooks/useUser";
+import { Conversation } from "@/lib/types";
 import { AnimatePresence, motion } from "framer-motion";
 import { useEffect, useState } from "react";
 import { FaBars } from "react-icons/fa";
 import { IoSendSharp } from "react-icons/io5";
 
 const Chat = () => {
-  const [newMessage, setNewMessage] = useState("");
   const [selectedChat, setSelectedChat] = useState<Conversation | null>(null);
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
-  const [messages, setMessages] = useState<Message[]>([]);
-  const { conversations, isLoading: isConversationsLoading } =
-    useListConversations();
-  const { isLoading: isMessagesLoading, messages: storedMessages } =
-    useMessages(selectedChat?.id || null);
-
-  useEffect(() => {
-    if (!selectedChat) return;
-    if (isMessagesLoading || !storedMessages || storedMessages.length === 0)
-      return;
-    if (selectedChat) {
-      setMessages(storedMessages);
-    }
-  }, [selectedChat, isMessagesLoading, storedMessages]);
+  const {
+    conversations,
+    isLoading: isConversationsLoading,
+    refetch,
+  } = useListConversations();
+  const [newMessage, setNewMessage] = useState("");
+  const { messages, sendMessage } = useChatSocket(selectedChat);
+  const { user } = useUser();
 
   useEffect(() => {
     if (!conversations || conversations.length === 0) return;
@@ -34,6 +28,8 @@ const Chat = () => {
       setSelectedChat(conversations[0]);
     }
   }, [conversations, selectedChat]);
+
+  if (!user) return null;
 
   return (
     <div className="flex w-full h-[calc(100vh-4rem)] bg-gray-100 relative">
@@ -70,10 +66,8 @@ const Chat = () => {
           </div>
         ) : (
           <>
-            {/* Chat Header */}
-            <div className="flex items-center justify-between h-16 p-4 bg-white shadow-md border-y">
+            <div className="flex items-center justify-between p-2 bg-white shadow-md border">
               <div className="flex items-center gap-2">
-                {/* Sidebar Toggle Button */}
                 <Button
                   onClick={() => setIsSidebarOpen(!isSidebarOpen)}
                   className={`px-2 py-3 ${isSidebarOpen ? "hidden" : "block"}`}
@@ -94,37 +88,41 @@ const Chat = () => {
               </div>
             </div>
 
-            {/* Chat Messages */}
             <div className="flex-1 p-4 overflow-y-auto">
-              {isMessagesLoading ? (
-                <p>Loading...</p>
-              ) : (
-                messages.map((message) => (
-                  <div
-                    key={message.id}
-                    className={`flex flex-col gap-1 ${
-                      message.senderId === 1 ? "items-end" : "items-start"
+              {messages.map((message) => (
+                <div
+                  key={message.id}
+                  className={`flex flex-col ${
+                    message.senderId === user.id ? "items-end" : "items-start"
+                  }`}
+                >
+                  <p
+                    className={`p-2 rounded-lg ${
+                      message.senderId === user.id
+                        ? "bg-blue-500 text-white"
+                        : "bg-gray-200"
                     }`}
                   >
-                    <p
-                      className={`p-2 rounded-lg ${
-                        message.senderId === 1
-                          ? "bg-blue-500 text-white"
-                          : "bg-gray-200"
-                      }`}
-                    >
-                      {message.message}
-                    </p>
-                    <span className="text-xs text-gray-500">
-                      {new Date(message.createdAt!).toLocaleTimeString("en-PK")}
-                    </span>
-                  </div>
-                ))
-              )}
+                    {message.message}
+                  </p>
+                  <span className="text-xs text-gray-500">
+                    {new Date(message.createdAt!).toLocaleTimeString()}
+                  </span>
+                </div>
+              ))}
             </div>
 
-            {/* Message Input */}
-            <div className="flex items-center p-4 border-t bg-white gap-2">
+            <form
+              onSubmit={(e: React.SyntheticEvent) => {
+                e.preventDefault();
+                if (newMessage.trim() !== "") {
+                  sendMessage(user?.id, newMessage);
+                  setNewMessage("");
+                  refetch();
+                }
+              }}
+              className="flex items-center p-4 border-t bg-white gap-2"
+            >
               <Input
                 type="text"
                 placeholder="Type a message"
@@ -132,10 +130,10 @@ const Chat = () => {
                 onChange={(e) => setNewMessage(e.target.value)}
                 className="w-full mb-0"
               />
-              <Button className="px-2">
+              <Button type="submit" className="px-2">
                 <IoSendSharp />
               </Button>
-            </div>
+            </form>
           </>
         )}
       </motion.div>

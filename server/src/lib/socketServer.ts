@@ -1,5 +1,6 @@
 import http from "http";
 import { Server } from "socket.io";
+import { messageModel } from "../models/message";
 
 export default function socketServer(server: http.Server) {
   const io = new Server(server, {
@@ -10,29 +11,25 @@ export default function socketServer(server: http.Server) {
   });
 
   io.on("connection", (socket) => {
-    console.log("a user connected", socket.id);
+    console.log("A user connected:", socket.id);
 
-    socket.on("send-message", ({ conversationId, userId, message }) => {
-      console.log("send-message", conversationId, userId, message);
-
-      // send message to the receiver
-      socket.to(conversationId).emit("receive-message", {
+    // Fetch messages for a conversation
+    socket.on("fetch-messages", async (conversationId: number) => {
+      const messages = await messageModel.list({
         conversationId,
-        userId,
-        message,
       });
+      socket.emit("messages", messages);
+    });
 
-      // send message to the sender
+    // Handle sending messages
+    socket.on("send-message", async (message) => {
+      const newMessage = await messageModel.add(message);
 
-      socket.emit("receive-message", {
-        conversationId,
-        userId,
-        message,
-      });
+      io.emit("receive-message", newMessage);
     });
 
     socket.on("disconnect", () => {
-      console.log("user disconnected");
+      console.log("User disconnected:", socket.id);
     });
   });
 }

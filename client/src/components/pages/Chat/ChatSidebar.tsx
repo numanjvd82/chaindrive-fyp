@@ -62,20 +62,15 @@ export const ChatSidebar: React.FC<Props> = ({
                     selectedChat.id === convo.id ? "bg-gray-200" : ""
                   }`}
                 >
-                  <img
-                    src={`data:image/jpeg;base64,${convo.avatar}`}
-                    alt={convo.name}
-                    className="w-10 h-10 rounded-full mr-3"
-                  />
                   <div className="flex-1">
                     <h3 className="font-semibold">{convo.name}</h3>
+                    <span className="text-xs text-gray-400">
+                      {new Date(convo.lastSeen).toLocaleDateString()}
+                    </span>
                     <p className="text-sm text-gray-500 truncate">
                       {truncateText(convo.lastMessage!, 15)}
                     </p>
                   </div>
-                  <span className="text-xs text-gray-400">
-                    {new Date(convo.lastSeen).toLocaleDateString()}
-                  </span>
                 </div>
               ))
             )}

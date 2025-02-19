@@ -1,20 +1,31 @@
 import { Conversation, Message } from "@/lib/types";
-import { useEffect } from "react";
-import { socket } from "src/MainApp";
+import { socket } from "@/MainApp";
+import { useEffect, useState } from "react";
 
-export default function useChatSocket(selectedChat: Conversation) {
+export default function useChatSocket(selectedChat: Conversation | null) {
+  const [messages, setMessages] = useState<Message[]>([]);
+
   useEffect(() => {
     if (!selectedChat) return;
 
-    // Fetch messages for the selected chat using seperate API call
+    socket.emit("fetch-messages", selectedChat.id);
 
-    // Listen for new messages
-    socket.on("receive-message", (message: Message) => {
-      setMessages((prev) => [...prev, message]);
-    });
+    const handleMessages = (fetchedMessages: Message[]) => {
+      setMessages(fetchedMessages);
+    };
+
+    const handleReceiveMessage = (message: Message) => {
+      if (message.conversationId === selectedChat.id) {
+        setMessages((prev) => [...prev, message]);
+      }
+    };
+
+    socket.on("messages", handleMessages);
+    socket.on("receive-message", handleReceiveMessage);
 
     return () => {
-      socket.off("receive-message");
+      socket.off("messages", handleMessages);
+      socket.off("receive-message", handleReceiveMessage);
     };
   }, [selectedChat]);
 
@@ -22,15 +33,15 @@ export default function useChatSocket(selectedChat: Conversation) {
     if (!selectedChat) return;
 
     const newMessage: Message = {
-      id: messages.length + 1,
+      id: Date.now(),
       conversationId: selectedChat.id,
       senderId: userId,
       message,
       isRead: false,
     };
 
+    // setMessages((prev) => [...prev, newMessage]);
     socket.emit("send-message", newMessage);
-    setMessages((prev) => [...prev, newMessage]); // Optimistic update
   };
 
   return { messages, sendMessage };
