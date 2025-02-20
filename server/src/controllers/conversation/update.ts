@@ -5,6 +5,11 @@ export const updateConversation = async (req: Request, res: Response) => {
   try {
     const { id } = req.params;
     const { lastMessage } = req.body;
+
+    if (!id || !lastMessage) {
+      throw new Error("Missing required fields");
+    }
+
     const result = await conversationModel.update({
       id: Number(id),
       lastMessage,

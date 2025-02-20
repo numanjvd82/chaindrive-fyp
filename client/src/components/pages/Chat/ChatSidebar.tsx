@@ -1,6 +1,6 @@
 import Button from "@/components/Button";
 import { Conversation } from "@/lib/types";
-import { truncateText } from "@/lib/utils";
+import { convertDateToString, truncateText } from "@/lib/utils";
 import { AnimatePresence, motion } from "framer-motion";
 import { FiSearch } from "react-icons/fi";
 import { IoCloseSharp } from "react-icons/io5";
@@ -8,7 +8,7 @@ import { IoCloseSharp } from "react-icons/io5";
 interface Props {
   isLoading: boolean;
   conversations: Conversation[];
-  selectedChat: Conversation;
+  selectedChat: Conversation | null;
   setSelectedChat: (convo: Conversation) => void;
   isSidebarOpen: boolean;
   setIsSidebarOpen: (open: boolean) => void;
@@ -22,6 +22,60 @@ export const ChatSidebar: React.FC<Props> = ({
   isSidebarOpen,
   setIsSidebarOpen,
 }) => {
+  const Loading = () => (
+    <motion.p
+      initial={{ opacity: 0, y: -10 }}
+      animate={{ opacity: 1, y: 0 }}
+      className="p-4 text-center"
+    >
+      Loading...
+    </motion.p>
+  );
+
+  const Conversations = () => {
+    return conversations.map((convo) => (
+      <div
+        key={convo.id}
+        onClick={() => setSelectedChat(convo)}
+        className={`flex items-center p-4 cursor-pointer border-b hover:bg-gray-100 ${
+          selectedChat?.id === convo.id ? "bg-gray-200" : ""
+        }`}
+      >
+        <div className="flex-1">
+          <h3 className="font-semibold">{convo.name}</h3>
+          <span className="text-xs text-gray-400">
+            Last Seen: {convertDateToString(convo.lastSeen)}
+          </span>
+          <p className="text-sm text-gray-500 truncate">
+            {convo.lastMessage && truncateText(convo.lastMessage, 15)}
+          </p>
+        </div>
+      </div>
+    ));
+  };
+
+  const NoConversations = () => (
+    <motion.p
+      initial={{ opacity: 0, y: -10 }}
+      animate={{ opacity: 1, y: 0 }}
+      className="p-4 text-center"
+    >
+      No conversations yet
+    </motion.p>
+  );
+
+  const FinalComponent = () => {
+    if (isLoading) {
+      return <Loading />;
+    } else if (conversations.length > 0) {
+      return <Conversations />;
+    } else if (conversations.length === 0) {
+      return <NoConversations />;
+    } else {
+      return null;
+    }
+  };
+
   return (
     <AnimatePresence>
       {isSidebarOpen && (
@@ -40,7 +94,7 @@ export const ChatSidebar: React.FC<Props> = ({
               <Button
                 type="button"
                 onClick={() => setIsSidebarOpen(false)}
-                className="px-2"
+                className="px-[10px]"
               >
                 <IoCloseSharp />
               </Button>
@@ -48,33 +102,7 @@ export const ChatSidebar: React.FC<Props> = ({
           </div>
 
           {/* Conversations List */}
-          <div>
-            {isLoading ? (
-              <p>Loading...</p>
-            ) : (
-              conversations.map((convo) => (
-                <div
-                  key={convo.id}
-                  onClick={() => {
-                    setSelectedChat(convo);
-                  }}
-                  className={`flex items-center p-4 cursor-pointer border-b hover:bg-gray-100 ${
-                    selectedChat.id === convo.id ? "bg-gray-200" : ""
-                  }`}
-                >
-                  <div className="flex-1">
-                    <h3 className="font-semibold">{convo.name}</h3>
-                    <span className="text-xs text-gray-400">
-                      {new Date(convo.lastSeen).toLocaleDateString()}
-                    </span>
-                    <p className="text-sm text-gray-500 truncate">
-                      {truncateText(convo.lastMessage!, 15)}
-                    </p>
-                  </div>
-                </div>
-              ))
-            )}
-          </div>
+          <FinalComponent />
         </motion.div>
       )}
     </AnimatePresence>

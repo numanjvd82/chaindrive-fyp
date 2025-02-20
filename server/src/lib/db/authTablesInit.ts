@@ -13,6 +13,7 @@ CREATE TABLE IF NOT EXISTS Users (
   password_hash TEXT NOT NULL,
   salt TEXT NOT NULL,
   role TEXT CHECK(role IN ('owner', 'renter')) NOT NULL,
+  is_online BOOLEAN DEFAULT 0,
   created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
   updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );

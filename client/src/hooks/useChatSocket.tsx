@@ -1,9 +1,24 @@
 import { Conversation, Message } from "@/lib/types";
-import { socket } from "@/MainApp";
 import { useEffect, useState } from "react";
+import { useSocket } from "./useSocket";
 
 export default function useChatSocket(selectedChat: Conversation | null) {
   const [messages, setMessages] = useState<Message[]>([]);
+  const [onlineUsers, setOnlineUsers] = useState<number[]>([]);
+  const { socket } = useSocket();
+
+  useEffect(() => {
+    const handleOnlineUsers = (users: number[]) => {
+      console.log(users);
+      setOnlineUsers(users);
+    };
+
+    socket.on("online-users", handleOnlineUsers);
+
+    return () => {
+      socket.off("online-users", handleOnlineUsers);
+    };
+  }, [socket]);
 
   useEffect(() => {
     if (!selectedChat) return;
@@ -27,7 +42,7 @@ export default function useChatSocket(selectedChat: Conversation | null) {
       socket.off("messages", handleMessages);
       socket.off("receive-message", handleReceiveMessage);
     };
-  }, [selectedChat]);
+  }, [selectedChat, socket]);
 
   const sendMessage = (userId: number, message: string) => {
     if (!selectedChat) return;
@@ -40,9 +55,8 @@ export default function useChatSocket(selectedChat: Conversation | null) {
       isRead: false,
     };
 
-    // setMessages((prev) => [...prev, newMessage]);
     socket.emit("send-message", newMessage);
   };
 
-  return { messages, sendMessage };
+  return { messages, sendMessage, onlineUsers };
 }

@@ -47,6 +47,6 @@ export const insertMessage = async (input: InsertMessageInput) => {
 
     return newMessage;
   } catch (error: any) {
-    throw new Error(error.message);
+    throw Error(error.message);
   }
 };
