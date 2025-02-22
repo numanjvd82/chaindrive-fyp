@@ -17,7 +17,6 @@ export const SocketProvider = ({ children }: { children: ReactNode }) => {
 
     socket.on("connect", () => {
       setIsConnected(true);
-      socket.emit("get-online-users");
     });
     socket.on("disconnect", () => setIsConnected(false));
 
@@ -27,6 +26,14 @@ export const SocketProvider = ({ children }: { children: ReactNode }) => {
       // socket.disconnect();
     };
   }, [user]);
+
+  useEffect(() => {
+    const interval = setInterval(() => {
+      socket.emit("heartbeat");
+    }, 10000); // Send every 10 seconds
+
+    return () => clearInterval(interval);
+  }, []);
 
   return (
     <SocketContext.Provider value={{ socket, isConnected }}>

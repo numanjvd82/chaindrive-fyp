@@ -9,7 +9,6 @@ export default function useChatSocket(selectedChat: Conversation | null) {
 
   useEffect(() => {
     const handleOnlineUsers = (users: number[]) => {
-      console.log(users);
       setOnlineUsers(users);
     };
 

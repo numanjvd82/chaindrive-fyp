@@ -3,6 +3,7 @@ import Input from "@/components/Input";
 import { ChatSidebar } from "@/components/pages/Chat/ChatSidebar";
 import useChatSocket from "@/hooks/useChatSocket";
 import useListConversations from "@/hooks/useListConversations";
+import useOnlineStatus from "@/hooks/useOnlineStatus";
 import useUser from "@/hooks/useUser";
 import { Conversation } from "@/lib/types";
 import { convertDateToString } from "@/lib/utils";
@@ -20,7 +21,8 @@ const Chat = () => {
     refetch,
   } = useListConversations();
   const [newMessage, setNewMessage] = useState("");
-  const { messages, sendMessage, onlineUsers } = useChatSocket(selectedChat);
+  const { messages, sendMessage } = useChatSocket(selectedChat);
+  const { onlineUsers } = useOnlineStatus();
   const { user } = useUser();
   const chatRef = useRef<HTMLDivElement>(null);
 
@@ -39,8 +41,11 @@ const Chat = () => {
 
   if (!user) return null;
 
-  const isOnline =
-    onlineUsers.filter((u) => u === selectedChat?.otherUserId).length > 0;
+  const isOnline = Array.from(onlineUsers).some(
+    (id) => id === selectedChat?.otherUserId
+  );
+
+  console.log({ onlineUsers });
 
   return (
     <div className="flex w-full h-[calc(100vh-4rem)] bg-gray-100 relative">

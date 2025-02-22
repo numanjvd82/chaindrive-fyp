@@ -15,4 +15,9 @@ export const convertDateToString = (date: Date) => {
   });
 };
 
+export const convertUtcToLocal = (date: Date) => {
+  const timeZoneDifference = new Date().getTimezoneOffset() * 60000;
+  return new Date(date).getTime() - timeZoneDifference;
+};
+
 export const ACCEPTED_IMAGE_TYPES = ["image/png", "image/jpeg", "image/jpg"];

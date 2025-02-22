@@ -12,25 +12,20 @@ export default function socketServer(server: http.Server) {
     },
   });
 
-  const onlineUsers = new Map();
+  const onlineUsers = new Set<number>();
 
   io.on("connection", (socket) => {
     const userId = socket.handshake.auth.userId;
     if (!userId) return;
 
-    // Update online status in db
-    onlineUsers.set(userId, socket.id);
-    console.log(`User ${userId} connected, total: ${onlineUsers.size}`);
+    console.log(`User ${userId} connected with socket ID: ${socket.id}`);
 
-    io.emit("online-users", Array.from(onlineUsers.keys()));
+    onlineUsers.add(userId);
+    io.emit("onlineUsers", Array.from(onlineUsers)); // Broadcast online users
 
-    sqliteInstance
-      .prepare(sql`UPDATE users SET is_online = 1 WHERE id = ?`)
-      .run(userId);
-
-    // Handle dedicated event to get online users
-    socket.on("get-online-users", () => {
-      socket.emit("online-users", Array.from(onlineUsers.keys()));
+    // Heartbeat to keep user online
+    socket.on("heartbeat", () => {
+      onlineUsers.add(userId);
     });
 
     // Fetch messages for a conversation
@@ -50,14 +45,19 @@ export default function socketServer(server: http.Server) {
     });
 
     socket.on("disconnect", () => {
+      console.log(`User ${userId} disconnected, waiting to verify...`);
       onlineUsers.delete(userId);
-      console.log(`User ${userId} disconnected, total: ${onlineUsers.size}`);
-
-      io.emit("online-users", Array.from(onlineUsers.keys()));
-
-      sqliteInstance
-        .prepare(sql`UPDATE users SET is_online = 0 WHERE id = ?`)
-        .run(userId);
+      io.emit("onlineUsers", Array.from(onlineUsers));
     });
   });
+}
+
+function updateUserStatus(userId: number, isOnline: boolean) {
+  try {
+    sqliteInstance
+      .prepare(sql`UPDATE users SET is_online = ? WHERE id = ?`)
+      .run(isOnline ? 1 : 0, userId);
+  } catch (error) {
+    console.error("Error updating user status:", error);
+  }
 }
