@@ -1,3 +1,4 @@
+import { Avatar } from "@/components/Avatar";
 import Button from "@/components/Button";
 import Input from "@/components/Input";
 import { ChatSidebar } from "@/components/pages/Chat/ChatSidebar";
@@ -6,7 +7,7 @@ import useListConversations from "@/hooks/useListConversations";
 import useOnlineStatus from "@/hooks/useOnlineStatus";
 import useUser from "@/hooks/useUser";
 import { Conversation } from "@/lib/types";
-import { convertDateToString } from "@/lib/utils";
+import { convertDateToString, convertUtcToLocal } from "@/lib/utils";
 import { AnimatePresence, motion } from "framer-motion";
 import { useEffect, useRef, useState } from "react";
 import { FaBars } from "react-icons/fa";
@@ -41,11 +42,26 @@ const Chat = () => {
 
   if (!user) return null;
 
-  const isOnline = Array.from(onlineUsers).some(
-    (id) => id === selectedChat?.otherUserId
-  );
+  const isOnline =
+    selectedChat && onlineUsers.has(selectedChat.otherUserId) ? true : false;
 
-  console.log({ onlineUsers });
+  // Inline Components
+  const NoChatSelected = () => (
+    <div className="flex-1 flex items-center justify-center bg-white">
+      <h2 className="text-lg font-semibold">
+        Select a chat to start messaging
+      </h2>
+
+      <Button
+        onClick={() => setIsSidebarOpen(!isSidebarOpen)}
+        className={`absolute top-2 left-2 px-[10px] py-3 ${
+          isSidebarOpen ? "hidden" : "block"
+        }`}
+      >
+        <FaBars />
+      </Button>
+    </div>
+  );
 
   return (
     <div className="flex w-full h-[calc(100vh-4rem)] bg-gray-100 relative">
@@ -75,20 +91,7 @@ const Chat = () => {
         className={`flex flex-1 flex-col transition-all duration-300`}
       >
         {!selectedChat ? (
-          <div className="flex-1 flex items-center justify-center bg-white">
-            <h2 className="text-lg font-semibold">
-              Select a chat to start messaging
-            </h2>
-
-            <Button
-              onClick={() => setIsSidebarOpen(!isSidebarOpen)}
-              className={`absolute top-2 left-2 px-[10px] py-3 ${
-                isSidebarOpen ? "hidden" : "block"
-              }`}
-            >
-              <FaBars />
-            </Button>
-          </div>
+          <NoChatSelected />
         ) : (
           <>
             <div className="flex items-center justify-between p-2 bg-white shadow-md border">
@@ -101,18 +104,13 @@ const Chat = () => {
                 >
                   <FaBars />
                 </Button>
-                <div className="relative">
-                  <img
-                    src={`data:image/jpeg;base64,${selectedChat.avatar}`}
-                    alt={selectedChat.name}
-                    className="w-10 h-10 rounded-full "
-                  />
-                  <span
-                    className={`w-3 h-3 rounded-full border ${
-                      isOnline ? "bg-green-400" : "bg-red-400"
-                    } inline-block absolute bottom-0 right-0 `}
-                  />
-                </div>
+                <Avatar
+                  avatar={`data:image/jpeg;base64,${selectedChat.avatar}`}
+                  showOnlineStatus={true}
+                  isOnline={isOnline}
+                  name={selectedChat.name}
+                />
+
                 <h2 className="text-lg font-semibold">
                   {selectedChat.name}
 
@@ -124,37 +122,42 @@ const Chat = () => {
             </div>
 
             <div ref={chatRef} className="flex-1 p-4 overflow-y-auto">
-              {messages.map((message) => (
-                <motion.div
-                  initial={{ opacity: 0, y: 20 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  exit={{ opacity: 0, y: 20 }}
-                  key={message.id}
-                  className={`flex flex-col gap-1 ${
-                    message.senderId === user.id ? "items-end" : "items-start"
-                  }`}
-                >
-                  <p
-                    className={`p-2 rounded-lg ${
-                      message.senderId === user.id
-                        ? "bg-primary text-white"
-                        : "bg-gray-200"
+              {messages.map((message) => {
+                const messageCreatedAt = new Date(
+                  convertUtcToLocal(message.createdAt!)
+                ).toLocaleTimeString();
+                return (
+                  <motion.div
+                    initial={{ opacity: 0, y: 20 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    exit={{ opacity: 0, y: 20 }}
+                    key={message.id}
+                    className={`flex flex-col gap-1 ${
+                      message.senderId === user.id ? "items-end" : "items-start"
                     }`}
                   >
-                    {message.message}
-                  </p>
-                  <span className="text-xs text-gray-500 mb-1">
-                    {new Date(message.createdAt!).toLocaleTimeString()}
-                  </span>
-                </motion.div>
-              ))}
+                    <p
+                      className={`p-2 rounded-lg ${
+                        message.senderId === user.id
+                          ? "bg-primary text-white"
+                          : "bg-gray-200"
+                      }`}
+                    >
+                      {message.message}
+                    </p>
+                    <span className="text-xs text-gray-500 mb-1">
+                      {messageCreatedAt}
+                    </span>
+                  </motion.div>
+                );
+              })}
             </div>
 
             <form
               onSubmit={(e: React.SyntheticEvent) => {
                 e.preventDefault();
                 if (newMessage.trim() !== "") {
-                  sendMessage(user?.id, newMessage);
+                  sendMessage(user.id, newMessage);
                   if (chatRef.current) {
                     chatRef.current.scrollTop = chatRef.current.scrollHeight;
                   }

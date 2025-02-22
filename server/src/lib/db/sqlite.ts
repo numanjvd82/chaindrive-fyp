@@ -4,7 +4,7 @@ import { chatTablesInit } from "./chatTablesInit";
 
 export let sqliteInstance: DbType;
 
-function getDbInstance() {
+export function getDbInstance() {
   if (!sqliteInstance) {
     sqliteInstance = new Database("chaindrive.db");
     sqliteInstance.pragma("journal_mode = WAL");

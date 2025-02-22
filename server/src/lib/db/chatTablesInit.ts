@@ -32,4 +32,14 @@ CREATE TABLE IF NOT EXISTS Messages (
 );
     `
   ).run();
+
+  db.prepare(
+    sql`
+CREATE TABLE IF NOT EXISTS OnlineUsers (
+    user_id INTEGER PRIMARY KEY,
+    last_seen TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (user_id) REFERENCES Users(id)
+);
+    `
+  ).run();
 }

@@ -52,6 +52,7 @@ export default function useChatSocket(selectedChat: Conversation | null) {
       senderId: userId,
       message,
       isRead: false,
+      createdAt: new Date(),
     };
 
     socket.emit("send-message", newMessage);

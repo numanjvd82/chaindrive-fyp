@@ -8,15 +8,25 @@ const useOnlineStatus = () => {
 
   const { socket } = useSocket();
 
+  // Receive updated online users from backend
   useEffect(() => {
-    socket.on("onlineUsers", (users) => {
-      setOnlineUsers(new Set(users)); // Update online users list
+    socket.on("userOnline", (users) => {
+      setOnlineUsers(new Set(users));
     });
 
     return () => {
-      socket.off("onlineUsers");
+      socket.off("userOnline");
     };
-  }, []);
+  }, [socket]);
+
+  // Send heartbeat every 5 seconds
+  useEffect(() => {
+    const interval = setInterval(() => {
+      socket.emit("heartbeat");
+    }, 5000);
+
+    return () => clearInterval(interval);
+  }, [socket]);
 
   return { onlineUsers };
 };

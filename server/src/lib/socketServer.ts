@@ -2,7 +2,7 @@ import http from "http";
 import { Server } from "socket.io";
 import { messageModel } from "../models/message";
 import { sql } from "../utils/utils";
-import { sqliteInstance } from "./db/sqlite";
+import { getDbInstance } from "./db/sqlite";
 
 export default function socketServer(server: http.Server) {
   const io = new Server(server, {
@@ -12,7 +12,16 @@ export default function socketServer(server: http.Server) {
     },
   });
 
-  const onlineUsers = new Set<number>();
+  const db = getDbInstance();
+
+  const addOnlineUser = db.prepare(sql`
+INSERT INTO OnlineUsers (user_id, last_seen) VALUES (?, CURRENT_TIMESTAMP) ON CONFLICT(user_id) DO UPDATE SET last_seen = CURRENT_TIMESTAMP`);
+
+  const removeInactiveUsers = db.prepare(
+    sql`DELETE FROM OnlineUsers WHERE last_seen < DATETIME('now', '-10 seconds')`
+  );
+
+  const getOnlineUsers = db.prepare(sql`SELECT user_id FROM OnlineUsers`);
 
   io.on("connection", (socket) => {
     const userId = socket.handshake.auth.userId;
@@ -20,12 +29,15 @@ export default function socketServer(server: http.Server) {
 
     console.log(`User ${userId} connected with socket ID: ${socket.id}`);
 
-    onlineUsers.add(userId);
-    io.emit("onlineUsers", Array.from(onlineUsers)); // Broadcast online users
+    // Broadcast updated online users
+    io.emit(
+      "userOnline",
+      getOnlineUsers.all().map((row: any) => row.user_id)
+    );
 
-    // Heartbeat to keep user online
+    // Handle heartbeat to update last_seen
     socket.on("heartbeat", () => {
-      onlineUsers.add(userId);
+      addOnlineUser.run(userId);
     });
 
     // Fetch messages for a conversation
@@ -38,7 +50,6 @@ export default function socketServer(server: http.Server) {
 
     // Handle sending messages
     socket.on("send-message", async (message) => {
-      console.log("Message received:", message);
       const newMessage = await messageModel.add(message);
 
       io.emit("receive-message", newMessage);
@@ -46,18 +57,15 @@ export default function socketServer(server: http.Server) {
 
     socket.on("disconnect", () => {
       console.log(`User ${userId} disconnected, waiting to verify...`);
-      onlineUsers.delete(userId);
-      io.emit("onlineUsers", Array.from(onlineUsers));
     });
   });
-}
 
-function updateUserStatus(userId: number, isOnline: boolean) {
-  try {
-    sqliteInstance
-      .prepare(sql`UPDATE users SET is_online = ? WHERE id = ?`)
-      .run(isOnline ? 1 : 0, userId);
-  } catch (error) {
-    console.error("Error updating user status:", error);
-  }
+  // Background task: Remove inactive users every 10 seconds
+  setInterval(() => {
+    removeInactiveUsers.run();
+    io.emit(
+      "userOnline",
+      getOnlineUsers.all().map((row: any) => row.user_id)
+    );
+  }, 10000);
 }

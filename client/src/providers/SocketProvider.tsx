@@ -27,14 +27,6 @@ export const SocketProvider = ({ children }: { children: ReactNode }) => {
     };
   }, [user]);
 
-  useEffect(() => {
-    const interval = setInterval(() => {
-      socket.emit("heartbeat");
-    }, 10000); // Send every 10 seconds
-
-    return () => clearInterval(interval);
-  }, []);
-
   return (
     <SocketContext.Provider value={{ socket, isConnected }}>
       {children}
