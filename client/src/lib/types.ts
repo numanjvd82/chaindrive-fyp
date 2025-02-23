@@ -33,3 +33,10 @@ export interface Message {
   isRead: boolean;
   createdAt?: Date;
 }
+
+export interface Notification {
+  id: number;
+  type: string;
+  content: string;
+  created_at: string;
+}

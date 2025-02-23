@@ -6,10 +6,10 @@ import helmet from "helmet";
 import http from "http";
 import morgan from "morgan";
 import { connectDb } from "./lib/db/sqlite";
-import socketServer from "./lib/socketServer";
 import errorLogger from "./middlewares/errorLogger";
 import { ensureAuthenticated } from "./middlewares/session";
 import router from "./routes";
+import socketServer from "./services";
 
 dotenv.config();
 

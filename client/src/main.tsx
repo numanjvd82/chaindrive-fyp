@@ -4,6 +4,7 @@ import { StrictMode } from "react";
 import { createRoot } from "react-dom/client";
 import { QueryClient, QueryClientProvider } from "react-query";
 import "./index.css";
+import { NotificationProvider } from "./providers/NotificationProvider";
 import { SocketProvider } from "./providers/SocketProvider";
 import { WalletProvider } from "./providers/WalletProvider";
 
@@ -13,11 +14,13 @@ createRoot(document.getElementById("root")!).render(
   <StrictMode>
     <QueryClientProvider client={queryClient}>
       <UserProvider>
-        <SocketProvider>
-          <WalletProvider>
-            <App />
-          </WalletProvider>
-        </SocketProvider>
+        <NotificationProvider>
+          <SocketProvider>
+            <WalletProvider>
+              <App />
+            </WalletProvider>
+          </SocketProvider>
+        </NotificationProvider>
       </UserProvider>
     </QueryClientProvider>
   </StrictMode>

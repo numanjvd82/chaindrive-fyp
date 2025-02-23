@@ -2,10 +2,11 @@ import logo from "@/assets/images/logo.svg";
 import useUser from "@/hooks/useUser";
 import { axiosInstance } from "@/lib/axios";
 import React from "react";
-import { FaRegBell, FaRegCommentDots } from "react-icons/fa";
+import { FaRegCommentDots } from "react-icons/fa";
 import { useQueryClient } from "react-query";
 import { Link, useNavigate } from "react-router-dom";
 import Dropdown from "./Dropdown";
+import { NotificationDropdown } from "./NotificationDropdown";
 
 const Header: React.FC = () => {
   const queryClient = useQueryClient();
@@ -47,9 +48,7 @@ const Header: React.FC = () => {
           >
             <FaRegCommentDots className="text-xl" />
           </Link>
-          <span className="bg-gray-200 cursor-pointer p-2 rounded-xl transition duration-300 ease-in-out hover:text-primary hover:bg-gray-300">
-            <FaRegBell className="text-xl" />
-          </span>
+          <NotificationDropdown />
           <Dropdown
             button={
               <img
