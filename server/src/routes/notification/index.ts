@@ -2,11 +2,11 @@ import express, { Request, Response } from "express";
 import { getDbInstance } from "../../lib/db/sqlite";
 import { sql } from "../../utils/utils";
 
-const router = express.Router();
+const notificationRouter = express.Router();
 const db = getDbInstance();
 
 // Fetch unread notifications
-router.get("/", (req: Request, res: Response) => {
+notificationRouter.get("/", (req: Request, res: Response) => {
   // @ts-ignore
   const userId = req.userId;
   if (!userId) {
@@ -14,19 +14,28 @@ router.get("/", (req: Request, res: Response) => {
     return;
   }
 
-  const notifications = db
-    .prepare(
-      sql`
-    SELECT * FROM notifications WHERE user_id = ? AND is_read = false
+  try {
+    const notifications = db
+      .prepare(
+        sql`
+    SELECT id, type, content, created_at FROM Notifications WHERE user_id = ? AND is_read = false ORDER BY created_at DESC
   `
-    )
-    .all(userId);
+      )
+      .all(userId);
 
-  res.json(notifications);
+    if (!notifications.length) {
+      res.json([]);
+      return;
+    }
+
+    res.json(notifications);
+  } catch (error: any) {
+    res.status(500).json({ error: error.message });
+  }
 });
 
 // Mark notifications as read
-router.post("/mark-read", (req, res) => {
+notificationRouter.post("/mark-read", (req, res) => {
   // @ts-ignore
   const userId = req.userId;
   if (!userId) {
@@ -34,28 +43,24 @@ router.post("/mark-read", (req, res) => {
     return;
   }
 
-  db.prepare(
-    sql`
-    UPDATE notifications SET is_read = true WHERE user_id = ?
-  `
-  ).run(userId);
+  try {
+    db.prepare(
+      sql`
+      UPDATE Notifications SET is_read = true WHERE user_id = ?
+    `
+    ).run(userId);
 
-  res.json({ success: true });
+    // delete all notifications
+    db.prepare(
+      sql`
+      DELETE FROM Notifications WHERE user_id = ? AND is_read = true
+    `
+    ).run(userId);
+
+    res.json({ success: true });
+  } catch (error: any) {
+    res.status(500).json({ error: error.message });
+  }
 });
 
-// Delete a notification
-router.delete("/:id", (req: Request, res: Response) => {
-  // @ts-ignore
-  const userId = req.userId;
-  const notificationId = req.params.id;
-
-  db.prepare(
-    sql`
-    DELETE FROM notifications WHERE id = ? AND user_id = ?
-  `
-  ).run(notificationId, userId);
-
-  res.json({ success: true });
-});
-
-export default router;
+export default notificationRouter;

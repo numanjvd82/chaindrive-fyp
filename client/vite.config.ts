@@ -1,3 +1,6 @@
+/// <reference types="vite/client" />
+/// <reference types="vite/types/importMeta.d.ts" />
+
 import react from "@vitejs/plugin-react-swc";
 import { defineConfig } from "vite";
 

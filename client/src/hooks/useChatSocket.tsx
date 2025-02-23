@@ -22,6 +22,8 @@ export default function useChatSocket(selectedChat: Conversation | null) {
   useEffect(() => {
     if (!selectedChat) return;
 
+    socket.emit("join-conversation", selectedChat.id);
+
     socket.emit("fetch-messages", selectedChat.id);
 
     const handleMessages = (fetchedMessages: Message[]) => {

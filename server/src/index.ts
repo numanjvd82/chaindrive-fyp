@@ -9,7 +9,7 @@ import { connectDb } from "./lib/db/sqlite";
 import errorLogger from "./middlewares/errorLogger";
 import { ensureAuthenticated } from "./middlewares/session";
 import router from "./routes";
-import socketServer from "./services";
+import socketServer from "./services/socketServer";
 
 dotenv.config();
 
@@ -48,6 +48,7 @@ app.use(ensureAuthenticated);
 
 app.use("/api/conversations", router.conversation);
 app.use("/api/messages", router.message);
+app.use("/api/notifications", router.notification);
 
 const PORT = process.env.PORT || 3000;
 

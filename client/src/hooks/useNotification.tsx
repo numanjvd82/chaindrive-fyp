@@ -1,10 +1,26 @@
-import { NotificationContext } from "@/contexts/NotificationContext";
-import { useContext } from "react";
+import { axiosInstance } from "@/lib/axios";
+import { Notification } from "@/lib/types";
+import { useQuery } from "react-query";
+
+async function fetchNotifications() {
+  try {
+    const { data } = await axiosInstance.get<Notification[]>(
+      "/api/notifications"
+    );
+    return data;
+  } catch (error) {
+    console.error(error);
+  }
+}
 
 export const useNotification = () => {
-  const context = useContext(NotificationContext);
-  if (!context) {
-    throw new Error("useNotification must be used within NotificationProvider");
-  }
-  return context;
+  const { data, isLoading, refetch } = useQuery(
+    "notifications",
+    fetchNotifications,
+    {
+      refetchInterval: 10000,
+    }
+  );
+
+  return { data, isLoading, refetch };
 };

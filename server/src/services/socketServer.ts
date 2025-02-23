@@ -24,28 +24,26 @@ export default function socketServer(server: http.Server) {
     },
   });
 
+  const onlineUsersSocket = new Map<number, string>();
+
   io.on("connection", (socket) => {
     const userId: number = socket.handshake.auth.userId;
     if (!userId) return;
 
     console.log(`User ${userId} connected with socket ID: ${socket.id}`);
 
-    // Broadcast updated online users
+    onlineUsersSocket.set(userId, socket.id);
+
     io.emit(
       "userOnline",
       getOnlineUsers.all().map((row: any) => row.user_id)
     );
-
-    // Send unread notifications when user connects
-    const notifications = getUnreadNotifications.all(userId);
-    socket.emit("unread-notifications", notifications);
 
     // Handle heartbeat to update last_seen
     socket.on("heartbeat", () => {
       addOnlineUser.run(userId);
     });
 
-    // Fetch messages for a conversation
     socket.on("fetch-messages", async (conversationId: number) => {
       const messages = await messageModel.list({
         conversationId,
@@ -53,27 +51,46 @@ export default function socketServer(server: http.Server) {
       socket.emit("messages", messages);
     });
 
+    // Join a conversation room
+    socket.on("join-conversation", (conversationId: number) => {
+      const room = `conversation-${conversationId}`;
+
+      const rooms = Array.from(socket.rooms);
+      rooms.forEach((room) => {
+        if (room.startsWith("conversation-")) {
+          socket.leave(room);
+        }
+      });
+
+      socket.join(room);
+    });
+
     // Handle sending messages
     socket.on("send-message", async (message: Message) => {
       const newMessage = await messageModel.add(message);
-
-      io.emit("receive-message", newMessage);
+      const room = `conversation-${message.conversationId}`;
+      io.to(room).emit("receive-message", newMessage);
 
       // Notify the recipient
-      const conversation = await conversationModel.byId(message.conversationId);
+      const conversation = await conversationModel.byId({
+        conversationId: message.conversationId,
+        userId,
+      });
       if (!conversation) return;
-      const recipientId = conversation.otherUserId;
-      const recipientIdStr = String(recipientId);
-      const onlineUsers = getOnlineUsers.get() as Record<string, number>;
-      const isRecipientOnline = Array.from(Object.values(onlineUsers)).includes(
-        recipientId
-      );
-      if (isRecipientOnline) {
-        io.to(recipientIdStr).emit("notification", {
+      console.log("Conversation", conversation);
+
+      const recipientId =
+        conversation.user1 === userId ? conversation.user2 : conversation.user1;
+      const isRecipientOnline = onlineUsersSocket.has(recipientId);
+      const recipeintSocketId = onlineUsersSocket.get(recipientId);
+
+      if (isRecipientOnline && recipeintSocketId) {
+        io.to(recipeintSocketId).emit("notification", {
           type: "message",
           content: `New message from ${conversation.name}`,
         });
       } else {
+        console.log("Recipient is offline, sending notification...");
         insertNotification.run(
           recipientId,
           "message",
@@ -82,18 +99,9 @@ export default function socketServer(server: http.Server) {
       }
     });
 
-    // Mark notification as read
-    socket.on("mark-as-read", (notificationId) => {
-      markNotificationAsRead.run(notificationId);
-    });
-
-    // Remove notification
-    socket.on("remove-notification", (notificationId) => {
-      deleteNotification.run(notificationId);
-    });
-
     socket.on("disconnect", () => {
       console.log(`User ${userId} disconnected, waiting to verify...`);
+      onlineUsersSocket.delete(userId);
     });
   });
 

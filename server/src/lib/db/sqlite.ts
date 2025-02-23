@@ -7,9 +7,7 @@ export let sqliteInstance: DbType;
 
 export function getDbInstance() {
   if (!sqliteInstance) {
-    sqliteInstance = new Database("chaindrive.db", {
-      verbose: console.log,
-    });
+    sqliteInstance = new Database("chaindrive.db", {});
     sqliteInstance.pragma("journal_mode = WAL");
     sqliteInstance.pragma("foreign_keys = ON");
   }

@@ -1,7 +1,9 @@
 import { NotificationContext } from "@/contexts/NotificationContext";
+import { useMarkAsReadNotification } from "@/hooks/useMarkAsReadNotification";
+import { useNotification } from "@/hooks/useNotification";
 import { useSocket } from "@/hooks/useSocket";
 import { Notification } from "@/lib/types";
-import { useEffect, useState } from "react";
+import { useContext, useEffect, useState } from "react";
 import { toast } from "react-toastify";
 
 export const NotificationProvider = ({
@@ -11,39 +13,63 @@ export const NotificationProvider = ({
 }) => {
   const [notifications, setNotifications] = useState<Notification[]>([]);
   const { socket } = useSocket();
+  const {
+    data,
+    isLoading: isNotificationsLoading,
+    refetch: refetchNotifications,
+  } = useNotification();
+  const { markAsReadNotification } = useMarkAsReadNotification();
 
   useEffect(() => {
-    socket.on("notification", (notification: Notification) => {
-      setNotifications((prev) => [notification, ...prev]);
-      toast(notification.content);
-      new Audio("/notification.mp3").play(); // Play sound
-    });
+    if (!isNotificationsLoading && data) {
+      setNotifications(data);
+    }
+  }, [data, isNotificationsLoading]);
 
-    socket.on("unread-notifications", (unread: Notification[]) => {
-      setNotifications(unread);
-    });
+  useEffect(() => {
+    const handleNotification = (notification: Notification) => {
+      setNotifications((prev) => [notification, ...prev]);
+      if (location.pathname !== "/chat") {
+        toast.info(notification.content, {
+          position: "top-right",
+          autoClose: 5000,
+        });
+      }
+
+      const audio = new Audio("/notification.mp3");
+      audio
+        .play()
+        .catch((err) =>
+          console.error("Error playing notification sound:", err)
+        );
+    };
+
+    socket.on("notification", handleNotification);
 
     return () => {
-      socket.off("notification");
-      socket.off("unread-notifications");
+      socket.off("notification", handleNotification);
     };
-  }, []);
+  }, [socket]); // Only depend on socket
 
-  const markAsRead = (id: number) => {
-    setNotifications((prev) => prev.filter((n) => n.id !== id));
-    socket.emit("mark-as-read", id);
-  };
-
-  const removeNotification = (id: number) => {
-    setNotifications((prev) => prev.filter((n) => n.id !== id));
-    socket.emit("remove-notification", id);
+  const markAllAsRead = () => {
+    setNotifications([]);
+    markAsReadNotification();
+    refetchNotifications();
   };
 
   return (
-    <NotificationContext.Provider
-      value={{ notifications, markAsRead, removeNotification }}
-    >
+    <NotificationContext.Provider value={{ notifications, markAllAsRead }}>
       {children}
     </NotificationContext.Provider>
   );
+};
+
+export const useNotificationProvider = () => {
+  const context = useContext(NotificationContext);
+  if (!context) {
+    throw new Error(
+      "useNotificationProvider must be used within a NotificationProvider"
+    );
+  }
+  return context;
 };
