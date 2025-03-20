@@ -15,10 +15,16 @@ const ProfilePage = React.lazy(() => import("./pages/Profile"));
 const HomePage = React.lazy(() => import("./pages/Homepage"));
 const Chat = React.lazy(() => import("./pages/Chat"));
 
+const DummyContract = React.lazy(() => import("./pages/DummyContract"));
+
 const ROUTES = [
   {
     link: "/",
     component: <HomePage />,
+  },
+  {
+    link: "/dummy-contract",
+    component: <DummyContract />,
   },
   {
     link: "/signup",
@@ -82,7 +88,7 @@ const MainApp: React.FC = () => {
         navigate("/not-authorized");
       }
     }
-  }, [loading, user, navigate, location.pathname]);
+  }, [loading, user, location.pathname]);
 
   if (loading) {
     return <Splash />;
