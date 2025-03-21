@@ -17,6 +17,8 @@ const Chat = React.lazy(() => import("./pages/Chat"));
 
 const DummyContract = React.lazy(() => import("./pages/DummyContract"));
 
+const ListVehicle = React.lazy(() => import("./pages/ListVehicle"));
+
 const ROUTES = [
   {
     link: "/",
@@ -42,6 +44,11 @@ const ROUTES = [
   {
     link: "/owner-dashboard",
     component: <OwnerDashboardPage />,
+    roles: ["owner"],
+  },
+  {
+    link: "/list-vehicle",
+    component: <ListVehicle />,
     roles: ["owner"],
   },
   {
