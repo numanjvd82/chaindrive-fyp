@@ -1,8 +1,8 @@
-import express, { Request, Response } from "express";
+import { Request, Response, Router } from "express";
 import { getDbInstance } from "../../lib/db/sqlite";
 import { sql } from "../../utils/utils";
 
-const notificationRouter = express.Router();
+const notificationRouter = Router();
 const db = getDbInstance();
 
 // Fetch unread notifications

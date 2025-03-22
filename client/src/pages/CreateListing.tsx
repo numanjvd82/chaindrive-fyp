@@ -1,12 +1,14 @@
 import Button from "@/components/Button";
-import Footer from "@/components/Footer";
 import Input from "@/components/Input";
 import RadioGroup from "@/components/RadioGroup";
 import Select from "@/components/Select";
+import { useCreateListing } from "@/hooks/useCreateListing";
 import { zodResolver } from "@hookform/resolvers/zod";
 import React, { useState } from "react";
 import { useForm } from "react-hook-form";
 import { IoIosClose } from "react-icons/io";
+import { useNavigate } from "react-router-dom";
+import { toast } from "react-toastify";
 import { z } from "zod";
 
 const schema = z.object({
@@ -57,13 +59,16 @@ const schema = z.object({
 
 type FormValues = z.infer<typeof schema>;
 
-const ListVehicle: React.FC = () => {
+const CreateListing: React.FC = () => {
   const [previews, setPreviews] = useState<string[]>([]);
+  const { createListing, isLoading } = useCreateListing();
+  const navigate = useNavigate();
   const {
     register,
     handleSubmit,
     setValue,
     watch,
+    reset,
     formState: { errors },
   } = useForm<FormValues>({
     resolver: zodResolver(schema),
@@ -86,9 +91,15 @@ const ListVehicle: React.FC = () => {
 
   const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const files = e.target.files ? Array.from(e.target.files) : [];
-    if (images.length + files.length > 4) {
-      alert("You can only upload up to 4 images.");
-      return;
+    if (images.length + files.length > 4) return;
+
+    for (const file of files) {
+      if (!["image/jpeg", "image/png"].includes(file.type)) {
+        return toast.error("Invalid file type. Only JPEG and PNG is allowed");
+      }
+      if (file.size > 2000000) {
+        return toast.error("Image size must be less than 2MB");
+      }
     }
 
     setValue("images", [...images, ...files]);
@@ -114,7 +125,6 @@ const ListVehicle: React.FC = () => {
   };
 
   const onSubmit = async (values: FormValues) => {
-    console.log(values);
     const formData = new FormData();
     formData.append("title", values.title);
     formData.append("model", values.model);
@@ -125,11 +135,27 @@ const ListVehicle: React.FC = () => {
     formData.append("licensePlate", values.licensePlate);
     formData.append("transmissionType", values.transmissionType);
     formData.append("fuelType", values.fuelType);
-    values.images.forEach((image) => formData.append("images", image));
+    values.images.forEach((image) => {
+      formData.append("images", image);
+    });
+
+    for (const [key, value] of formData.entries()) {
+      console.log({ [key]: value });
+    }
+
     try {
       // Send vehicle data to the server
-    } catch (error) {
-      console.error("Error saving vehicle:", error);
+      await createListing(formData);
+      reset();
+      setPreviews([]);
+      toast.success("Vehicle listed successfully!", {
+        onClose: () => navigate("/list-vehicle"),
+      });
+    } catch (err: any) {
+      console.error("Error saving vehicle:", err);
+      toast.error(
+        err.response?.data.message || "An error occurred. Please try again."
+      );
     }
   };
 
@@ -192,6 +218,7 @@ const ListVehicle: React.FC = () => {
             error={errors.licensePlate?.message}
           />
 
+          <p className="text-sm text-gray-600">Transmission Type</p>
           <RadioGroup
             {...register("transmissionType")}
             name="transmissionType"
@@ -251,14 +278,13 @@ const ListVehicle: React.FC = () => {
             </div>
           </div>
 
-          <Button type="submit" className="ml-auto">
+          <Button isLoading={isLoading} type="submit" className="ml-auto">
             List Vehicle
           </Button>
         </form>
       </div>
-      <Footer />
     </div>
   );
 };
 
-export default ListVehicle;
+export default CreateListing;

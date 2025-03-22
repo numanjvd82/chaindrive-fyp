@@ -43,3 +43,20 @@ export interface Message {
   isRead: boolean;
   createdAt: Date;
 }
+
+export interface Listing {
+  id: number;
+  title: string;
+  model: string;
+  year: number;
+  pricePerDay: number;
+  numOfSeats: number;
+  location: string;
+  licensePlate: string;
+  transmissionType: "manual" | "automatic";
+  fuelType: "petrol" | "diesel" | "electric" | "hybrid";
+  ownerId: number;
+  images: string[];
+  createdAt: Date;
+  updatedAt: Date;
+}

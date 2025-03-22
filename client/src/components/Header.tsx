@@ -5,6 +5,7 @@ import React from "react";
 import { FaRegCommentDots } from "react-icons/fa";
 import { useQueryClient } from "react-query";
 import { Link, useNavigate } from "react-router-dom";
+import Button from "./Button";
 import Dropdown from "./Dropdown";
 import { NotificationDropdown } from "./NotificationDropdown";
 
@@ -34,6 +35,11 @@ const Header: React.FC = () => {
       </div>
 
       <nav className="hidden sm:flex items-center space-x-6">
+        {user.role === "owner" ? (
+          <Link to="/listings/create">
+            <Button variant="primary">List Vehicle</Button>
+          </Link>
+        ) : null}
         <Link
           to={user.role === "owner" ? "/owner-dashboard" : "/renter-dashboard"}
           className="font-semibold text-gray-600 hover:text-primary"

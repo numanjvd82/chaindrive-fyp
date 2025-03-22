@@ -40,3 +40,20 @@ export interface Notification {
   content: string;
   created_at: string;
 }
+
+export interface Listing {
+  id: number;
+  title: string;
+  model: string;
+  year: number;
+  pricePerDay: number;
+  numOfSeats: number;
+  location: string;
+  licensePlate: string;
+  transmissionType: "manual" | "automatic";
+  fuelType: "petrol" | "diesel" | "electric" | "hybrid";
+  ownerId: number;
+  images: string[];
+  createdAt: Date;
+  updatedAt: Date;
+}
