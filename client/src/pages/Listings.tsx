@@ -84,16 +84,13 @@ const CarCard: React.FC<{ listing: Listing }> = ({ listing }) => {
 
       {/* Display Image */}
       <div>
-        {images.map((img, i) => (
-          <motion.img
-            key={i}
-            src={`data:image/png;base64,${img}`}
-            alt={title + i}
-            className="w-56 h-36 rounded-lg object-cover shadow-lg"
-            whileHover={{ scale: 1.03 }}
-            transition={{ duration: 0.2, ease: "easeOut" }}
-          />
-        ))}
+        <motion.img
+          src={`data:image/png;base64,${images[0]}`}
+          alt={title}
+          className="w-56 h-36 rounded-lg object-cover shadow-lg"
+          whileHover={{ scale: 1.03 }}
+          transition={{ duration: 0.2, ease: "easeOut" }}
+        />
       </div>
     </motion.div>
   );
@@ -101,12 +98,6 @@ const CarCard: React.FC<{ listing: Listing }> = ({ listing }) => {
 
 const Listings: React.FC = () => {
   const { error, isLoading, listings } = useListings();
-
-  if (isLoading) {
-    <div className="text-center h-screen flex items-center justify-center">
-      <Loader size="lg" />
-    </div>;
-  }
 
   if (error) {
     return (
@@ -122,6 +113,12 @@ const Listings: React.FC = () => {
         <p className="text-gray-500 text-lg">No listings found</p>
       </div>
     );
+  }
+
+  if (isLoading) {
+    <div className="text-center h-screen flex items-center justify-center">
+      <Loader size="lg" />
+    </div>;
   }
 
   return (

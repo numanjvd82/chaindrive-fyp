@@ -7,6 +7,15 @@ export const truncateText = (name: string, maxLength: number = 15) => {
   return name;
 };
 
+// Converts File to an Image Element
+export const createImageElement = (file: File): Promise<HTMLImageElement> => {
+  return new Promise((resolve) => {
+    const img = new Image();
+    img.src = URL.createObjectURL(file);
+    img.onload = () => resolve(img);
+  });
+};
+
 export const convertDateToString = (date: Date) => {
   return new Date(date).toLocaleDateString("en-US", {
     year: "numeric",
