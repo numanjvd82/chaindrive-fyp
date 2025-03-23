@@ -30,8 +30,6 @@ const PaymentModal: React.FC<PaymentModalProps> = ({
     setDisabled(false);
   };
 
-  console.log(account);
-
   return (
     <DialogModal
       isOpen={isOpen}

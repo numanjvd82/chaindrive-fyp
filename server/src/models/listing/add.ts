@@ -63,9 +63,7 @@ export async function addListing(input: AddListingInput) {
     const images = await Promise.all(
       parsedInput.images.map(async (image, i: number) => {
         const base64Image = convertBufferToBase64(image);
-        return {
-          [`image${i + 1}`]: base64Image,
-        };
+        return base64Image;
       })
     );
 

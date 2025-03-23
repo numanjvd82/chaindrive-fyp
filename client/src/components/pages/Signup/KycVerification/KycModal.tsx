@@ -35,7 +35,6 @@ const KycModal: React.FC<KycModalProps> = ({
     event: React.ChangeEvent<HTMLInputElement>,
     fieldName: string
   ) => {
-    console.log(event.target.files);
     const file = event.target.files && event.target.files[0];
 
     if (!file) {

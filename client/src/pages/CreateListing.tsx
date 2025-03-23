@@ -139,20 +139,15 @@ const CreateListing: React.FC = () => {
       formData.append("images", image);
     });
 
-    for (const [key, value] of formData.entries()) {
-      console.log({ [key]: value });
-    }
-
     try {
       // Send vehicle data to the server
       await createListing(formData);
       reset();
       setPreviews([]);
       toast.success("Vehicle listed successfully!", {
-        onClose: () => navigate("/list-vehicle"),
+        onClose: () => navigate("/listings"),
       });
     } catch (err: any) {
-      console.error("Error saving vehicle:", err);
       toast.error(
         err.response?.data.message || "An error occurred. Please try again."
       );

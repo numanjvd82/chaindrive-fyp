@@ -77,7 +77,6 @@ export default function socketServer(server: http.Server) {
         userId,
       });
       if (!conversation) return;
-      console.log("Conversation", conversation);
 
       const recipientId =
         conversation.user1 === userId ? conversation.user2 : conversation.user1;
@@ -90,7 +89,6 @@ export default function socketServer(server: http.Server) {
           content: `New message from ${conversation.name}`,
         });
       } else {
-        console.log("Recipient is offline, sending notification...");
         insertNotification.run(
           recipientId,
           "message",

@@ -14,10 +14,9 @@ const SignupPage = React.lazy(() => import("./pages/Signup"));
 const ProfilePage = React.lazy(() => import("./pages/Profile"));
 const HomePage = React.lazy(() => import("./pages/Homepage"));
 const Chat = React.lazy(() => import("./pages/Chat"));
-
-const DummyContract = React.lazy(() => import("./pages/DummyContract"));
-
+const ListingsPage = React.lazy(() => import("./pages/Listings"));
 const CreateListing = React.lazy(() => import("./pages/CreateListing"));
+const DummyContract = React.lazy(() => import("./pages/DummyContract"));
 
 const ROUTES = [
   {
@@ -49,6 +48,11 @@ const ROUTES = [
   {
     link: "/listings/create",
     component: <CreateListing />,
+    roles: ["owner"],
+  },
+  {
+    link: "/listings",
+    component: <ListingsPage />,
     roles: ["owner"],
   },
   {
