@@ -5,7 +5,7 @@ import { ChatSidebar } from "@/components/pages/Chat/ChatSidebar";
 import useChatSocket from "@/hooks/useChatSocket";
 import useListConversations from "@/hooks/useListConversations";
 import useOnlineStatus from "@/hooks/useOnlineStatus";
-import useUser from "@/hooks/useUser";
+import { useUser } from "@/hooks/useUser";
 import { Conversation } from "@/lib/types";
 import { convertDateToString, convertUtcToLocal } from "@/lib/utils";
 import { AnimatePresence, motion } from "framer-motion";

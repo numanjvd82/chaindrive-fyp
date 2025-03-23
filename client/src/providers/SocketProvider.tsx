@@ -1,5 +1,5 @@
 import { SocketContext } from "@/contexts/SocketContext";
-import useUser from "@/hooks/useUser";
+import { useUser } from "@/hooks/useUser";
 import { socket } from "@/lib/socket";
 import { ReactNode, useEffect, useState } from "react";
 

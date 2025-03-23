@@ -1,6 +1,7 @@
 import { axiosInstance } from "@/lib/axios";
 import { Notification } from "@/lib/types";
 import { useQuery } from "react-query";
+import { useUser } from "./useUser";
 
 async function fetchNotifications() {
   try {
@@ -14,11 +15,13 @@ async function fetchNotifications() {
 }
 
 export const useNotification = () => {
+  const { user } = useUser();
   const { data, isLoading, refetch } = useQuery(
     "notifications",
     fetchNotifications,
     {
       refetchInterval: 10000,
+      enabled: !!user,
     }
   );
 

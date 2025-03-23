@@ -1,5 +1,5 @@
 import logo from "@/assets/images/logo.svg";
-import useUser from "@/hooks/useUser";
+import { useUser } from "@/hooks/useUser";
 import { axiosInstance } from "@/lib/axios";
 import React from "react";
 import { FaRegCommentDots } from "react-icons/fa";

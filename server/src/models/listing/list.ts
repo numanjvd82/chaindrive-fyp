@@ -32,8 +32,8 @@ export async function list(id: ListInput) {
           fuelType: listing.fuel_type,
           ownerId: listing.owner_id,
           images: JSON.parse(listing.images),
-          createdAt: listing.created_at,
-          updatedAt: listing.updated_at,
+          createdAt: new Date(listing.created_at),
+          updatedAt: new Date(listing.updated_at),
         };
       });
     return listings as Listing[];

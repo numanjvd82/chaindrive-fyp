@@ -4,7 +4,7 @@ import IdCardImages from "@/components/pages/Profile/IdCardImages";
 import KycVerificationStatus from "@/components/pages/Profile/KycVerificationStatus";
 import PaymentModal from "@/components/pages/Profile/PaymentModal";
 import Splash from "@/components/Splash";
-import useUser from "@/hooks/useUser";
+import { useUser } from "@/hooks/useUser";
 import { useState } from "react";
 import { FormProvider, useForm } from "react-hook-form";
 

@@ -1,39 +1,18 @@
-import { useEffect, useState } from "react";
-import { toast } from "react-toastify";
-import { UserContext } from "../contexts/UserContext";
-import { axiosInstance } from "../lib/axios";
+import { UserContext } from "@/contexts/UserContext";
+import useAuthUser from "@/hooks/useAuthUser";
 import { User } from "../lib/types";
 
 export const UserProvider = ({ children }: { children: React.ReactNode }) => {
-  const [user, setUser] = useState<User | null>(null);
-  const [loading, setLoading] = useState(true);
-
-  const fetchUser = async () => {
-    setLoading(true);
-    try {
-      const { data } = await axiosInstance.get<User>("/api/auth/me", {
-        withCredentials: true,
-      });
-      setUser(data);
-      return user;
-    } catch (err: any) {
-      // Handle session expiration
-      if (err.response?.status === 401) {
-        setUser(null);
-        toast.error("Your session has expired. Please log in again."); // Show toast notification
-      }
-      return null;
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  useEffect(() => {
-    fetchUser(); // Fetch user details on initial render
-  }, []);
+  const { user, loading, refetch } = useAuthUser(); // Use the custom hook
 
   return (
-    <UserContext.Provider value={{ user, setUser, fetchUser, loading }}>
+    <UserContext.Provider
+      value={{
+        user: user as User,
+        fetchUser: refetch,
+        loading,
+      }}
+    >
       {children}
     </UserContext.Provider>
   );

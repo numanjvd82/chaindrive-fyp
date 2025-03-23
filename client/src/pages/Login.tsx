@@ -1,6 +1,6 @@
 import Button from "@/components/Button";
 import Input from "@/components/Input";
-import useUser from "@/hooks/useUser";
+import { useUser } from "@/hooks/useUser";
 import { axiosInstance } from "@/lib/axios";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { SubmitHandler, useForm } from "react-hook-form";
@@ -32,12 +32,12 @@ const Login = () => {
     mode: "onTouched",
   });
   const navigate = useNavigate();
-  const { refetch } = useUser();
+  const { fetchUser } = useUser();
 
   const onSubmit: SubmitHandler<LoginForm> = async (data) => {
     try {
       await axiosInstance.post("/api/auth/login", data);
-      const user = await refetch(); // Fetch and update user context
+      const user = await fetchUser(); // Fetch and update user context
       if (user.data) {
         const role = user.data.role;
         const path =

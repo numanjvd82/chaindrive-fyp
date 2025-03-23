@@ -1,5 +1,5 @@
 import { WalletContext } from "@/contexts/WalletContext";
-import useUser from "@/hooks/useUser";
+import { useUser } from "@/hooks/useUser";
 import { ethers } from "ethers";
 import { useEffect, useState } from "react";
 import { toast } from "react-toastify";
