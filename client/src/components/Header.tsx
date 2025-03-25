@@ -72,6 +72,12 @@ const Header: React.FC = () => {
                 Profile
               </Link>
               <Link
+                to="/listings"
+                className="block px-4 py-2 text-gray-600 hover:bg-gray-100"
+              >
+                Listings
+              </Link>
+              <Link
                 to="/settings"
                 onClick={handleLogout}
                 className="block px-4 py-2 bg-primary text-white transition-all hover:brightness-110"
