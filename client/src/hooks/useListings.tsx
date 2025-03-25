@@ -13,11 +13,15 @@ async function fetchListings() {
 }
 
 export function useListings() {
-  const { data, error, isLoading } = useQuery("listings", fetchListings);
+  const { data, error, isLoading, refetch } = useQuery(
+    "listings",
+    fetchListings
+  );
 
   return {
     listings: data,
     error,
     isLoading,
+    refetch,
   };
 }

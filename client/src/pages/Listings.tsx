@@ -1,5 +1,6 @@
 import Button from "@/components/Button";
 import Loader from "@/components/Loader";
+import { DeleteModal } from "@/components/pages/Listings/DeleteModal";
 import { useListings } from "@/hooks/useListings";
 import { Listing } from "@/lib/types";
 import { motion } from "framer-motion";
@@ -14,7 +15,17 @@ import {
   FaTrash,
 } from "react-icons/fa";
 
-const CarCard: React.FC<{ listing: Listing }> = ({ listing }) => {
+type CarCardProps = {
+  listing: Listing;
+  setShowDeleteModal: React.Dispatch<React.SetStateAction<boolean>>;
+  setListingId: React.Dispatch<React.SetStateAction<number | undefined>>;
+};
+
+const CarCard: React.FC<CarCardProps> = ({
+  listing,
+  setShowDeleteModal,
+  setListingId,
+}) => {
   const {
     title,
     year,
@@ -25,6 +36,7 @@ const CarCard: React.FC<{ listing: Listing }> = ({ listing }) => {
     model,
     transmissionType,
     location,
+    id,
   } = listing;
 
   return (
@@ -76,6 +88,10 @@ const CarCard: React.FC<{ listing: Listing }> = ({ listing }) => {
             variant="primary"
             type="button"
             className="bg-red-600 text-white flex items-center gap-2"
+            onClick={() => {
+              setShowDeleteModal(true);
+              setListingId(id);
+            }}
           >
             <FaTrash /> Delete
           </Button>
@@ -97,7 +113,11 @@ const CarCard: React.FC<{ listing: Listing }> = ({ listing }) => {
 };
 
 const Listings: React.FC = () => {
-  const { error, isLoading, listings } = useListings();
+  const { error, isLoading, listings, refetch } = useListings();
+  const [showDeleteModal, setShowDeleteModal] = React.useState(false);
+  const [listingId, setListingId] = React.useState<number | undefined>(
+    undefined
+  );
 
   if (error) {
     return (
@@ -123,13 +143,25 @@ const Listings: React.FC = () => {
 
   return (
     <div className="bg-gray-100 min-h-screen p-6">
+      <DeleteModal
+        showDeleteModal={showDeleteModal}
+        setShowDeleteModal={setShowDeleteModal}
+        listingId={listingId}
+        refetch={refetch}
+      />
+
       <div className="max-w-3xl mx-auto">
         <h2 className="text-3xl font-bold">
           Your Vehicles ({listings.length})
         </h2>
         <div className="mt-5 space-y-5">
           {listings.map((listing) => (
-            <CarCard key={listing.id} listing={listing} />
+            <CarCard
+              key={listing.id}
+              listing={listing}
+              setShowDeleteModal={setShowDeleteModal}
+              setListingId={setListingId}
+            />
           ))}
         </div>
       </div>

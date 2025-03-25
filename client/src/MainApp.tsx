@@ -107,7 +107,11 @@ const MainApp: React.FC = () => {
 
   return (
     <Suspense fallback={<Splash />}>
-      <ToastContainer pauseOnFocusLoss={false} pauseOnHover={false} />
+      <ToastContainer
+        pauseOnFocusLoss={false}
+        pauseOnHover={false}
+        autoClose={3000}
+      />
 
       <Header />
       <Routes>

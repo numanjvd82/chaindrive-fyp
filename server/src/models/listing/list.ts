@@ -38,7 +38,6 @@ export async function list(id: ListInput) {
       });
     return listings as Listing[];
   } catch (err: any) {
-    console.error(`Error fetching listings: ${err.message}`);
     throw new Error(`Unable to fetch listings: ${err.message}`);
   }
 }
