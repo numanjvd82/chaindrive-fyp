@@ -5,6 +5,7 @@ import car1Image from "@/assets/images/car-1.png";
 import car2Image from "@/assets/images/car-2.png";
 import car3Image from "@/assets/images/car-3.png";
 import car4Image from "@/assets/images/car-4.png";
+import Footer from "@/components/Footer";
 
 const cars: CarProps[] = [
   {
@@ -59,9 +60,12 @@ const cars: CarProps[] = [
 
 const RenterDashboard = () => {
   return (
+    <div>
     <div className="min-h-screen bg-gray-100 p-8 flex flex-col items-center">
       <h1 className="text-3xl font-bold text-center mb-8">Car Rental</h1>
       <CarGrid cars={cars} />
+    </div>
+    <Footer />
     </div>
   );
 };

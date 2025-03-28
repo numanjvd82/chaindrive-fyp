@@ -27,9 +27,9 @@ const ImageSlider: React.FC<ImageSliderProps> = ({ images }) => {
   }
 
   return (
-    <div className="relative w-full max-w-lg mx-auto overflow-hidden rounded-lg shadow-lg">
+    <div className="relative w-96 h-72 rounded-lg shadow-lg">
       {/* Slider container */}
-      <div className="relative h-64 md:h-80">
+      <div className="relative h-64 md:h-72">
         {displayedImages.map((image, index) => (
           <div
             key={index}

@@ -18,10 +18,6 @@ const CarDetail = () => {
       "Keyless entry",
       "Leather seats"
     ],
-    rules: [
-      "No smoking",
-      "Pets allowed"
-    ]
   };
 
   const images = [
@@ -31,36 +27,20 @@ const CarDetail = () => {
   ];
 
   return (
-    <div className="p-8 max-w-2xl ">
+    <div className="p-6 w-full mr-auto">
       <h1 className="text-2xl font-bold mb-2">{carData.name}</h1>
       <ImageSlider images={images} />
-      <h2 className="text-xl font-semibold mt-6 mb-3">Car Details</h2>
+      <h1 className="text-xl font-bold text-gray-800 my-6">Car Details</h1>
       
       <div className="space-y-2">
-        <p><span className="font-medium">Location:</span> {carData.location}</p>
-        <p><span className="font-medium">Fuel type:</span> {carData.fuelType}</p>
-        <p><span className="font-medium">Transmission:</span> {carData.transmission}</p>
-        <p><span className="font-medium">Seats:</span> {carData.seatingCapacity}</p>
-        <p><span className="font-medium">Color:</span> {carData.paintColor}</p>
+        <p className='flex justify-between'><span className="font-medium text-blue-500">Location:</span> {carData.location}</p>
+        <p className='flex justify-between'><span className="font-medium text-blue-500">Fuel type:</span> {carData.fuelType}</p>
+        <p className='flex justify-between'><span className="font-medium text-blue-500">Transmission:</span> {carData.transmission}</p>
+        <p className='flex justify-between'><span className="font-medium text-blue-500">Seats:</span> {carData.seatingCapacity}</p>
+        <p className='flex justify-between'><span className="font-medium text-blue-500">Color:</span> {carData.paintColor}</p>
+        <p className='flex justify-between'><span className="font-medium text-blue-500">Features:</span> {carData.features}</p>
       </div>
 
-      <div className="mt-6">
-        <h3 className="font-semibold text-lg">Features</h3>
-        <p className="list-disc pl-5 mt-2">
-          {carData.features.map((feature, index) => (
-            <p key={index}>{feature}</p>
-          ))}
-        </p> 
-      </div>
-
-      <div className="mt-6">
-        <h3 className="font-semibold text-lg">Rules</h3>
-        <ul className="list-disc pl-5 mt-2">
-          {carData.rules.map((rule, index) => (
-            <li key={index}>{rule}</li>
-          ))}
-        </ul>
-      </div>
     </div>
   );
 };

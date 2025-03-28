@@ -38,7 +38,7 @@ const BookingCalculator: React.FC<BookingSummaryProps> = ({
   };
 
   return (
-    <div className="border rounded-lg p-6 shadow-sm bg-white h-1/4 w-1/4">
+    <div className="border rounded-lg p-6 shadow-sm bg-white h-1/4 w-1/2 mr-6 mt-12">
       <div className='flex justify-between'>
         <h3 className="text-lg font-semibold mb-4">Booking dates</h3>
         <h3 className="text-lg mb-4">${ppd}/day</h3>
