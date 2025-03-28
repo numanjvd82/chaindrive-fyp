@@ -4,6 +4,7 @@ import { FaRegSnowflake, FaStar } from "react-icons/fa";
 import { FiUser } from "react-icons/fi";
 import { GiCarDoor } from "react-icons/gi";
 import { TbManualGearbox } from "react-icons/tb";
+import { Link } from "react-router-dom";
 
 export interface CarProps {
   name: string;
@@ -15,7 +16,7 @@ export interface CarProps {
   doors: number;
   price: number;
   image: string;
-  onRentClick: () => void;
+  link: string;
 }
 
 export const CarCard: React.FC<CarProps> = ({
@@ -28,7 +29,7 @@ export const CarCard: React.FC<CarProps> = ({
   doors,
   price,
   image,
-  onRentClick,
+  link,
 }) => {
   return (
     <div className="flex flex-col items-start w-70 border rounded-lg shadow-xl py-4 px-6 bg-white min-h-[450px]">
@@ -81,9 +82,14 @@ export const CarCard: React.FC<CarProps> = ({
           <span className="text-sm text-gray-500"> /day</span>
         </p>
       </div>
-      <Button onClick={onRentClick} className="mt-4 w-full">
+      <Link 
+        to={link} 
+        className="mt-4 w-full"
+      >
+      <Button className="mt-4 w-full">
         Rent Now →
-      </Button>
+      </Button></Link>
+      
     </div>
   );
 };

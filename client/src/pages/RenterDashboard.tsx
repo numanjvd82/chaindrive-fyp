@@ -17,7 +17,7 @@ const cars: CarProps[] = [
     doors: 4,
     price: 1800,
     image: car1Image,
-    onRentClick: () => alert("Renting Jaguar XE L P250!"),
+    link: "/vehicle-detail",
   },
   {
     name: "Audi R8",
@@ -29,7 +29,7 @@ const cars: CarProps[] = [
     doors: 2,
     price: 2100,
     image: car2Image,
-    onRentClick: () => alert("Renting Audi R8!"),
+    link: "/vehicle-detail",
   },
   {
     name: "BMW M3",
@@ -41,7 +41,7 @@ const cars: CarProps[] = [
     doors: 4,
     price: 1600,
     image: car3Image,
-    onRentClick: () => alert("Renting BMW M3!"),
+    link: "/vehicle-detail",
   },
   {
     name: "Lamborghini Huracan",
@@ -53,7 +53,7 @@ const cars: CarProps[] = [
     doors: 2,
     price: 2300,
     image: car4Image,
-    onRentClick: () => alert("Renting Lamborghini Huracan!"),
+    link: "/vehicle-detail",
   },
 ];
 

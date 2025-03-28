@@ -4,6 +4,7 @@ import { ToastContainer } from "react-toastify";
 import Header from "./components/Header";
 import Splash from "./components/Splash";
 import { useUser } from "./hooks/useUser";
+import RentVehicle from "./pages/RentVehicle";
 
 const LoginPage = React.lazy(() => import("./pages/Login"));
 const NotFoundPage = React.lazy(() => import("./pages/NotFound"));
@@ -38,6 +39,12 @@ const ROUTES = [
   {
     link: "/renter-dashboard",
     component: <RenterDashboardPage />,
+    roles: ["renter"],
+  },
+  // change 
+  {
+    link: "/vehicle-detail",
+    component: <RentVehicle />,
     roles: ["renter"],
   },
   {

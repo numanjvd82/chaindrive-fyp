@@ -29,23 +29,33 @@ const Header: React.FC = () => {
   };
 
   return (
-    <header className="flex justify-between items-center h-16 p-4 bg-white shadow-md">
+    <header className="flex justify-between items-center h-16 px-14 bg-white shadow-md">
       <div className="flex items-center space-x-2">
         <img src={logo} alt="Chaindrive Logo" className="h-15 w-15" />
       </div>
 
       <nav className="hidden sm:flex items-center space-x-6">
-        {user.role === "owner" ? (
-          <Link to="/listings/create">
-            <Button variant="primary">List Vehicle</Button>
-          </Link>
-        ) : null}
+
         <Link
           to={user.role === "owner" ? "/owner-dashboard" : "/renter-dashboard"}
           className="font-semibold text-gray-600 hover:text-primary"
         >
           Dashboard
         </Link>
+
+
+        {user.role === "owner" ? (
+          <Link to="/listings/create">
+            <Button variant="primary">List Vehicle</Button>
+          </Link>
+        ) : <>
+          <Link to="/renter-bookings" className="font-semibold text-gray-600 hover:text-primary">
+            Bookings
+          </Link>
+          <Link to="/become-host">
+            <Button variant="primary">Become a host</Button>
+          </Link>
+        </>}
 
         <div className="flex items-center space-x-4">
           <Link
