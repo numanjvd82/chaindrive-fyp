@@ -1,7 +1,7 @@
 const Footer: React.FC = () => {
   return (
     <div
-      className={`mt-6 w-full relative bg-blue-950 text-white overflow-hidden flex flex-col items-start justify-start pt-[41px] px-40 pb-[30px] box-border gap-[76.3px] leading-[normal] tracking-[normal] text-left text-xs text-lightgray font-poppins mq450:gap-[19px] mq450:pl-5 mq450:pr-5 mq450:box-border mq725:gap-[38px] mq725:pl-20 mq725:pr-20 mq725:box-border`}
+      className={` w-full relative bg-blue-950 text-white overflow-hidden flex flex-col items-start justify-start pt-[41px] px-40 pb-[30px] box-border gap-[76.3px] leading-[normal] tracking-[normal] text-left text-xs text-lightgray font-poppins mq450:gap-[19px] mq450:pl-5 mq450:pr-5 mq450:box-border mq725:gap-[38px] mq725:pl-20 mq725:pr-20 mq725:box-border`}
     >
       <section className="w-[1064px] flex flex-row items-start justify-between max-w-full gap-5 text-left text-base text-grays-white font-poppins mq1050:flex-wrap">
         <div className="flex flex-col items-start justify-center gap-8">

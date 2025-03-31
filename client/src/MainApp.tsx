@@ -17,6 +17,7 @@ const Chat = React.lazy(() => import("./pages/Chat"));
 const ListingsPage = React.lazy(() => import("./pages/Listings"));
 const CreateListing = React.lazy(() => import("./pages/CreateListing"));
 const DummyContract = React.lazy(() => import("./pages/DummyContract"));
+const ListingDetails = React.lazy(() => import("./pages/ListingDetails"));
 
 const ROUTES = [
   {
@@ -38,6 +39,12 @@ const ROUTES = [
   {
     link: "/renter-dashboard",
     component: <RenterDashboardPage />,
+    roles: ["renter"],
+  },
+  // change
+  {
+    link: "/listing-detail/:id",
+    component: <ListingDetails />,
     roles: ["renter"],
   },
   {
