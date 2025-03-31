@@ -54,8 +54,14 @@ app.use("/api/listings", router.listing);
 const PORT = process.env.PORT || 3000;
 
 connectDb();
-server.listen(PORT, () => {
-  console.log(`Server is running on port http://localhost:${PORT}`);
-});
+server.listen(
+  {
+    port: PORT,
+    host: "0.0.0.0",
+  },
+  () => {
+    console.log(`Server is running on port http://localhost:${PORT}`);
+  }
+);
 
 export default app;
