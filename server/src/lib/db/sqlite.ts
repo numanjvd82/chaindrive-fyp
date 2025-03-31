@@ -38,6 +38,7 @@ export function connectDb() {
   fuel_type TEXT NOT NULL,
   images JSON NOT NULL, 
   owner_id INTEGER NOT NULL,
+  expected_device_id TEXT UNIQUE NULL,
   created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
   updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
   FOREIGN KEY(owner_id) REFERENCES Users(id)
