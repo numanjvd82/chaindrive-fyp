@@ -1,47 +1,72 @@
 import Button from "@/components/Button";
 import Divider from "@/components/Divider";
+import { AvailableRental, Listing } from "@/lib/types";
 import { FaRegSnowflake, FaStar } from "react-icons/fa";
 import { FiUser } from "react-icons/fi";
 import { GiCarDoor } from "react-icons/gi";
 import { TbManualGearbox } from "react-icons/tb";
-import { Link } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 
-export interface CarProps {
-  name: string;
-  rating: number;
-  reviews: number;
-  passengers: number;
-  transmission: string;
-  airConditioning: boolean;
-  doors: number;
-  price: number;
-  image: string;
-  link: string;
-}
+export const CarCard: React.FC<Listing> = (props) => {
+  const {
+    title,
+    year,
+    fuelType,
+    numOfSeats,
+    images,
+    licensePlate,
+    model,
+    transmissionType,
+    location,
+    pricePerDay,
+    id,
+    createdAt,
+    ownerId,
+    updatedAt,
+  } = props;
 
-export const CarCard: React.FC<CarProps> = ({
-  name,
-  rating,
-  reviews,
-  passengers,
-  transmission,
-  airConditioning,
-  doors,
-  price,
-  image,
-  link,
-}) => {
+  const navigate = useNavigate();
+
+  const rating = 4.5;
+  const reviews = 120;
+  const passengers = numOfSeats;
+  const airConditioning = true;
+  const doors = 4;
+  const transmission = transmissionType;
+
+  const handleViewDetails = () => {
+    const details: AvailableRental = {
+      id,
+      title,
+      year,
+      fuelType,
+      numOfSeats,
+      images,
+      licensePlate,
+      model,
+      transmissionType,
+      location,
+      pricePerDay,
+      createdAt,
+      updatedAt,
+      ownerId,
+    };
+    navigate(`/listing-detail/${id}`, {
+      state: { details },
+    });
+  };
+
   return (
-    <div className="flex flex-col items-start w-70 border rounded-lg shadow-xl py-4 px-6 bg-white min-h-[450px]">
-      <div className="h-[150px] w-full flex justify-center">
+    <div className="flex flex-col items-start w-80 border rounded-lg shadow-xl py-4 px-6 bg-white min-h-[450px]">
+      <div className="h-[200px] w-full flex justify-center">
         <img
-          src={image}
-          alt={name}
-          className="rounded-lg h-full object-contain"
+          src={`data:image/jpeg;base64,${images[0]}`}
+          alt={title}
+          className="rounded-lg h-full object-fill"
         />
       </div>
       <div>
-        <h3 className="text-lg font-medium mt-4">{name}</h3>
+        <h3 className="text-lg font-medium mt-4">{title}</h3>
         <div className="flex items-center">
           <FaStar className="text-xl mr-1 text-yellow-300" />
           <span>
@@ -78,18 +103,13 @@ export const CarCard: React.FC<CarProps> = ({
       <div className="flex justify-between w-full">
         <p className="text-lg font-bold">Price</p>
         <p>
-          <span className="text-lg font-bold">${price}</span>
+          <span className="text-lg font-bold">PKR{pricePerDay}</span>
           <span className="text-sm text-gray-500"> /day</span>
         </p>
       </div>
-      <Link 
-        to={link} 
-        className="mt-4 w-full"
-      >
-      <Button className="mt-4 w-full">
+      <Button onClick={handleViewDetails} className="mt-4 w-full">
         Rent Now →
-      </Button></Link>
-      
+      </Button>
     </div>
   );
 };

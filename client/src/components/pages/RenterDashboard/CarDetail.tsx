@@ -1,46 +1,47 @@
-import ImageSlider from '@/components/ImageSlider';
-import React from 'react';
+import { AvailableRental } from "@/lib/types";
+import React from "react";
 
-const CarDetail = () => {
-  const carData = {
-    name: "MERCEDES C63 AMG",
-    location: "Larvae, Pakistan",
-    fuelType: "Petrol",
-    transmission: "Automatic",
-    seatingCapacity: 2,
-    paintColor: "Black",
-    features: [
-      "Free picking up",
-      "Free street parking",
-      "EV charging",
-      "Bluetooth",
-      "GPS navigation",
-      "Keyless entry",
-      "Leather seats"
-    ],
-  };
+type Props = {
+  rental: Omit<AvailableRental, "images">;
+};
 
-  const images = [
-    '/logo.svg',
-    '/maincar.svg',
-    'card2(prd).svg'
-  ];
-
+const CarDetail: React.FC<Props> = ({ rental }) => {
   return (
-    <div className="p-6 w-full mr-auto">
-      <h1 className="text-2xl font-bold mb-2">{carData.name}</h1>
-      <ImageSlider images={images} />
-      <h1 className="text-xl font-bold text-gray-800 my-6">Car Details</h1>
-      
-      <div className="space-y-2">
-        <p className='flex justify-between'><span className="font-medium text-blue-500">Location:</span> {carData.location}</p>
-        <p className='flex justify-between'><span className="font-medium text-blue-500">Fuel type:</span> {carData.fuelType}</p>
-        <p className='flex justify-between'><span className="font-medium text-blue-500">Transmission:</span> {carData.transmission}</p>
-        <p className='flex justify-between'><span className="font-medium text-blue-500">Seats:</span> {carData.seatingCapacity}</p>
-        <p className='flex justify-between'><span className="font-medium text-blue-500">Color:</span> {carData.paintColor}</p>
-        <p className='flex justify-between'><span className="font-medium text-blue-500">Features:</span> {carData.features}</p>
-      </div>
+    <div className="bg-gray-900 text-white p-6 md:p-8 rounded-lg shadow-lg ">
+      <h2 className="text-2xl md:text-3xl font-bold text-blue-400">
+        {rental.title} {rental.model} ({rental.year})
+      </h2>
 
+      <p className="text-lg text-gray-300 mt-2">
+        Price:{" "}
+        <span className="text-blue-400 font-semibold">
+          {rental.pricePerDay}
+          <span className="text-sm"> PKR / day</span>
+        </span>
+      </p>
+
+      <div className="mt-6 grid grid-cols-1 sm:grid-cols-2 gap-4">
+        <p>
+          <span className="text-blue-300 font-medium">Location:</span>{" "}
+          {rental.location}
+        </p>
+        <p>
+          <span className="text-blue-300 font-medium">Fuel Type:</span>{" "}
+          {rental.fuelType.toUpperCase()}
+        </p>
+        <p>
+          <span className="text-blue-300 font-medium">Transmission:</span>{" "}
+          {rental.transmissionType.toUpperCase()}
+        </p>
+        <p>
+          <span className="text-blue-300 font-medium">Seats:</span>{" "}
+          {rental.numOfSeats}
+        </p>
+        <p>
+          <span className="text-blue-300 font-medium">License Plate:</span>{" "}
+          {rental.licensePlate}
+        </p>
+      </div>
     </div>
   );
 };
