@@ -3,9 +3,11 @@ import { getDbInstance } from "../../lib/db/sqlite";
 import { convertBufferToBase64, sql } from "../../utils/utils";
 import { schema } from "./add";
 
-export type EditListingInput = z.infer<typeof schema> & {
-  userId: number;
-};
+const editSchema = schema.extend({
+  id: z.number().int().positive(),
+});
+
+export type EditListingInput = z.infer<typeof editSchema>;
 
 const SQL_QUERY = sql`
   UPDATE listings
@@ -25,7 +27,7 @@ const SQL_QUERY = sql`
 export async function editListing(input: EditListingInput) {
   try {
     const db = getDbInstance();
-    const parsedInput = schema.parse(input);
+    const parsedInput = editSchema.parse(input);
     // convert images to base64
     const images = await Promise.all(
       parsedInput.images.map(async (image, i: number) => {
@@ -48,7 +50,7 @@ export async function editListing(input: EditListingInput) {
         parsedInput.transmissionType,
         parsedInput.fuelType,
         JSON.stringify(images),
-        input.userId
+        parsedInput.id
       );
 
     if (result.changes === 0) {

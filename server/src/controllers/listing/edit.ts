@@ -3,6 +3,7 @@ import { listingModel } from "../../models/listing";
 
 export const editListing = async (req: Request, res: Response) => {
   const {
+    id,
     title,
     model,
     year,
@@ -20,8 +21,14 @@ export const editListing = async (req: Request, res: Response) => {
   const yearNumber = Number(year);
   const pricePerDayNumber = Number(pricePerDay);
   const seatsNumber = Number(seats);
+  const listingId = Number(id);
 
-  if (isNaN(yearNumber) || isNaN(pricePerDayNumber) || isNaN(seatsNumber)) {
+  if (
+    isNaN(yearNumber) ||
+    isNaN(pricePerDayNumber) ||
+    isNaN(seatsNumber) ||
+    isNaN(id)
+  ) {
     res.status(400).json({ message: "Invalid numerical values provided" });
     return;
   }
@@ -43,6 +50,7 @@ export const editListing = async (req: Request, res: Response) => {
 
   try {
     await listingModel.edit({
+      id: listingId,
       title,
       model,
       year: yearNumber,
@@ -53,7 +61,6 @@ export const editListing = async (req: Request, res: Response) => {
       transmissionType,
       fuelType,
       images,
-      userId,
     });
 
     res.status(201).json({

@@ -84,12 +84,14 @@ const Header: React.FC = () => {
               >
                 Profile
               </Link>
-              <Link
-                to="/listings"
-                className="block px-4 py-2 text-gray-600 hover:bg-gray-100"
-              >
-                Listings
-              </Link>
+              {user.role === "owner" ? (
+                <Link
+                  to="/listings"
+                  className="block px-4 py-2 text-gray-600 hover:bg-gray-100"
+                >
+                  Listings
+                </Link>
+              ) : null}
               <Link
                 to="/settings"
                 onClick={handleLogout}
