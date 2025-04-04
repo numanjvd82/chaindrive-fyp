@@ -1,4 +1,6 @@
 import Button from "@/components/Button";
+import Calendar from "@/components/Calendar";
+import dayjs from "dayjs";
 import React, { useState } from "react";
 
 interface BookingSummaryProps {
@@ -10,83 +12,71 @@ const BookingCalculator: React.FC<BookingSummaryProps> = ({
   ppd = 45,
   onBookNow,
 }) => {
-  const [checkInDate, setCheckInDate] = useState<string>("");
-  const [checkOutDate, setCheckOutDate] = useState<string>("");
-  const [totalDays, setTotalDays] = useState<number>(0);
+  const [dates, setDates] = useState<string[]>([]);
 
-  const calculateTotalDays = () => {
-    if (checkInDate && checkOutDate) {
-      const startDate = new Date(checkInDate);
-      const endDate = new Date(checkOutDate);
+  const onlyOneDay =
+    dates.length === 1 ||
+    (dates.length > 0 &&
+      dayjs(dates[0]).isSame(dayjs(dates[dates.length - 1]), "day"));
 
-      // Ensure dates are valid
-      if (isNaN(startDate.getTime()) || isNaN(endDate.getTime())) {
-        setTotalDays(0);
-        return;
-      }
-
-      // Calculate the difference in milliseconds
-      const diffTime = Math.abs(endDate.getTime() - startDate.getTime());
-      // Convert to days
-      const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
-
-      setTotalDays(diffDays);
-    } else {
-      setTotalDays(0);
-    }
+  const calculateTotal = () => {
+    if (dates.length === 0) return 0;
+    const startDate = dayjs(dates[0]);
+    const endDate = dayjs(dates[dates.length - 1]);
+    const totalDays = endDate.diff(startDate, "day") + 1; // +1 to include start date
+    return totalDays * ppd;
   };
+  const total = calculateTotal();
+  const totalDays = dates.length;
 
   return (
-    <div className="border rounded-lg p-6 shadow-md bg-white w-full max-w-sm mx-auto h-[350px] lg:w-full">
-      {/* Header */}
+    <div className="border rounded-xl p-6 shadow-lg bg-white w-full max-w-sm mx-auto h-[350px] lg:w-full">
       <div className="flex justify-between items-center">
-        <h3 className="text-lg font-semibold">Booking Dates</h3>
-        <h3 className="text-lg">PKR{ppd}/day</h3>
+        <h2 className="text-lg font-semibold">Booking Summary</h2>
+        <h3 className="text-lg font-bold text-primary">PKR {ppd}/day</h3>
       </div>
 
-      {/* Date Inputs */}
+      <div className="mt-5">
+        <div className="bg-gray-100 flex justify-between items-center rounded-lg shadow-sm p-3">
+          <Calendar
+            trigger={
+              <div className="text-sm text-gray-700 cursor-pointer w-full">
+                <p className="font-medium text-primary">
+                  {dates.length > 0
+                    ? onlyOneDay
+                      ? `Selected Date: ${dayjs(dates[0]).format("DD/MM/YYYY")}`
+                      : `Selected Dates: ${dayjs(dates[0]).format(
+                          "DD/MM/YYYY"
+                        )} - ${dayjs(dates[dates.length - 1]).format(
+                          "DD/MM/YYYY"
+                        )}`
+                    : "Select Dates"}
+                </p>
+              </div>
+            }
+            onDateSelect={(dates) => setDates(dates)}
+          />
+        </div>
+      </div>
+
+      <div className="flex justify-between items-center mt-6 border-t pt-4">
+        <p className="font-medium text-lg">Total</p>
+        <p className="text-2xl font-bold text-primary">PKR {total}</p>
+      </div>
+
       <div className="mt-4">
-        <div className="bg-gray-100 rounded-lg shadow-sm p-3 mb-3">
-          <label className="text-sm text-gray-600 block">Check-in</label>
-          <input
-            type="date"
-            className="w-full bg-transparent focus:outline-none"
-            value={checkInDate}
-            onChange={(e) => {
-              setCheckInDate(e.target.value);
-              calculateTotalDays();
-            }}
-          />
-        </div>
-
-        <div className="bg-gray-100 rounded-lg shadow-sm p-3 mb-3">
-          <label className="text-sm text-gray-600 block">Check-out</label>
-          <input
-            type="date"
-            className="w-full bg-transparent focus:outline-none"
-            value={checkOutDate}
-            onChange={(e) => {
-              setCheckOutDate(e.target.value);
-              calculateTotalDays();
-            }}
-          />
-        </div>
-
-        {totalDays > 0 && (
-          <div className="bg-gray-100 rounded-lg shadow-sm p-3 mb-3">
-            <p className="text-sm text-gray-600">Number of days: {totalDays}</p>
-          </div>
-        )}
+        <p className="text-sm text-gray-500 mt-2">
+          {totalDays > 0
+            ? `Total Days: ${totalDays}`
+            : "Please select dates to see total days."}
+        </p>
       </div>
 
-      {/* Total Price */}
-      <div className="flex justify-between items-center mt-4">
-        <p className="font-medium">Total</p>
-        <p className="text-lg font-bold">PKR{(ppd * totalDays).toFixed(2)}</p>
-      </div>
-
-      {/* Booking Button */}
-      <Button onClick={onBookNow} className="w-full py-2 mt-4">
+      <Button
+        onClick={onBookNow}
+        disabled={total === 0}
+        className="w-full py-3 mt-6 text-lg font-semibold"
+      >
         Initiate Booking
       </Button>
     </div>

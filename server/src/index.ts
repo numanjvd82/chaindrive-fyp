@@ -46,6 +46,7 @@ app.use("/api/auth", router.auth);
 
 app.use(ensureAuthenticated);
 
+app.use("/api/users", router.user);
 app.use("/api/conversations", router.conversation);
 app.use("/api/messages", router.message);
 app.use("/api/notifications", router.notification);

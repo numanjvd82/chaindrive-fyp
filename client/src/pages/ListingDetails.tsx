@@ -21,9 +21,6 @@ const ListingDetails = () => {
 
   const images = rentalDetails.images;
 
-  const rating = 4.5;
-  const reviews = 120;
-
   return (
     <>
       <div className="bg-gray-100 p-6">
@@ -33,22 +30,17 @@ const ListingDetails = () => {
             <ImageSlider images={images} />
           </div>
           <div className="w-full lg:w-1/4">
-            <BookingCalculator ppd={110} />
+            <BookingCalculator ppd={rentalDetails.pricePerDay} />
           </div>
         </div>
 
-        <div className="mt-8">
-          <CarDetail rental={rentalDetails} />
-        </div>
-
-        <div className="mt-8">
-          <AboutVehicleOwner
-            name="John Doe"
-            rating={4.5}
-            reviewCount={20}
-            country="Pakistan"
-            memberSince="2020"
-          />
+        <div className="mt-8 flex flex-col lg:flex-row gap-6">
+          <div className="w-full lg:w-3/4">
+            <CarDetail rental={rentalDetails} />
+          </div>
+          <div className="w-full lg:w-1/4">
+            <AboutVehicleOwner id={rentalDetails.ownerId} />
+          </div>
         </div>
 
         <div className="mt-8">

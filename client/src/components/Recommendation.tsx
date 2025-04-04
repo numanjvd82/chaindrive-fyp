@@ -21,7 +21,7 @@ const Recommendation = () => {
   ];
 
   return (
-    <div className="p-8">
+    <div className="">
       <h1 className="text-2xl font-bold text-gray-800 mb-8">
         Recommended For You
       </h1>
