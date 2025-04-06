@@ -18,6 +18,9 @@ const ListingsPage = React.lazy(() => import("./pages/Listings"));
 const CreateListing = React.lazy(() => import("./pages/CreateListing"));
 const DummyContract = React.lazy(() => import("./pages/DummyContract"));
 const ListingDetails = React.lazy(() => import("./pages/ListingDetails"));
+const RentalConfirmation = React.lazy(
+  () => import("./pages/RentalConfirmation")
+);
 
 const ROUTES = [
   {
@@ -45,6 +48,11 @@ const ROUTES = [
   {
     link: "/listing-detail/:id",
     component: <ListingDetails />,
+    roles: ["renter"],
+  },
+  {
+    link: "/rental-confirmation/:id",
+    component: <RentalConfirmation />,
     roles: ["renter"],
   },
   {

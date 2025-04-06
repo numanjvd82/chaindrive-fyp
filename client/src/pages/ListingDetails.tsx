@@ -30,7 +30,7 @@ const ListingDetails = () => {
             <ImageSlider images={images} />
           </div>
           <div className="w-full lg:w-1/4">
-            <BookingCalculator ppd={rentalDetails.pricePerDay} />
+            <BookingCalculator rental={rentalDetails} />
           </div>
         </div>
 

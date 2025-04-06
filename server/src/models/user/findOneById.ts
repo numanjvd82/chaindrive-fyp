@@ -32,7 +32,6 @@ export const findOneById = async (id: z.infer<typeof idSchema>) => {
   if (!id) return;
   try {
     const parsedId = idSchema.parse(id);
-    console.log("Parsed ID:", parsedId);
     const user = sqliteInstance
       .prepare(SQL_QUERY)
       .all(parsedId)

@@ -45,8 +45,6 @@ export const UploadImage: React.FC<Props> = ({
           );
         }
 
-        console.log(predictions);
-
         const isValidPicture = predictions.every(
           (prediction) => prediction.class === "car" && prediction.score >= 0.5
         );

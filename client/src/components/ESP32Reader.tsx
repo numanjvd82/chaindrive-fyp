@@ -25,7 +25,6 @@ const ESP32Reader = () => {
 
         const text = new TextDecoder().decode(value);
         accumulatedData += text; // Append chunks
-        console.log("Accumulated Data:", accumulatedData);
 
         // Extract id from logs
         const match = accumulatedData.match(/Unique ID:\s*([0-9A-Fa-f]{12})/);
