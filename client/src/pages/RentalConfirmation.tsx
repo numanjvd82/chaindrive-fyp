@@ -1,10 +1,12 @@
 import Button from "@/components/Button";
 import useAuthUser from "@/hooks/useAuthUser";
+import { useListWallet } from "@/hooks/useListWallet";
 import { useWallet } from "@/hooks/useWallet";
 import { AvailableRental } from "@/lib/types";
 import dayjs from "dayjs";
 import React, { useEffect, useState } from "react";
 import { useLocation } from "react-router-dom";
+import { toast } from "react-toastify";
 
 type LocationState = {
   rental: AvailableRental;
@@ -20,37 +22,61 @@ const RentalConfirmation: React.FC = () => {
   const [selectedPayment, setSelectedPayment] = useState<
     "easypaisa" | "ethereum"
   >("ethereum");
+  const [grandTotalInEth, setGrandTotalInEth] = useState<number | undefined>();
+
+  const { user } = useAuthUser();
   const { account, provider, signer, connectWallet } = useWallet();
   const location = useLocation();
+
   const { rental, bookingData } = location.state as LocationState;
-  const { user } = useAuthUser();
-  const [grandTotalInEth, setGrandTotalInEth] = useState<number | undefined>();
+  const { wallet: ownerWallet, isLoading: isOwnerWalletLoading } =
+    useListWallet({
+      id: rental?.ownerId,
+    });
 
   const securityDeposit = rental.pricePerDay * bookingData.totalDays * 0.4;
   const platformFee = bookingData.totalPrice * 0.2;
   const grandTotal = bookingData.totalPrice + securityDeposit + platformFee;
 
-  const startDate = dayjs(bookingData.startDate).format("DD MMM YYYY HH:mm");
-  const endDate = dayjs(bookingData.endDate).format("DD MMM YYYY HH:mm");
-
   useEffect(() => {
     const fetchPkrToEth = async (grandTotal: number) => {
-      const response = await fetch(
-        "https://api.coingecko.com/api/v3/simple/price?ids=ethereum&vs_currencies=pkr"
-      );
-      const data = await response.json();
-      const pkrToEth = data.ethereum.pkr;
-      const totalPriceInPkr = (grandTotal / pkrToEth).toFixed(6);
-      setGrandTotalInEth(Number(totalPriceInPkr));
+      try {
+        const response = await fetch(
+          "https://api.coingecko.com/api/v3/simple/price?ids=ethereum&vs_currencies=pkr"
+        );
+        const data = await response.json();
+        const pkrToEth = data.ethereum.pkr;
+        const totalPriceInPkr = (grandTotal / pkrToEth).toFixed(6);
+        setGrandTotalInEth(Number(totalPriceInPkr));
+      } catch (error) {
+        console.error("Error fetching PKR to ETH conversion rate:", error);
+        setGrandTotalInEth(undefined);
+        toast.error(
+          "Failed to fetch the conversion rate. Please try again later."
+        );
+      }
     };
     fetchPkrToEth(grandTotal);
   }, [grandTotal]);
+
+  const startDate = dayjs(bookingData.startDate).format("DD MMM YYYY HH:mm");
+  const endDate = dayjs(bookingData.endDate).format("DD MMM YYYY HH:mm");
 
   if (!rental || !bookingData || !user) {
     return (
       <div className="bg-gray-100 min-h-screen flex items-center justify-center">
         <p className="text-red-500 text-lg">
           An error occurred while fetching data.
+        </p>
+      </div>
+    );
+  }
+
+  if (!ownerWallet) {
+    return (
+      <div className="bg-gray-100 min-h-screen flex items-center justify-center">
+        <p className="text-red-500 text-lg">
+          An error occurred while fetching the owner's wallet address.
         </p>
       </div>
     );
@@ -184,7 +210,10 @@ const RentalConfirmation: React.FC = () => {
           </div>
         </div>
 
-        <Button className="w-full py-3  font-bold rounded-lg">
+        <Button
+          disabled={isOwnerWalletLoading}
+          className="w-full py-3  font-bold rounded-lg"
+        >
           Confirm Payment
         </Button>
       </div>

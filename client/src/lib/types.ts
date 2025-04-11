@@ -60,3 +60,12 @@ export interface Listing {
 }
 
 export type AvailableRental = Omit<Listing, "expectedDeviceId">;
+
+export interface Wallet {
+  id: number;
+  userId: number;
+  walletAddress: string;
+  balance: number;
+  createdAt: Date;
+  updatedAt: Date;
+}

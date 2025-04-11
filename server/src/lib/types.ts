@@ -60,3 +60,12 @@ export interface Listing {
   createdAt: Date;
   updatedAt: Date;
 }
+
+export interface Wallet {
+  id: number;
+  userId: number;
+  walletAddress: string;
+  balance: number;
+  createdAt: Date;
+  updatedAt: Date;
+}
