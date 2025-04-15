@@ -6,6 +6,7 @@
   "scripts": {
     "start": "node dist/index.js",
     "dev": "nodemon src/index.ts",
+    "local-node": "npx hardhat node --verbose",
     "debug": "node --inspect src/index.ts",
     "build": "tsc"
   },
@@ -16,6 +17,7 @@
     "better-sqlite3": "^11.7.0",
     "cookie-parser": "^1.4.7",
     "cors": "^2.8.5",
+    "dayjs": "^1.11.13",
     "express": "^4.21.2",
     "helmet": "^8.0.0",
     "multer": "^1.4.5-lts.1",

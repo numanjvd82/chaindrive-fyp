@@ -2,29 +2,17 @@ import Button from "@/components/Button";
 import { AccountInfo } from "@/components/pages/Profile/AccountInfo";
 import IdCardImages from "@/components/pages/Profile/IdCardImages";
 import KycVerificationStatus from "@/components/pages/Profile/KycVerificationStatus";
-import PaymentModal from "@/components/pages/Profile/PaymentModal";
 import Splash from "@/components/Splash";
+import { useListWallet } from "@/hooks/useListWallet";
+import { useStoreWallet } from "@/hooks/useStoreWallet";
 import { useUser } from "@/hooks/useUser";
-import { useState } from "react";
-import { FormProvider, useForm } from "react-hook-form";
+import { useWallet } from "@/hooks/useWallet";
 
 const ProfilePage: React.FC = () => {
-  const methods = useForm<any>();
   const { user, loading } = useUser();
-  const [isOpen, setIsOpen] = useState(false);
-  const openModal = () => setIsOpen(true);
-  const closeModal = () => setIsOpen(false);
-
-  const handleConfirm = async () => {
-    console.log("Submitted");
-    window.alert("Payment method added successfully!");
-    closeModal();
-  };
-
-  const handleCancel = () => {
-    console.log("Cancelled");
-    closeModal();
-  };
+  const { wallet, refetch } = useListWallet();
+  const { account, connectWallet, provider, signer } = useWallet();
+  const { storeWallet, isLoadingStoreWallet } = useStoreWallet();
 
   if (loading) {
     return <Splash />;
@@ -33,6 +21,18 @@ const ProfilePage: React.FC = () => {
   if (!user) {
     return null;
   }
+
+  const handleAddWallet = async () => {
+    if (!signer || !provider) return;
+    try {
+      const address = await signer.getAddress();
+
+      await storeWallet(address);
+      refetch();
+    } finally {
+      // Pass
+    }
+  };
 
   return (
     <div className="p-8 space-y-8 bg-gray-100 min-h-screen">
@@ -44,36 +44,72 @@ const ProfilePage: React.FC = () => {
         idCardBack={user.idCardBack}
       />
 
-      {/* Action Buttons */}
       <div className="p-6 bg-accent rounded-lg shadow-md space-y-4">
         <h2 className="text-xl font-bold">Actions</h2>
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-          <Button variant="primary">View Bookings</Button>
           <Button variant="secondary">Edit Profile</Button>
           <Button variant="secondary">Change Password</Button>
         </div>
       </div>
 
-      {/* Add Payment Method Section */}
-      <div className="p-6 bg-accent rounded-lg shadow-md">
-        <h2 className="text-xl font-bold">Add Payment Method</h2>
-        <p className="text-gray-600 my-2">
-          To make transactions, please add a payment method.
-        </p>
-        <Button onClick={openModal} variant="primary">
-          Add Payment Method
-        </Button>
+      <div className="p-6 bg-accent rounded-lg shadow-md space-y-4">
+        {wallet ? (
+          <>
+            <h2 className="text-xl font-bold text-gray-800">Payment Method</h2>
+            <p className="text-gray-600">
+              Your payment method is already added. You can update it if needed.
+            </p>
+            <div className="bg-gray-100 p-4 rounded-lg">
+              <p className="text-gray-800 font-mono text-sm">
+                <strong>Wallet Address:</strong> {wallet.walletAddress}
+              </p>
+            </div>
+            <Button
+              disabled={!account || !signer || !provider}
+              variant="primary"
+              isLoading={isLoadingStoreWallet}
+              onClick={async () => handleAddWallet()}
+            >
+              Update Wallet Address
+            </Button>
+            {!account || !signer || !provider ? (
+              <Button onClick={connectWallet} variant="primary">
+                Connect Wallet
+              </Button>
+            ) : null}
+          </>
+        ) : (
+          <>
+            <h2 className="text-xl font-bold text-gray-800">
+              Add Payment Method
+            </h2>
+            <p className="text-gray-600">
+              To rent a car or use our services, please add a payment method.
+            </p>
+            <p className="text-gray-600">
+              You can add a payment method using your wallet address. Please
+              connect your wallet to proceed.
+            </p>
+            <div className="flex flex-col sm:flex-row gap-4">
+              <Button
+                disabled={!!(account || signer || provider)}
+                onClick={connectWallet}
+                variant="primary"
+              >
+                {account ? "Wallet Connected" : "Connect Wallet"}
+              </Button>
+              <Button
+                disabled={!account || !signer || !provider}
+                variant="primary"
+                isLoading={isLoadingStoreWallet}
+                onClick={async () => handleAddWallet()}
+              >
+                Store Wallet Address
+              </Button>
+            </div>
+          </>
+        )}
       </div>
-
-      <FormProvider {...methods}>
-        <PaymentModal
-          isOpen={isOpen}
-          setIsOpen={setIsOpen}
-          closeModal={closeModal}
-          handleConfirm={handleConfirm}
-          handleCancel={handleCancel}
-        />
-      </FormProvider>
     </div>
   );
 };

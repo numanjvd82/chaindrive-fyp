@@ -1,3 +1,4 @@
+import ESP32Reader from "@/components/ESP32Reader";
 import { hoverTransition } from "@/components/pages/OwnerDashboard/ActiveRentalCard";
 import ActiveRentals from "@/components/pages/OwnerDashboard/ActiveRentals";
 import { motion } from "framer-motion";
@@ -17,6 +18,8 @@ const OwnerDashboard: React.FC = () => {
       <Link to="/dummy-contract" className="text-blue-500">
         Dummy Contract
       </Link>
+
+      <ESP32Reader />
 
       <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
         {[

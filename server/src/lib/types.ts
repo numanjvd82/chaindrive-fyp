@@ -60,3 +60,31 @@ export interface Listing {
   createdAt: Date;
   updatedAt: Date;
 }
+
+export interface Wallet {
+  id: number;
+  userId: number;
+  walletAddress: string;
+  balance: number;
+  createdAt: Date;
+  updatedAt: Date;
+}
+
+export type Rental = {
+  id: number;
+  listingId: number;
+  renterId: number;
+  ownerId: number;
+  renterAddress: string;
+  ownerAddress: string;
+  startDate: Date;
+  endDate: Date;
+  rentalFee: number;
+  securityDeposit: number;
+  platformFee: number;
+  totalEth: string;
+  renterConfirmed: boolean;
+  ownerConfirmed: boolean;
+  isCompleted: boolean;
+  createdAt: Date;
+};

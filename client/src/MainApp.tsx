@@ -17,6 +17,10 @@ const Chat = React.lazy(() => import("./pages/Chat"));
 const ListingsPage = React.lazy(() => import("./pages/Listings"));
 const CreateListing = React.lazy(() => import("./pages/CreateListing"));
 const DummyContract = React.lazy(() => import("./pages/DummyContract"));
+const ListingDetails = React.lazy(() => import("./pages/ListingDetails"));
+const RentalConfirmation = React.lazy(
+  () => import("./pages/RentalConfirmation")
+);
 
 const ROUTES = [
   {
@@ -38,6 +42,17 @@ const ROUTES = [
   {
     link: "/renter-dashboard",
     component: <RenterDashboardPage />,
+    roles: ["renter"],
+  },
+  // change
+  {
+    link: "/listing-detail/:id",
+    component: <ListingDetails />,
+    roles: ["renter"],
+  },
+  {
+    link: "/rental-confirmation/:id",
+    component: <RentalConfirmation />,
     roles: ["renter"],
   },
   {
@@ -107,7 +122,11 @@ const MainApp: React.FC = () => {
 
   return (
     <Suspense fallback={<Splash />}>
-      <ToastContainer pauseOnFocusLoss={false} pauseOnHover={false} />
+      <ToastContainer
+        pauseOnFocusLoss={false}
+        pauseOnHover={false}
+        autoClose={3000}
+      />
 
       <Header />
       <Routes>

@@ -1,8 +1,10 @@
 import Database, { Database as DbType } from "better-sqlite3";
-import { sql } from "../../utils/utils";
 import { authTablesInit } from "./authTablesInit";
 import { chatTablesInit } from "./chatTablesInit";
+import { listingTableInit } from "./listingTableInit";
 import { notificationTableInit } from "./notificationTableInit";
+import { rentalTableInit } from "./rentalTableInit";
+import { walletTableInit } from "./walletTableInit";
 
 export let sqliteInstance: DbType;
 
@@ -23,26 +25,9 @@ export function connectDb() {
     authTablesInit(db);
     chatTablesInit(db);
     notificationTableInit(db);
-
-    db.prepare(
-      sql`CREATE TABLE IF NOT EXISTS Listings(
-  id INTEGER PRIMARY KEY AUTOINCREMENT,
-  title TEXT NOT NULL,
-  model TEXT NOT NULL,
-  year INTEGER NOT NULL,
-  price_per_day INTEGER NOT NULL,
-  num_of_seats INTEGER NOT NULL,
-  location TEXT NOT NULL,
-  license_plate TEXT NOT NULL,
-  transmission_type TEXT NOT NULL,
-  fuel_type TEXT NOT NULL,
-  images JSON NOT NULL, 
-  owner_id INTEGER NOT NULL,
-  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-  updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-  FOREIGN KEY(owner_id) REFERENCES Users(id)
-)`
-    ).run();
+    listingTableInit(db);
+    walletTableInit(db);
+    rentalTableInit(db);
 
     console.log("Database schema created successfully.");
   } catch (err) {

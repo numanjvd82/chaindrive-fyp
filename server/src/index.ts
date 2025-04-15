@@ -46,16 +46,25 @@ app.use("/api/auth", router.auth);
 
 app.use(ensureAuthenticated);
 
+app.use("/api/users", router.user);
+app.use("/api/wallet", router.wallet);
 app.use("/api/conversations", router.conversation);
 app.use("/api/messages", router.message);
 app.use("/api/notifications", router.notification);
 app.use("/api/listings", router.listing);
+app.use("/api/rentals", router.rental);
 
 const PORT = process.env.PORT || 3000;
 
 connectDb();
-server.listen(PORT, () => {
-  console.log(`Server is running on port http://localhost:${PORT}`);
-});
+server.listen(
+  {
+    port: PORT,
+    host: "0.0.0.0",
+  },
+  () => {
+    console.log(`Server is running on port http://localhost:${PORT}`);
+  }
+);
 
 export default app;
