@@ -1,9 +1,10 @@
 import Database, { Database as DbType } from "better-sqlite3";
-import { sql } from "../../utils/utils";
 import { authTablesInit } from "./authTablesInit";
 import { chatTablesInit } from "./chatTablesInit";
 import { listingTableInit } from "./listingTableInit";
 import { notificationTableInit } from "./notificationTableInit";
+import { rentalTableInit } from "./rentalTableInit";
+import { walletTableInit } from "./walletTableInit";
 
 export let sqliteInstance: DbType;
 
@@ -25,18 +26,8 @@ export function connectDb() {
     chatTablesInit(db);
     notificationTableInit(db);
     listingTableInit(db);
-
-    db.prepare(
-      sql`
-CREATE TABLE IF NOT EXISTS Wallets (
-  id INTEGER PRIMARY KEY AUTOINCREMENT,
-  user_id INTEGER NOT NULL,
-  wallet_address TEXT NOT NULL,
-  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-  updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-  FOREIGN KEY(user_id) REFERENCES Users(id) ON DELETE CASCADE
-)`
-    ).run();
+    walletTableInit(db);
+    rentalTableInit(db);
 
     console.log("Database schema created successfully.");
   } catch (err) {

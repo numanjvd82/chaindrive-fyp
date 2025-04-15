@@ -6,6 +6,7 @@
   "scripts": {
     "start": "node dist/index.js",
     "dev": "nodemon src/index.ts",
+    "local-node": "npx hardhat node --verbose",
     "debug": "node --inspect src/index.ts",
     "build": "tsc"
   },

@@ -1,6 +1,7 @@
 /** @type import('hardhat/config').HardhatUserConfig */
 require("@nomicfoundation/hardhat-toolbox");
 require("dotenv").config();
+import "@nomicfoundation/hardhat-ethers";
 
 module.exports = {
   solidity: "0.8.20",
