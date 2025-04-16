@@ -4,3 +4,6 @@ dist
 chaindrive.db
 chaindrive.db-shm
 chaindrive.db-wal
+artifacts/
+cache/
+typechain-types/

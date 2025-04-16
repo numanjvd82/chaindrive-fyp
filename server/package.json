@@ -7,6 +7,9 @@
     "start": "node dist/index.js",
     "dev": "nodemon src/index.ts",
     "local-node": "npx hardhat node --verbose",
+    "compile": "npx hardhat compile",
+    "deploy": "npx hardhat run scripts/deploy-upgradeable.ts --network localhost",
+    "upgrade": "npx hardhat run scripts/upgrade.js --network localhost",
     "debug": "node --inspect src/index.ts",
     "build": "tsc"
   },
@@ -14,6 +17,9 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
+    "@openzeppelin/contracts": "^5.3.0",
+    "@openzeppelin/contracts-upgradeable": "^5.3.0",
+    "@openzeppelin/hardhat-upgrades": "^3.9.0",
     "better-sqlite3": "^11.7.0",
     "cookie-parser": "^1.4.7",
     "cors": "^2.8.5",
