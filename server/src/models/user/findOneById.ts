@@ -31,9 +31,10 @@ WHERE u.id = ?;
 export const findOneById = async (id: z.infer<typeof idSchema>) => {
   if (!id) return;
   try {
+    const parsedId = idSchema.parse(id);
     const user = sqliteInstance
       .prepare(SQL_QUERY)
-      .all(id)
+      .all(parsedId)
       .map((row: any) => {
         const changedRow = {
           ...row,

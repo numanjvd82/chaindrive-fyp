@@ -54,6 +54,18 @@ export interface Listing {
   fuelType: "petrol" | "diesel" | "electric" | "hybrid";
   ownerId: number;
   images: string[];
+  expectedDeviceId: string | null;
+  createdAt: Date;
+  updatedAt: Date;
+}
+
+export type AvailableRental = Omit<Listing, "expectedDeviceId">;
+
+export interface Wallet {
+  id: number;
+  userId: number;
+  walletAddress: string;
+  balance: number;
   createdAt: Date;
   updatedAt: Date;
 }

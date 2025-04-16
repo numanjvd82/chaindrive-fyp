@@ -1,5 +1,5 @@
 import { AnimatePresence, motion } from "motion/react";
-import React from "react";
+import React, { useEffect } from "react";
 import { createPortal } from "react-dom";
 import { FaTimes } from "react-icons/fa";
 
@@ -20,11 +20,25 @@ const DialogModal: React.FC<DialogModalProps> = ({
   children,
   footer,
 }) => {
+  useEffect(() => {
+    if (isOpen) {
+      document.body.style.overflow = "hidden";
+    } else {
+      document.body.style.overflow = "";
+    }
+
+    return () => {
+      document.body.style.overflow = "";
+    };
+  }, [isOpen]);
+
+  if (!isOpen) return null;
+
   return createPortal(
     <AnimatePresence>
       {isOpen && (
         <motion.div
-          className="fixed overflow-auto inset-0 z-[1000] flex items-center justify-center bg-black bg-opacity-50"
+          className={`fixed overflow-y-auto inset-0 z-[1000] flex items-center justify-center bg-black bg-opacity-50`}
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           exit={{ opacity: 0 }}
@@ -32,7 +46,7 @@ const DialogModal: React.FC<DialogModalProps> = ({
         >
           {/* Modal container */}
           <motion.div
-            className="bg-white rounded-lg shadow-lg w-full max-w-md p-6 relative"
+            className="bg-white rounded-lg shadow-lg w-full max-h-screen overflow-y-auto max-w-md p-6 relative "
             initial={{ scale: 0.8, opacity: 0 }}
             animate={{ scale: 1, opacity: 1 }}
             exit={{ scale: 0.8, opacity: 0 }}

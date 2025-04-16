@@ -9,7 +9,7 @@ const fetchEthPrice = async () => {
   return data.ethereum; // Returns { usd: price, pkr: price }
 };
 
-export const useEthConversion = (weiValue: string) => {
+export const useEthConversion = (weiValue?: string, pkrAmount?: number) => {
   const {
     data: ethPrice,
     isLoading,
@@ -18,29 +18,23 @@ export const useEthConversion = (weiValue: string) => {
     queryKey: ["ethPrice"],
     queryFn: fetchEthPrice,
     staleTime: 60000, // 1 min caching
-    enabled: weiValue !== "",
   });
 
-  if (!weiValue) {
-    return {
-      ethValue: "",
-      usdValue: null,
-      pkrValue: null,
-      isLoading,
-      error,
-    };
-  }
+  const eth = weiValue ? ethers.formatEther(weiValue) : null;
 
-  const ethValue = ethers.formatEther(weiValue);
+  console.log(pkrAmount);
+
+  const pkrToEth =
+    ethPrice && pkrAmount ? (pkrAmount / ethPrice.pkr).toFixed(6) : null;
+
+  const pkrToWei = pkrToEth ? ethers.parseEther(pkrToEth).toString() : null;
 
   return {
-    ethValue,
-    usdValue: ethPrice
-      ? (parseFloat(ethValue) * ethPrice.usd).toFixed(2)
-      : null,
-    pkrValue: ethPrice
-      ? (parseFloat(ethValue) * ethPrice.pkr).toFixed(2)
-      : null,
+    eth: eth !== null ? eth.toString() : "",
+    usd: ethPrice.usd,
+    pkr: ethPrice.pkr,
+    pkrToEth,
+    pkrToWei,
     isLoading,
     error,
   };

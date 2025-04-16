@@ -1,10 +1,11 @@
 import Button from "@/components/Button";
 import Loader from "@/components/Loader";
 import { DeleteModal } from "@/components/pages/Listings/DeleteModal";
+import { EditModal } from "@/components/pages/Listings/EditModal";
 import { useListings } from "@/hooks/useListings";
 import { Listing } from "@/lib/types";
 import { motion } from "framer-motion";
-import React from "react";
+import React, { useState } from "react";
 import {
   FaCar,
   FaCogs,
@@ -18,12 +19,14 @@ import {
 type CarCardProps = {
   listing: Listing;
   setShowDeleteModal: React.Dispatch<React.SetStateAction<boolean>>;
+  setShowEditModal: React.Dispatch<React.SetStateAction<boolean>>;
   setListingId: React.Dispatch<React.SetStateAction<number | undefined>>;
 };
 
 const CarCard: React.FC<CarCardProps> = ({
   listing,
   setShowDeleteModal,
+  setShowEditModal,
   setListingId,
 }) => {
   const {
@@ -80,6 +83,10 @@ const CarCard: React.FC<CarCardProps> = ({
             variant="primary"
             type="button"
             className="flex items-center gap-2"
+            onClick={() => {
+              setListingId(id);
+              setShowEditModal(true);
+            }}
           >
             <FaEdit /> Edit
           </Button>
@@ -89,8 +96,8 @@ const CarCard: React.FC<CarCardProps> = ({
             type="button"
             className="bg-red-600 text-white flex items-center gap-2"
             onClick={() => {
-              setShowDeleteModal(true);
               setListingId(id);
+              setShowDeleteModal(true);
             }}
           >
             <FaTrash /> Delete
@@ -114,10 +121,9 @@ const CarCard: React.FC<CarCardProps> = ({
 
 const Listings: React.FC = () => {
   const { error, isLoading, listings, refetch } = useListings();
-  const [showDeleteModal, setShowDeleteModal] = React.useState(false);
-  const [listingId, setListingId] = React.useState<number | undefined>(
-    undefined
-  );
+  const [showDeleteModal, setShowDeleteModal] = useState(false);
+  const [showEditModal, setShowEditModal] = useState(false);
+  const [listingId, setListingId] = useState<number | undefined>(undefined);
 
   if (error) {
     return (
@@ -141,12 +147,24 @@ const Listings: React.FC = () => {
     </div>;
   }
 
+  const toBeEditedListing = listings.find(
+    (listing) => listing.id === listingId
+  );
+
   return (
     <div className="bg-gray-100 min-h-screen p-6">
       <DeleteModal
         showDeleteModal={showDeleteModal}
         setShowDeleteModal={setShowDeleteModal}
         listingId={listingId}
+        setListingId={setListingId}
+        refetch={refetch}
+      />
+
+      <EditModal
+        showEditModal={showEditModal}
+        setShowEditModal={setShowEditModal}
+        listing={toBeEditedListing}
         refetch={refetch}
       />
 
@@ -160,6 +178,7 @@ const Listings: React.FC = () => {
               key={listing.id}
               listing={listing}
               setShowDeleteModal={setShowDeleteModal}
+              setShowEditModal={setShowEditModal}
               setListingId={setListingId}
             />
           ))}

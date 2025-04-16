@@ -2,7 +2,7 @@ import { z } from "zod";
 import { getDbInstance } from "../../lib/db/sqlite";
 import { convertBufferToBase64, sql } from "../../utils/utils";
 
-const schema = z.object({
+export const schema = z.object({
   title: z
     .string()
     .min(3, {

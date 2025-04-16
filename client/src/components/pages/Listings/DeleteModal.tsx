@@ -7,6 +7,7 @@ type Props = {
   showDeleteModal: boolean;
   setShowDeleteModal: React.Dispatch<React.SetStateAction<boolean>>;
   listingId: number | undefined;
+  setListingId: React.Dispatch<React.SetStateAction<number | undefined>>;
   refetch: () => void;
 };
 
@@ -14,11 +15,13 @@ export const DeleteModal: React.FC<Props> = ({
   showDeleteModal,
   setShowDeleteModal,
   listingId,
+  setListingId,
   refetch,
 }) => {
   const { deleteListing, isLoading } = useDeleteListing();
   const onClose = () => {
     setShowDeleteModal(false);
+    setListingId(undefined);
   };
 
   const handleDelete = async (id: number | undefined) => {

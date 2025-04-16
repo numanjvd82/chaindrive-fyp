@@ -35,7 +35,10 @@ const Header: React.FC = () => {
       </div>
 
       <nav className="hidden sm:flex items-center space-x-6">
+<<<<<<< HEAD
 
+=======
+>>>>>>> origin/numan
         <Link
           to={user.role === "owner" ? "/owner-dashboard" : "/renter-dashboard"}
           className="font-semibold text-gray-600 hover:text-primary"
@@ -43,11 +46,15 @@ const Header: React.FC = () => {
           Dashboard
         </Link>
 
+<<<<<<< HEAD
 
+=======
+>>>>>>> origin/numan
         {user.role === "owner" ? (
           <Link to="/listings/create">
             <Button variant="primary">List Vehicle</Button>
           </Link>
+<<<<<<< HEAD
         ) : <>
           <Link to="/renter-bookings" className="font-semibold text-gray-600 hover:text-primary">
             Bookings
@@ -56,6 +63,21 @@ const Header: React.FC = () => {
             <Button variant="primary">Become a host</Button>
           </Link>
         </>}
+=======
+        ) : (
+          <>
+            <Link
+              to="/renter-bookings"
+              className="font-semibold text-gray-600 hover:text-primary"
+            >
+              Bookings
+            </Link>
+            <Link to="/become-host">
+              <Button variant="primary">Become a host</Button>
+            </Link>
+          </>
+        )}
+>>>>>>> origin/numan
 
         <div className="flex items-center space-x-4">
           <Link
@@ -81,12 +103,14 @@ const Header: React.FC = () => {
               >
                 Profile
               </Link>
-              <Link
-                to="/listings"
-                className="block px-4 py-2 text-gray-600 hover:bg-gray-100"
-              >
-                Listings
-              </Link>
+              {user.role === "owner" ? (
+                <Link
+                  to="/listings"
+                  className="block px-4 py-2 text-gray-600 hover:bg-gray-100"
+                >
+                  Listings
+                </Link>
+              ) : null}
               <Link
                 to="/settings"
                 onClick={handleLogout}
