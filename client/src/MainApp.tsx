@@ -21,6 +21,7 @@ const ListingDetails = React.lazy(() => import("./pages/ListingDetails"));
 const RentalConfirmation = React.lazy(
   () => import("./pages/RentalConfirmation")
 );
+const RentalSuccessful = React.lazy(() => import("./pages/RentalSuccessful"));
 
 const ROUTES = [
   {
@@ -44,7 +45,6 @@ const ROUTES = [
     component: <RenterDashboardPage />,
     roles: ["renter"],
   },
-  // change
   {
     link: "/listing-detail/:id",
     component: <ListingDetails />,
@@ -53,6 +53,11 @@ const ROUTES = [
   {
     link: "/rental-confirmation/:id",
     component: <RentalConfirmation />,
+    roles: ["renter"],
+  },
+  {
+    link: "/rental-successful/:id",
+    component: <RentalSuccessful />,
     roles: ["renter"],
   },
   {

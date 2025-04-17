@@ -1,5 +1,6 @@
 import { z } from "zod";
 import { getDbInstance } from "../../lib/db/sqlite";
+import { Rental } from "../../lib/types";
 import { sql } from "../../utils/utils";
 
 export const createSchema = z.object({
@@ -21,8 +22,8 @@ export const createSchema = z.object({
 
 export type CreateRentalInput = z.infer<typeof createSchema>;
 
-export async function createRental(input: CreateRentalInput) {
-  if (!input) return;
+export async function createRental(input: CreateRentalInput): Promise<Rental> {
+  if (!input) throw new Error("Input is required");
 
   try {
     const parsedInput = createSchema.parse(input);
@@ -42,6 +43,7 @@ export async function createRental(input: CreateRentalInput) {
       ownerId,
       renterId,
     } = parsedInput;
+
     const db = getDbInstance();
 
     const stmt = db.prepare(sql`
@@ -83,7 +85,31 @@ INSERT INTO rentals (
       throw new Error("Failed to create rental");
     }
 
-    return true;
+    // Fetch the newly created rental to return it
+    const rental = db
+      .prepare(sql`SELECT * FROM Rentals WHERE id = ?`)
+      .all(result.lastInsertRowid)
+      .map((rental: any) => ({
+        // camelCase the keys
+        id: rental.id,
+        listingId: rental.listing_id,
+        renterId: rental.renter_id,
+        ownerId: rental.owner_id,
+        renterAddress: rental.renter_address,
+        ownerAddress: rental.owner_address,
+        startDate: new Date(rental.start_date),
+        endDate: new Date(rental.end_date),
+        rentalFee: rental.rental_fee,
+        securityDeposit: rental.security_deposit,
+        platformFee: rental.platform_fee,
+        totalEth: rental.total_eth,
+        renterConfirmed: rental.renter_confirmed === 1,
+        ownerConfirmed: rental.owner_confirmed === 1,
+        isCompleted: rental.is_completed === 1,
+        createdAt: new Date(rental.created_at),
+      }))[0] as Rental;
+
+    return rental;
   } catch (error) {
     console.error("Error creating rental:", error);
     throw new Error("Failed to create rental");
