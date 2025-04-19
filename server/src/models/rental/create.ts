@@ -6,7 +6,6 @@ import { sql } from "../../utils/utils";
 export const createSchema = z.object({
   listingId: z.number(),
   renterId: z.number(),
-  ownerId: z.number(),
   renterAddress: z.string(),
   ownerAddress: z.string(),
   startDate: z.string(),
@@ -15,9 +14,8 @@ export const createSchema = z.object({
   securityDeposit: z.number(),
   platformFee: z.number(),
   totalEth: z.string(),
-  renterConfirmed: z.boolean().optional(),
-  ownerConfirmed: z.boolean().optional(),
   isCompleted: z.boolean().optional(),
+  status: z.enum(["pending", "active", "cancelled"]),
 });
 
 export type CreateRentalInput = z.infer<typeof createSchema>;
@@ -37,11 +35,9 @@ export async function createRental(input: CreateRentalInput): Promise<Rental> {
       securityDeposit,
       platformFee,
       totalEth,
-      renterConfirmed,
-      ownerConfirmed,
       isCompleted,
-      ownerId,
       renterId,
+      status,
     } = parsedInput;
 
     const db = getDbInstance();
@@ -52,33 +48,29 @@ INSERT INTO rentals (
   renter_address,
   owner_address,
   renter_id,
-  owner_id,
   start_date,
   end_date,
   rental_fee,
   security_deposit,
   platform_fee,
   total_eth,
-  renter_confirmed,
-  owner_confirmed,
-  is_completed
-) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`);
+  is_completed,
+  status
+) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`);
 
     const result = stmt.run(
       listingId,
       renterAddress,
       ownerAddress,
       renterId,
-      ownerId,
       startDate,
       endDate,
       rentalFee,
       securityDeposit,
       platformFee,
       totalEth,
-      renterConfirmed ? 1 : 0,
-      ownerConfirmed ? 1 : 0,
-      isCompleted ? 1 : 0
+      isCompleted ? 1 : 0,
+      status
     );
 
     if (result.changes === 0) {
@@ -90,7 +82,6 @@ INSERT INTO rentals (
       .prepare(sql`SELECT * FROM Rentals WHERE id = ?`)
       .all(result.lastInsertRowid)
       .map((rental: any) => ({
-        // camelCase the keys
         id: rental.id,
         listingId: rental.listing_id,
         renterId: rental.renter_id,
@@ -103,10 +94,13 @@ INSERT INTO rentals (
         securityDeposit: rental.security_deposit,
         platformFee: rental.platform_fee,
         totalEth: rental.total_eth,
-        renterConfirmed: rental.renter_confirmed === 1,
         ownerConfirmed: rental.owner_confirmed === 1,
+        completedByRenter: rental.completed_by_renter === 1,
+        completedByOwner: rental.completed_by_owner === 1,
         isCompleted: rental.is_completed === 1,
         createdAt: new Date(rental.created_at),
+        status: rental.status,
+        updatedAt: new Date(rental.updated_at),
       }))[0] as Rental;
 
     return rental;

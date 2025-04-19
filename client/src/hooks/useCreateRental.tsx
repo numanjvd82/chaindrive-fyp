@@ -4,6 +4,7 @@ import { useMutation } from "react-query";
 
 interface CreateRentalInput {
   listingId: number;
+  renterId: number;
   renterAddress: string;
   ownerAddress: string;
   startDate: string;
@@ -12,11 +13,8 @@ interface CreateRentalInput {
   securityDeposit: number;
   platformFee: number;
   totalEth: string;
-  renterConfirmed?: boolean;
-  ownerConfirmed?: boolean;
   isCompleted?: boolean;
-  ownerId: number;
-  renterId: number;
+  status: string;
 }
 
 async function createRental(rentalData: CreateRentalInput) {

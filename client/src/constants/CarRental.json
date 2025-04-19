@@ -194,6 +194,11 @@
   {
     "inputs": [
       {
+        "internalType": "uint256",
+        "name": "id",
+        "type": "uint256"
+      },
+      {
         "internalType": "address payable",
         "name": "owner",
         "type": "address"
@@ -220,19 +225,6 @@
     "type": "function"
   },
   {
-    "inputs": [],
-    "name": "rentalCounter",
-    "outputs": [
-      {
-        "internalType": "uint256",
-        "name": "",
-        "type": "uint256"
-      }
-    ],
-    "stateMutability": "view",
-    "type": "function"
-  },
-  {
     "inputs": [
       {
         "internalType": "uint256",
@@ -242,6 +234,11 @@
     ],
     "name": "rentals",
     "outputs": [
+      {
+        "internalType": "uint256",
+        "name": "id",
+        "type": "uint256"
+      },
       {
         "internalType": "address payable",
         "name": "renter",

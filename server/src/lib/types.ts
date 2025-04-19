@@ -74,7 +74,6 @@ export type Rental = {
   id: number;
   listingId: number;
   renterId: number;
-  ownerId: number;
   renterAddress: string;
   ownerAddress: string;
   startDate: Date;
@@ -83,8 +82,11 @@ export type Rental = {
   securityDeposit: number;
   platformFee: number;
   totalEth: string;
-  renterConfirmed: boolean;
   ownerConfirmed: boolean;
+  completedByRenter: boolean;
+  completedByOwner: boolean;
   isCompleted: boolean;
   createdAt: Date;
+  status: "pending" | "active" | "cancelled";
+  updatedAt: Date;
 };

@@ -20,11 +20,9 @@ export const createRental = async (req: Request, res: Response) => {
     securityDeposit,
     platformFee,
     totalEth,
-    renterConfirmed,
-    ownerConfirmed,
     isCompleted,
-    ownerId,
     renterId,
+    status,
   } = req.body;
 
   try {
@@ -38,10 +36,8 @@ export const createRental = async (req: Request, res: Response) => {
       securityDeposit,
       platformFee,
       totalEth,
-      renterConfirmed,
-      ownerConfirmed,
+      status,
       isCompleted,
-      ownerId,
       renterId,
     });
 

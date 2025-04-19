@@ -31,10 +31,13 @@ export async function getbyId(rentalId: GetRentalByIdInput) {
       securityDeposit: rental.security_deposit,
       platformFee: rental.platform_fee,
       totalEth: rental.total_eth,
-      renterConfirmed: rental.renter_confirmed === 1,
       ownerConfirmed: rental.owner_confirmed === 1,
+      completedByRenter: rental.completed_by_renter === 1,
+      completedByOwner: rental.completed_by_owner === 1,
       isCompleted: rental.is_completed === 1,
       createdAt: new Date(rental.created_at),
+      status: rental.status,
+      updatedAt: new Date(rental.updated_at),
     };
   } catch (error: any) {
     console.error("Error fetching rental:", error.message);

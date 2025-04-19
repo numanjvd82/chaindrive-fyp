@@ -107,6 +107,33 @@ const RentalConfirmation: React.FC = () => {
     }
 
     try {
+      toast.loading("Creating rental...");
+      // Now create rental in DB
+      const rentalData = {
+        listingId: rental.id,
+        renterAddress: account,
+        ownerAddress: ownerWallet.walletAddress,
+        startDate: bookingData.startDate.toISOString(),
+        endDate: bookingData.endDate.toISOString(),
+        rentalFee: bookingData.totalPrice,
+        securityDeposit,
+        platformFee,
+        totalEth: (grandTotal / ethInPkr).toFixed(6),
+        ownerConfirmed: false,
+        isCompleted: false,
+        renterId: user.id,
+        status: "pending",
+      };
+
+      const createdRental = await createRental(rentalData);
+      if (!createdRental) {
+        toast.dismiss();
+        throw new Error("Failed to create rental.");
+      }
+
+      toast.dismiss();
+      toast.loading("Creating rental on blockchain...");
+
       const rentalContract = getContractInstance(signer);
 
       const rentalFeeEth = bookingData.totalPrice / ethInPkr;
@@ -126,12 +153,8 @@ const RentalConfirmation: React.FC = () => {
       const totalAmountInWei =
         rentalFeeWei + securityDepositWei + platformFeeWei;
 
-      console.log("rentalFeeWei:", rentalFeeWei.toString());
-      console.log("securityDepositWei:", securityDepositWei.toString());
-      console.log("platformFeeWei:", platformFeeWei.toString());
-      console.log("Total amount (in Wei):", totalAmountInWei.toString());
-
       const tx = await rentalContract.initiateRental(
+        createdRental.id,
         ownerWallet.walletAddress,
         rentalFeeWei,
         securityDepositWei,
@@ -141,11 +164,13 @@ const RentalConfirmation: React.FC = () => {
         }
       );
 
+      toast.dismiss();
       toast.loading("Transaction sent. Waiting for confirmation...");
 
       const receipt = await tx.wait();
 
       if (!receipt || receipt.status !== 1) {
+        toast.dismiss();
         toast.error("Transaction failed or was reverted.");
         return;
       }
@@ -160,27 +185,19 @@ const RentalConfirmation: React.FC = () => {
         return;
       }
 
-      // Now create rental in DB
-      const rentalData = {
-        listingId: rental.id,
-        renterAddress: account,
-        ownerAddress: ownerWallet.walletAddress,
-        startDate: bookingData.startDate.toISOString(),
-        endDate: bookingData.endDate.toISOString(),
-        rentalFee: bookingData.totalPrice,
-        securityDeposit,
-        platformFee,
-        totalEth: (grandTotal / ethInPkr).toFixed(6),
-        renterConfirmed: false,
-        ownerConfirmed: false,
-        isCompleted: false,
-        ownerId: rental.ownerId,
-        renterId: user.id,
-      };
-
-      const createdRental = await createRental(rentalData);
-      toast.dismiss(); // Clear loading if shown
-      navigate(`/rental-successful/${createdRental.id}`);
+      toast.dismiss();
+      toast.success(
+        `Rental created successfully!
+        \nTransaction Hash: ${receipt.hash}
+        \nRental ID: ${createdRental.id}
+        \nRental Fee: ${rentalFeeEth} ETH
+        \nSecurity Deposit: ${securityDepositEth} ETH
+        \nPlatform Fee: ${platformFeeEth} ETH
+        `,
+        {
+          onClose: () => navigate(`/rental-successful/${createdRental.id}`),
+        }
+      );
     } catch (err: any) {
       console.error("Error creating rental:", err);
       toast.dismiss(); // Clear loading if shown

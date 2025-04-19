@@ -23,7 +23,7 @@ export async function completeRentalFromOwner(
       .prepare(
         sql`SELECT * FROM Rentals WHERE id = ? 
         AND is_completed = 0 
-        AND owner_confirmed = 1`
+        AND completed_by_owner = 1`
       )
       .all(input)
       .map((rental: any) => ({
@@ -39,10 +39,13 @@ export async function completeRentalFromOwner(
         securityDeposit: rental.security_deposit,
         platformFee: rental.platform_fee,
         totalEth: rental.total_eth,
-        renterConfirmed: rental.renter_confirmed === 1 ? true : false,
-        ownerConfirmed: rental.owner_confirmed === 1 ? true : false,
-        isCompleted: rental.is_completed === 1 ? true : false,
+        ownerConfirmed: rental.owner_confirmed === 1,
+        completedByRenter: rental.completed_by_renter === 1,
+        completedByOwner: rental.completed_by_owner === 1,
+        isCompleted: rental.is_completed === 1,
         createdAt: new Date(rental.created_at),
+        status: rental.status,
+        updatedAt: new Date(rental.updated_at),
       }))[0] as Rental | undefined;
 
     if (!rental) {
@@ -51,7 +54,7 @@ export async function completeRentalFromOwner(
 
     // Update the rental to mark it as completed from the owner's side
     const result = db
-      .prepare(sql`UPDATE Rentals SET owner_confirmed = 1 WHERE id = ?`)
+      .prepare(sql`UPDATE Rentals SET completed_by_owner = 1 WHERE id = ?`)
       .run(input);
 
     if (result.changes === 0) {
@@ -59,7 +62,7 @@ export async function completeRentalFromOwner(
     }
 
     // Check if the renter has already confirmed the rental
-    if (rental.renterConfirmed) {
+    if (rental.completedByRenter) {
       // If the renter has confirmed, mark the rental as fully completed
       const completeResult = db
         .prepare(sql`UPDATE Rentals SET is_completed = 1 WHERE id = ?`)

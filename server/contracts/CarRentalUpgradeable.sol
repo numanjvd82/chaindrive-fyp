@@ -8,6 +8,7 @@ contract CarRentalUpgradeable is Initializable, ReentrancyGuardUpgradeable {
     address payable public chaindriveWallet;
 
     struct Rental {
+        uint256 id;
         address payable renter;
         address payable owner;
         uint256 rentalFee;
@@ -19,7 +20,6 @@ contract CarRentalUpgradeable is Initializable, ReentrancyGuardUpgradeable {
     }
 
     mapping(uint256 => Rental) public rentals;
-    uint256 public rentalCounter;
 
     event RentalInitiated(
         uint256 rentalId,
@@ -43,6 +43,7 @@ contract CarRentalUpgradeable is Initializable, ReentrancyGuardUpgradeable {
     }
 
     function initiateRental(
+        uint256 id,
         address payable owner,
         uint256 rentalFee,
         uint256 securityDeposit,
@@ -50,9 +51,10 @@ contract CarRentalUpgradeable is Initializable, ReentrancyGuardUpgradeable {
     ) external payable {
         uint256 totalAmount = rentalFee + securityDeposit + platformFee;
         require(msg.value == totalAmount, "Incorrect ETH amount");
+        require(rentals[id].renter == address(0), "Rental ID already exists");
 
-        rentalCounter++;
-        rentals[rentalCounter] = Rental({
+        rentals[id] = Rental({
+            id: id,
             renter: payable(msg.sender),
             owner: owner,
             rentalFee: rentalFee,
@@ -63,7 +65,7 @@ contract CarRentalUpgradeable is Initializable, ReentrancyGuardUpgradeable {
             isCompleted: false
         });
 
-        emit RentalInitiated(rentalCounter, msg.sender, owner, totalAmount);
+        emit RentalInitiated(id, msg.sender, owner, totalAmount);
     }
 
     function completeRentalByRenter(uint256 rentalId) external {
