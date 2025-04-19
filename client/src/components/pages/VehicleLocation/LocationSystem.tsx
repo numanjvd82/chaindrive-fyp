@@ -16,14 +16,6 @@ const LocationSystem: React.FC = () => {
     if (!user) {
         return null;
     }
-    //   const defaultProps = {
-    //     center: {
-    //       lat: 10.99835602,
-    //       lng: 77.01502627
-    //     },
-    //     zoom: 11
-    //   };
-
 
     return (
 
@@ -34,12 +26,6 @@ const LocationSystem: React.FC = () => {
                 <p className="text-sm mb-4 mt-2">
                     Real-time location of your vehicles.
                 </p>
-                {/* <GoogleMapReact
-        bootstrapURLKeys={{ key: "AIzaSyB7ETOwK6NMmiPX1HUAThIjfDbcXxQ_A6c" }}
-        defaultCenter={defaultProps.center}
-        defaultZoom={defaultProps.zoom}
-      >
-      </GoogleMapReact> */}
 
                 <img src="/dummylocation.svg"></img>
 

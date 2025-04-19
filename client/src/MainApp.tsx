@@ -5,6 +5,9 @@ import Header from "./components/Header";
 import Splash from "./components/Splash";
 import { useUser } from "./hooks/useUser";
 import RentVehicle from "./pages/RentVehicle";
+import LocationSystem from "./components/pages/VehicleLocation/locationSystem";
+import ActiveRentals from "./components/pages/OwnerDashboard/ActiveRentals";
+import ActiveRentalData from "./components/pages/OwnerDashboard/ActiveRentalData";
 
 const LoginPage = React.lazy(() => import("./pages/Login"));
 const NotFoundPage = React.lazy(() => import("./pages/NotFound"));
@@ -27,6 +30,10 @@ const ROUTES = [
   {
     link: "/",
     component: <HomePage />,
+  },
+  {
+    link: "/act",
+    component: <ActiveRentalData />,
   },
   {
     link: "/dummy-contract",
@@ -75,6 +82,12 @@ const ROUTES = [
     link: "/listings",
     component: <ListingsPage />,
     roles: ["owner"],
+  },
+  // location page
+  {
+    link: "/track",
+    component: <LocationSystem />,
+    roles: ["owner", "renter"],
   },
   {
     link: "/profile",
