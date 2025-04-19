@@ -3,8 +3,16 @@ import { Listing } from "../../lib/types";
 import { sql } from "../../utils/utils";
 
 const SQL_QUERY = sql`
-SELECT *
-FROM listings
+SELECT l.*
+FROM listings l
+LEFT JOIN rentals r
+  ON l.id = r.listing_id
+  AND r.status = 'active'
+  AND (
+    (r.start_date <= CURRENT_TIMESTAMP AND r.end_date >= CURRENT_TIMESTAMP) -- Overlapping rental
+    OR (r.start_date >= CURRENT_TIMESTAMP) -- Future rental
+  )
+WHERE r.id IS NULL
 `;
 
 export async function availableRentals() {
