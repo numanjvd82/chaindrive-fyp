@@ -20,12 +20,11 @@ export const createRental = async (req: Request, res: Response) => {
     securityDeposit,
     platformFee,
     totalEth,
-    renterConfirmed,
-    ownerConfirmed,
     isCompleted,
-    ownerId,
     renterId,
+    status,
   } = req.body;
+
   try {
     const rental = await rentalModel.add({
       listingId,
@@ -37,21 +36,12 @@ export const createRental = async (req: Request, res: Response) => {
       securityDeposit,
       platformFee,
       totalEth,
-      renterConfirmed,
-      ownerConfirmed,
+      status,
       isCompleted,
-      ownerId,
       renterId,
     });
 
-    if (!rental) {
-      res.status(400).json({ error: "Failed to create rental" });
-      return;
-    }
-
-    res.status(201).json({
-      message: "Rental created successfully",
-    });
+    res.status(201).json(rental);
   } catch (error: any) {
     console.error("Error creating rental:", error);
     res.status(500).json({

@@ -69,3 +69,24 @@ export interface Wallet {
   createdAt: Date;
   updatedAt: Date;
 }
+
+export type Rental = {
+  id: number;
+  listingId: number;
+  renterId: number;
+  renterAddress: string;
+  ownerAddress: string;
+  startDate: Date;
+  endDate: Date;
+  rentalFee: number;
+  securityDeposit: number;
+  platformFee: number;
+  totalEth: string;
+  ownerConfirmed: boolean;
+  completedByRenter: boolean;
+  completedByOwner: boolean;
+  isCompleted: boolean;
+  createdAt: Date;
+  status: "pending" | "active" | "cancelled";
+  updatedAt: Date;
+};

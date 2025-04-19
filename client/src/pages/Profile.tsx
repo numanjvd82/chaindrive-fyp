@@ -10,7 +10,9 @@ import { useWallet } from "@/hooks/useWallet";
 
 const ProfilePage: React.FC = () => {
   const { user, loading } = useUser();
-  const { wallet, refetch } = useListWallet();
+  const { wallet, refetch } = useListWallet({
+    id: user ? user.id : 0,
+  });
   const { account, connectWallet, provider, signer } = useWallet();
   const { storeWallet, isLoadingStoreWallet } = useStoreWallet();
 
@@ -64,14 +66,16 @@ const ProfilePage: React.FC = () => {
                 <strong>Wallet Address:</strong> {wallet.walletAddress}
               </p>
             </div>
-            <Button
-              disabled={!account || !signer || !provider}
-              variant="primary"
-              isLoading={isLoadingStoreWallet}
-              onClick={async () => handleAddWallet()}
-            >
-              Update Wallet Address
-            </Button>
+            {user.role === "owner" ? (
+              <Button
+                disabled={!account || !signer || !provider}
+                variant="primary"
+                isLoading={isLoadingStoreWallet}
+                onClick={async () => handleAddWallet()}
+              >
+                Update Wallet Address
+              </Button>
+            ) : null}
             {!account || !signer || !provider ? (
               <Button onClick={connectWallet} variant="primary">
                 Connect Wallet
@@ -98,14 +102,16 @@ const ProfilePage: React.FC = () => {
               >
                 {account ? "Wallet Connected" : "Connect Wallet"}
               </Button>
-              <Button
-                disabled={!account || !signer || !provider}
-                variant="primary"
-                isLoading={isLoadingStoreWallet}
-                onClick={async () => handleAddWallet()}
-              >
-                Store Wallet Address
-              </Button>
+              {user.role === "owner" ? (
+                <Button
+                  disabled={!account || !signer || !provider}
+                  variant="primary"
+                  isLoading={isLoadingStoreWallet}
+                  onClick={async () => handleAddWallet()}
+                >
+                  Store Wallet Address
+                </Button>
+              ) : null}
             </div>
           </>
         )}

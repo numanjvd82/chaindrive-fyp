@@ -1,11 +1,15 @@
 import Button from "@/components/Button";
 import useAuthUser from "@/hooks/useAuthUser";
+import { useCreateRental } from "@/hooks/useCreateRental";
 import { useListWallet } from "@/hooks/useListWallet";
+import { usePkrToEth } from "@/hooks/usePkrToEth";
 import { useWallet } from "@/hooks/useWallet";
+import { getContractInstance } from "@/lib/contract";
 import { AvailableRental } from "@/lib/types";
 import dayjs from "dayjs";
-import React, { useEffect, useState } from "react";
-import { useLocation } from "react-router-dom";
+import { ethers } from "ethers";
+import React, { useState } from "react";
+import { useLocation, useNavigate } from "react-router-dom";
 import { toast } from "react-toastify";
 
 type LocationState = {
@@ -22,7 +26,8 @@ const RentalConfirmation: React.FC = () => {
   const [selectedPayment, setSelectedPayment] = useState<
     "easypaisa" | "ethereum"
   >("ethereum");
-  const [grandTotalInEth, setGrandTotalInEth] = useState<number | undefined>();
+
+  const navigate = useNavigate();
 
   const { user } = useAuthUser();
   const { account, provider, signer, connectWallet } = useWallet();
@@ -33,34 +38,16 @@ const RentalConfirmation: React.FC = () => {
     useListWallet({
       id: rental?.ownerId,
     });
+  const { createRental, isCreateRentalLoading } = useCreateRental();
+  const { data: ethInPkr, isLoading: isEthInPkrLoading } = usePkrToEth();
 
-  const securityDeposit = rental.pricePerDay * bookingData.totalDays * 0.4;
-  const platformFee = bookingData.totalPrice * 0.2;
-  const grandTotal = bookingData.totalPrice + securityDeposit + platformFee;
-
-  useEffect(() => {
-    const fetchPkrToEth = async (grandTotal: number) => {
-      try {
-        const response = await fetch(
-          "https://api.coingecko.com/api/v3/simple/price?ids=ethereum&vs_currencies=pkr"
-        );
-        const data = await response.json();
-        const pkrToEth = data.ethereum.pkr;
-        const totalPriceInPkr = (grandTotal / pkrToEth).toFixed(6);
-        setGrandTotalInEth(Number(totalPriceInPkr));
-      } catch (error) {
-        console.error("Error fetching PKR to ETH conversion rate:", error);
-        setGrandTotalInEth(undefined);
-        toast.error(
-          "Failed to fetch the conversion rate. Please try again later."
-        );
-      }
-    };
-    fetchPkrToEth(grandTotal);
-  }, [grandTotal]);
-
-  const startDate = dayjs(bookingData.startDate).format("DD MMM YYYY HH:mm");
-  const endDate = dayjs(bookingData.endDate).format("DD MMM YYYY HH:mm");
+  if (isEthInPkrLoading) {
+    return (
+      <div className="bg-gray-100 min-h-screen flex items-center justify-center">
+        <p className="text-gray-500 text-lg">Loading conversion rate...</p>
+      </div>
+    );
+  }
 
   if (!rental || !bookingData || !user) {
     return (
@@ -81,6 +68,145 @@ const RentalConfirmation: React.FC = () => {
       </div>
     );
   }
+
+  if (!ethInPkr) {
+    return (
+      <div className="bg-gray-100 min-h-screen flex items-center justify-center">
+        <p className="text-red-500 text-lg">
+          An error occurred while fetching the PKR to ETH conversion rate.
+        </p>
+      </div>
+    );
+  }
+
+  const securityDeposit = rental.pricePerDay * bookingData.totalDays * 0.4;
+  const platformFee = bookingData.totalPrice * 0.2;
+  const grandTotal = bookingData.totalPrice + securityDeposit + platformFee;
+  const startDate = dayjs(bookingData.startDate).format("DD MMM YYYY HH:mm");
+  const endDate = dayjs(bookingData.endDate).format("DD MMM YYYY HH:mm");
+
+  const handleCreateRental = async () => {
+    if (selectedPayment === "easypaisa") {
+      toast.info("Easypaisa payment method is currently not supported.");
+      return;
+    }
+
+    if (!account || !provider || !signer) {
+      toast.error("Please connect your wallet to proceed.");
+      return;
+    }
+
+    if (!ownerWallet) {
+      toast.error("Unable to retrieve the owner's wallet address.");
+      return;
+    }
+
+    if (!ethInPkr) {
+      toast.error("Failed to calculate total ETH. Please try again.");
+      return;
+    }
+
+    try {
+      toast.loading("Creating rental...");
+      // Now create rental in DB
+      const rentalData = {
+        listingId: rental.id,
+        renterAddress: account,
+        ownerAddress: ownerWallet.walletAddress,
+        startDate: bookingData.startDate.toISOString(),
+        endDate: bookingData.endDate.toISOString(),
+        rentalFee: bookingData.totalPrice,
+        securityDeposit,
+        platformFee,
+        totalEth: (grandTotal / ethInPkr).toFixed(6),
+        ownerConfirmed: false,
+        isCompleted: false,
+        renterId: user.id,
+        status: "pending",
+      };
+
+      const createdRental = await createRental(rentalData);
+      if (!createdRental) {
+        toast.dismiss();
+        throw new Error("Failed to create rental.");
+      }
+
+      toast.dismiss();
+      toast.loading("Creating rental on blockchain...");
+
+      const rentalContract = getContractInstance(signer);
+
+      const rentalFeeEth = bookingData.totalPrice / ethInPkr;
+      const securityDepositEth = securityDeposit / ethInPkr;
+      const platformFeeEth = platformFee / ethInPkr;
+
+      const rentalFeeWei = ethers.parseUnits(rentalFeeEth.toFixed(18), "ether");
+      const securityDepositWei = ethers.parseUnits(
+        securityDepositEth.toFixed(18),
+        "ether"
+      );
+      const platformFeeWei = ethers.parseUnits(
+        platformFeeEth.toFixed(18),
+        "ether"
+      );
+
+      const totalAmountInWei =
+        rentalFeeWei + securityDepositWei + platformFeeWei;
+
+      const tx = await rentalContract.initiateRental(
+        createdRental.id,
+        ownerWallet.walletAddress,
+        rentalFeeWei,
+        securityDepositWei,
+        platformFeeWei,
+        {
+          value: totalAmountInWei,
+        }
+      );
+
+      toast.dismiss();
+      toast.loading("Transaction sent. Waiting for confirmation...");
+
+      const receipt = await tx.wait();
+
+      if (!receipt || receipt.status !== 1) {
+        toast.dismiss();
+        toast.error("Transaction failed or was reverted.");
+        return;
+      }
+
+      const rentalCreatedEvent = receipt.logs
+        .map((log) => rentalContract.interface.parseLog(log))
+        .find((event) => event?.name === "RentalInitiated");
+
+      if (!rentalCreatedEvent) {
+        toast.dismiss();
+        toast.error("Rental creation failed. Please try again.");
+        return;
+      }
+
+      toast.dismiss();
+      toast.success(
+        `Rental created successfully!
+        \nTransaction Hash: ${receipt.hash}
+        \nRental ID: ${createdRental.id}
+        \nRental Fee: ${rentalFeeEth} ETH
+        \nSecurity Deposit: ${securityDepositEth} ETH
+        \nPlatform Fee: ${platformFeeEth} ETH
+        `,
+        {
+          onClose: () => navigate(`/rental-successful/${createdRental.id}`),
+        }
+      );
+    } catch (err: any) {
+      console.error("Error creating rental:", err);
+      toast.dismiss(); // Clear loading if shown
+      toast.error(
+        err.response?.data.message ||
+          "Rental creation failed. Please try again."
+      );
+    }
+  };
 
   return (
     <div className="flex items-center  min-h-screen bg-gray-100">
@@ -123,7 +249,9 @@ const RentalConfirmation: React.FC = () => {
 
             <div className="flex justify-between">
               <span className="font-medium">Grand Total in ETH</span>
-              <span>ETH {grandTotalInEth}</span>
+              <span>
+                ETH {ethInPkr ? (grandTotal / ethInPkr).toFixed(6) : "..."}
+              </span>
             </div>
           </div>
 
@@ -211,7 +339,8 @@ const RentalConfirmation: React.FC = () => {
         </div>
 
         <Button
-          disabled={isOwnerWalletLoading}
+          disabled={isOwnerWalletLoading || isCreateRentalLoading}
+          onClick={handleCreateRental}
           className="w-full py-3  font-bold rounded-lg"
         >
           Confirm Payment

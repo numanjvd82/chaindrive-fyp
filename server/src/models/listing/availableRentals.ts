@@ -3,7 +3,8 @@ import { Listing } from "../../lib/types";
 import { sql } from "../../utils/utils";
 
 const SQL_QUERY = sql`
-SELECT * FROM listings;
+SELECT *
+FROM listings
 `;
 
 export async function availableRentals() {

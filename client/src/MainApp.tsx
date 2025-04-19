@@ -5,8 +5,6 @@ import Header from "./components/Header";
 import Splash from "./components/Splash";
 import { useUser } from "./hooks/useUser";
 import RentVehicle from "./pages/RentVehicle";
-import LocationSystem from "./components/pages/VehicleLocation/locationSystem";
-import ActiveRentals from "./components/pages/OwnerDashboard/ActiveRentals";
 import ActiveRentalData from "./components/pages/OwnerDashboard/ActiveRentalData";
 
 const LoginPage = React.lazy(() => import("./pages/Login"));
@@ -25,6 +23,7 @@ const ListingDetails = React.lazy(() => import("./pages/ListingDetails"));
 const RentalConfirmation = React.lazy(
   () => import("./pages/RentalConfirmation")
 );
+const RentalSuccessful = React.lazy(() => import("./pages/RentalSuccessful"));
 
 const ROUTES = [
   {
@@ -52,12 +51,6 @@ const ROUTES = [
     component: <RenterDashboardPage />,
     roles: ["renter"],
   },
-  // change 
-  {
-    link: "/vehicle-detail",
-    component: <RentVehicle />,
-  },
-  // change
   {
     link: "/listing-detail/:id",
     component: <ListingDetails />,
@@ -66,6 +59,11 @@ const ROUTES = [
   {
     link: "/rental-confirmation/:id",
     component: <RentalConfirmation />,
+    roles: ["renter"],
+  },
+  {
+    link: "/rental-successful/:id",
+    component: <RentalSuccessful />,
     roles: ["renter"],
   },
   {
@@ -82,12 +80,6 @@ const ROUTES = [
     link: "/listings",
     component: <ListingsPage />,
     roles: ["owner"],
-  },
-  // location page
-  {
-    link: "/track",
-    component: <LocationSystem />,
-    roles: ["owner", "renter"],
   },
   {
     link: "/profile",
