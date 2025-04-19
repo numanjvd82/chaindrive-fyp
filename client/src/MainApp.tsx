@@ -23,6 +23,14 @@ const RentalConfirmation = React.lazy(
 );
 const RentalSuccessful = React.lazy(() => import("./pages/RentalSuccessful"));
 
+const RenterActiveRentals = React.lazy(
+  () => import("./pages/RenterActiveRentals")
+);
+
+const OwnerActiveRentals = React.lazy(
+  () => import("./pages/OwnerActiveRentals")
+);
+
 const ROUTES = [
   {
     link: "/",
@@ -63,6 +71,16 @@ const ROUTES = [
   {
     link: "/owner-dashboard",
     component: <OwnerDashboardPage />,
+    roles: ["owner"],
+  },
+  {
+    link: "/renter/active-rentals",
+    component: <RenterActiveRentals />,
+    roles: ["renter"],
+  },
+  {
+    link: "/owner/active-rentals",
+    component: <OwnerActiveRentals />,
     roles: ["owner"],
   },
   {

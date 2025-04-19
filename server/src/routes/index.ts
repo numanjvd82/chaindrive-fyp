@@ -1,5 +1,6 @@
 import authRouter from "./auth";
 import conversationRouter from "./conversation";
+import dashboardRouter from "./dashboard";
 import listingRouter from "./listing";
 import messageRouter from "./message";
 import notificationRouter from "./notification";
@@ -10,6 +11,7 @@ import walletRouter from "./wallet";
 const router = {
   auth: authRouter,
   user: userRouter,
+  dashboard: dashboardRouter,
   wallet: walletRouter,
   conversation: conversationRouter,
   message: messageRouter,

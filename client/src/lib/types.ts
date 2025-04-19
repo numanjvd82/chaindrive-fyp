@@ -92,3 +92,7 @@ export type Rental = {
   status: "pending" | "active" | "cancelled";
   updatedAt: Date;
 };
+
+export type RentalWithImages = Rental & {
+  images: string[];
+};
