@@ -1,7 +1,9 @@
 import { z } from "zod";
 import { getDbInstance } from "../../lib/db/sqlite";
-import { Rental } from "../../lib/types";
+import { Listing, Rental } from "../../lib/types";
+import { notificationDbFunctions } from "../../services/notfication";
 import { sql } from "../../utils/utils";
+import { userModel } from "../user";
 
 export const createSchema = z.object({
   listingId: z.number(),
@@ -21,6 +23,7 @@ export const createSchema = z.object({
 export type CreateRentalInput = z.infer<typeof createSchema>;
 
 export async function createRental(input: CreateRentalInput): Promise<Rental> {
+  const { insertNotification } = notificationDbFunctions;
   if (!input) throw new Error("Input is required");
 
   try {
@@ -41,6 +44,36 @@ export async function createRental(input: CreateRentalInput): Promise<Rental> {
     } = parsedInput;
 
     const db = getDbInstance();
+
+    const listing = db
+      .prepare(sql`SELECT * FROM Listings WHERE id = ?`)
+      .all(listingId)
+      .map((listing: any) => ({
+        id: listing.id,
+        title: listing.title,
+        model: listing.model,
+        year: listing.year,
+        pricePerDay: listing.price_per_day,
+        numOfSeats: listing.num_of_seats,
+        location: listing.location,
+        licensePlate: listing.license_plate,
+        transmissionType: listing.transmission_type,
+        fuelType: listing.fuel_type,
+        ownerId: listing.owner_id,
+        images: JSON.parse(listing.images),
+        createdAt: new Date(listing.created_at),
+        updatedAt: new Date(listing.updated_at),
+      }))[0] as Listing | undefined;
+
+    if (!listing) {
+      throw new Error("Listing not found");
+    }
+
+    const listingOwnerId = listing.ownerId;
+
+    if (listingOwnerId === renterId) {
+      throw new Error("Renter cannot be the owner of the listing");
+    }
 
     const stmt = db.prepare(sql`
 INSERT INTO rentals (
@@ -102,6 +135,26 @@ INSERT INTO rentals (
         status: rental.status,
         updatedAt: new Date(rental.updated_at),
       }))[0] as Rental;
+
+    const user = await userModel.findOneById(renterId);
+
+    if (!user) {
+      throw new Error("Rental User not found");
+    }
+
+    const renterName = `${user.firstName} ${user.lastName}`;
+    // Send notification to the owner
+    insertNotification.run(
+      listingOwnerId,
+      "rental_confirmation",
+      `New rental request from ${renterName} for listing ${listing.title}
+        \nStarting from ${new Date(startDate).toDateString()} to ${new Date(
+        endDate
+      ).toDateString()}
+        \nPlease confirm the rental request`,
+      null,
+      rental.id
+    );
 
     return rental;
   } catch (error) {

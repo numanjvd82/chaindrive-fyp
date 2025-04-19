@@ -39,6 +39,8 @@ export interface Notification {
   type: string;
   content: string;
   created_at: string;
+  rentalId: number | null;
+  link: string | null;
 }
 
 export interface Listing {
