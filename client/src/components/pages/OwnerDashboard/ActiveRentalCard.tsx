@@ -1,12 +1,6 @@
-import { motion } from "framer-motion";
-
-export interface Rental {
-  id: number;
-  dates: string;
-  car: string;
-  amount: number;
-  image: string;
-}
+import { RentalWithImages } from "@/lib/types";
+import dayjs from "dayjs";
+import { motion } from "motion/react";
 
 export const hoverTransition = {
   type: "spring",
@@ -15,13 +9,16 @@ export const hoverTransition = {
   mass: 0.8,
 };
 
-const ActiveRentalCard: React.FC<Rental> = ({
-  amount,
-  car,
-  dates,
+const ActiveRentalCard: React.FC<RentalWithImages> = ({
   id,
-  image,
+  rentalFee,
+  images,
+  startDate,
+  endDate,
+  title,
 }) => {
+  const formattedStartDate = dayjs(startDate).format("DD/MM/YY");
+  const formattedEndDate = dayjs(endDate).format("DD/MM/YY");
   return (
     <motion.div
       key={id}
@@ -36,13 +33,17 @@ const ActiveRentalCard: React.FC<Rental> = ({
       transition={hoverTransition}
     >
       <div className="flex items-center space-x-4">
-        <img src={image} alt={car} className="w-12 h-12 rounded-md" />
+        <img
+          src={`data:image/jpeg;base64,${images[0]}`}
+          alt={title}
+          className="w-12 h-12 rounded-md"
+        />
         <div>
-          <p className="text-sm text-gray-500">{dates}</p>
-          <p className="font-medium">{car}</p>
+          <p className="text-sm text-gray-500">{`${formattedStartDate} - ${formattedEndDate}`}</p>
+          <p className="font-medium">{title}</p>
         </div>
       </div>
-      <p className="font-medium">${amount.toLocaleString()}</p>
+      <p className="font-medium">${rentalFee.toLocaleString()}</p>
     </motion.div>
   );
 };

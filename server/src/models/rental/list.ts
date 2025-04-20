@@ -4,13 +4,15 @@ import { sql } from "../../utils/utils";
 
 const SQL_QUERY = sql`
  SELECT *,
-  l.images
+  l.images,
+  l.title
   FROM Rentals r
   JOIN Listings l ON r.listing_id = l.id
 `;
 
 export type RentalWithImages = Rental & {
   images: string[];
+  title: string;
 };
 
 export async function listRentals() {
@@ -22,6 +24,7 @@ export async function listRentals() {
       .all()
       .map((rental: any) => ({
         id: rental.id,
+        title: rental.title,
         listingId: rental.listing_id,
         renterId: rental.renter_id,
         ownerId: rental.owner_id,

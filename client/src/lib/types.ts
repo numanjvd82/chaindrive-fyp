@@ -95,4 +95,5 @@ export type Rental = {
 
 export type RentalWithImages = Rental & {
   images: string[];
+  title: string;
 };

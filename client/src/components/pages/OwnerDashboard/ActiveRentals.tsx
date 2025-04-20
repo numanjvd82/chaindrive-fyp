@@ -1,34 +1,38 @@
-import activeRentalMock from "@/assets/images/active-rental-mock.png";
-import ActiveRentalCard, { Rental } from "./ActiveRentalCard";
-
-const rentals: Rental[] = [
-  {
-    id: 1,
-    dates: "11/10/24 - 11/12/24",
-    car: "2022 BMW M4",
-    amount: 2100,
-    image: activeRentalMock, // Replace with actual car image URL
-  },
-  {
-    id: 2,
-    dates: "11/01/24 - 11/04/24",
-    car: "2021 Tesla Model S",
-    amount: 1800,
-    image: activeRentalMock,
-  },
-  {
-    id: 3,
-    dates: "10/25/24 - 10/31/24",
-    car: "2019 Porsche 911",
-    amount: 2300,
-    image: activeRentalMock,
-  },
-];
+import { useListRentals } from "@/hooks/useListRentals";
+import ActiveRentalCard from "./ActiveRentalCard";
 
 const ActiveRentals = () => {
+  const { rentals, isLoading } = useListRentals();
+
+  if (isLoading) {
+    return (
+      <div className="mt-4 flex items-center justify-between p-4 bg-accent rounded-lg shadow">
+        <p className="text-lg">Loading...</p>
+      </div>
+    );
+  }
+
+  if (!rentals || rentals.length === 0) {
+    return (
+      <div className="mt-4 flex items-center justify-between p-4 bg-accent rounded-lg shadow">
+        <p className="text-md">No active rentals found.</p>
+      </div>
+    );
+  }
+
+  const activeRentals = rentals.filter((rental) => rental.status === "active");
+
+  if (activeRentals.length === 0) {
+    return (
+      <div className="mt-4 flex items-center justify-between p-4 bg-accent rounded-lg shadow">
+        <p className="text-md">No active rentals found.</p>
+      </div>
+    );
+  }
+
   return (
     <div className="mt-4 space-y-4">
-      {rentals.map((rental) => (
+      {activeRentals.map((rental) => (
         <ActiveRentalCard key={rental.id} {...rental} />
       ))}
     </div>
