@@ -19,10 +19,6 @@ export const completeFromOwner = async (req: Request, res: Response) => {
 
     res.status(200).json({ message: "Rental successfully completed by owner" });
   } catch (error: any) {
-    console.error(
-      "Error in completeRentalFromOwner controller:",
-      error.message
-    );
     res.status(500).json({ message: error.message || "Internal Server Error" });
   }
 };

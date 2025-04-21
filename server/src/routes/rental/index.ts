@@ -12,7 +12,7 @@ rentalRouter.get("/", listRentals);
 rentalRouter.get("/:id", getRentalById);
 rentalRouter.post("/confirm", confirmRentalFromOwner);
 rentalRouter.post("/", createRental);
-rentalRouter.post("/complete/renter", completeFromRenter);
-rentalRouter.post("/complete/owner", completeFromOwner);
+rentalRouter.patch("/complete/renter", completeFromRenter);
+rentalRouter.patch("/complete/owner", completeFromOwner);
 
 export default rentalRouter;

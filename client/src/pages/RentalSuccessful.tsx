@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import { FaCheckCircle } from "react-icons/fa";
 import { useNavigate, useParams } from "react-router-dom";
 
@@ -7,10 +7,24 @@ const RentalSuccessful: React.FC = () => {
     id: string;
   }>();
   const navigate = useNavigate();
+  const [countdown, setCountdown] = useState(5);
 
   const handleGoToDashboard = () => {
     navigate("/renter-dashboard");
   };
+
+  useEffect(() => {
+    const timer = setInterval(() => {
+      setCountdown((prev) => prev - 1);
+    }, 1000);
+
+    if (countdown === 0) {
+      clearInterval(timer);
+      navigate(`/rentals/${id}`);
+    }
+
+    return () => clearInterval(timer);
+  }, [countdown, navigate, id]);
 
   if (!id) {
     return (
@@ -37,6 +51,10 @@ const RentalSuccessful: React.FC = () => {
         <p className="text-gray-600 mb-6">
           Your rental has been successfully confirmed. Thank you for choosing
           our service!
+        </p>
+        <p className="text-gray-600 mb-6">
+          You will be redirected to the rental details page in {countdown}{" "}
+          seconds.
         </p>
         <div className="flex flex-col space-y-4">
           <button

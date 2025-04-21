@@ -7,6 +7,12 @@ import { useAvailableRentals } from "@/hooks/useAvailableRentals";
 const RenterDashboard = () => {
   const { error, isLoading, availableRentals } = useAvailableRentals();
 
+  if (isLoading) {
+    <div className="text-center h-screen flex items-center justify-center">
+      <Loader size="lg" />
+    </div>;
+  }
+
   if (error) {
     return (
       <div className="text-center h-screen flex items-center justify-center">
@@ -21,12 +27,6 @@ const RenterDashboard = () => {
         <p className="text-gray-500 text-lg">No available rentals found</p>
       </div>
     );
-  }
-
-  if (isLoading) {
-    <div className="text-center h-screen flex items-center justify-center">
-      <Loader size="lg" />
-    </div>;
   }
 
   return (

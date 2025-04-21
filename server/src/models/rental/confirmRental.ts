@@ -23,9 +23,14 @@ export async function confirmRental(input: ConfirmRentalInput) {
     }
 
     // Update the rental status to 'active'
-    db.prepare(sql`UPDATE rentals SET status = 'active' WHERE id = ?`).run(
-      rentalId
-    );
+    db.prepare(
+      sql`
+    UPDATE rentals 
+    SET status = 'active',
+    owner_confirmed = 1
+    WHERE id = ?
+     `
+    ).run(rentalId);
 
     return rentalId;
   } catch (error) {

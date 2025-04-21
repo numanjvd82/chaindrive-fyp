@@ -43,21 +43,21 @@ const Header: React.FC = () => {
         </Link>
 
         {user.role === "owner" ? (
-          <Link to="/listings/create">
-            <Button variant="primary">List Vehicle</Button>
-          </Link>
-        ) : (
           <>
+            <Link to="/listings/create">
+              <Button variant="primary">List Vehicle</Button>
+            </Link>
             <Link
               to="/renter-bookings"
               className="font-semibold text-gray-600 hover:text-primary"
             >
               Bookings
             </Link>
-            <Link to="/become-host">
-              <Button variant="primary">Become a host</Button>
-            </Link>
           </>
+        ) : (
+          <Link to="/become-host">
+            <Button variant="primary">Become a host</Button>
+          </Link>
         )}
 
         <div className="flex items-center space-x-4">

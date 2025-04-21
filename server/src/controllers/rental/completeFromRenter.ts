@@ -23,10 +23,6 @@ export const completeFromRenter = async (req: Request, res: Response) => {
       .status(200)
       .json({ message: "Rental successfully completed by renter" });
   } catch (error: any) {
-    console.error(
-      "Error in completeRentalFromRenter controller:",
-      error.message
-    );
     res.status(500).json({ message: error.message || "Internal Server Error" });
   }
 };

@@ -43,7 +43,7 @@ const ActiveRentalCard: React.FC<RentalWithImages> = ({
           <p className="font-medium">{title}</p>
         </div>
       </div>
-      <p className="font-medium">${rentalFee.toLocaleString()}</p>
+      <p className="font-medium">PKR{rentalFee.toLocaleString()}</p>
     </motion.div>
   );
 };

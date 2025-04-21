@@ -31,6 +31,10 @@ const OwnerActiveRentals = React.lazy(
   () => import("./pages/OwnerActiveRentals")
 );
 
+const ActiveRentalDetail = React.lazy(
+  () => import("./pages/ActiveRentalDetail")
+);
+
 const ROUTES = [
   {
     link: "/",
@@ -82,6 +86,11 @@ const ROUTES = [
     link: "/owner/active-rentals",
     component: <OwnerActiveRentals />,
     roles: ["owner"],
+  },
+  {
+    link: "/rentals/:id",
+    component: <ActiveRentalDetail />,
+    roles: ["owner", "renter"],
   },
   {
     link: "/listings/create",

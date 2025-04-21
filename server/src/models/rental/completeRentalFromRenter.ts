@@ -17,15 +17,16 @@ export async function completeRentalFromRenter(
   }
   try {
     const db = getDbInstance();
+    const rentalId = completeRentalFromRenterSchema.parse(input);
 
     // Check if the rental exists and is not already completed
     const rental = db
       .prepare(
         sql`SELECT * FROM Rentals WHERE id = ? 
         AND is_completed = 0 
-        AND completed_by_renter = 1`
+        AND completed_by_renter = 0`
       )
-      .all(input)
+      .all(rentalId)
       .map((rental: any) => ({
         id: rental.id,
         listingId: rental.listing_id,
@@ -75,7 +76,6 @@ export async function completeRentalFromRenter(
 
     return true;
   } catch (error) {
-    console.error("Error completing rental from renter:", error);
     throw new Error("Failed to complete rental from renter");
   }
 }
