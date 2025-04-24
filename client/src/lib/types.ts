@@ -89,7 +89,7 @@ export type Rental = {
   completedByOwner: boolean;
   isCompleted: boolean;
   createdAt: Date;
-  status: "pending" | "active" | "cancelled";
+  status: "pending" | "active" | "cancelled" | "completed";
   updatedAt: Date;
 };
 

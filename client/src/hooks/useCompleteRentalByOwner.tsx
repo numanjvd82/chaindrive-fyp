@@ -3,7 +3,7 @@ import { useMutation } from "react-query";
 
 async function completeRentalByOwner(rentalId: number) {
   try {
-    const { data } = await axiosInstance.patch("/api/rentals/complete/renter", {
+    const { data } = await axiosInstance.patch("/api/rentals/complete/owner", {
       rentalId,
     });
     return data;

@@ -1,4 +1,3 @@
-import dayjs from "dayjs";
 import { z } from "zod";
 import { walletModel } from ".";
 import { getDbInstance } from "../../lib/db/sqlite";
@@ -25,41 +24,28 @@ export const store = async (input: StoreInput) => {
     });
 
     if (existingWallet) {
-      const userCannotUpdate = dayjs(existingWallet.updatedAt).isAfter(
-        dayjs().subtract(3, "day")
-      );
-
-      if (userCannotUpdate) {
-        const nextUpdateDate = dayjs(existingWallet.updatedAt).add(3, "day");
-        throw new Error(
-          `Wallet cannot be updated until ${nextUpdateDate.format(
-            "YYYY-MM-DD"
-          )}`
-        );
-      } else {
-        // Insert the new wallet into the database
-        const stmt = db.prepare(
-          sql`UPDATE Wallets
+      // Insert the new wallet into the database
+      const stmt = db.prepare(
+        sql`UPDATE Wallets
 SET 
   user_id = ?, 
   wallet_address = ?, 
   updated_at = CURRENT_TIMESTAMP
 WHERE 
   wallet_address = ?`
-        );
+      );
 
-        const result = stmt.run(
-          input.userId,
-          parsedInput.walletAddress,
-          parsedInput.walletAddress
-        );
+      const result = stmt.run(
+        input.userId,
+        parsedInput.walletAddress,
+        parsedInput.walletAddress
+      );
 
-        if (result.changes === 0) {
-          throw new Error("Failed to update wallet");
-        }
-
-        return true;
+      if (result.changes === 0) {
+        throw new Error("Failed to update wallet");
       }
+
+      return true;
     }
 
     // Insert the new wallet into the database
@@ -75,6 +61,6 @@ VALUES (?, ?, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP)`
 
     return true;
   } catch (error: any) {
-    throw new Error(`Wallet operation failed: ${error.message}`);
+    throw new Error(error.message);
   }
 };

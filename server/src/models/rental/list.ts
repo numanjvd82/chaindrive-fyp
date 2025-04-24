@@ -3,7 +3,25 @@ import { Rental } from "../../lib/types";
 import { sql } from "../../utils/utils";
 
 const SQL_QUERY = sql`
- SELECT *,
+ SELECT 
+  r.id AS rental_id,
+  r.listing_id,
+  r.renter_id,
+  r.renter_address,
+  r.owner_address,
+  r.start_date,
+  r.end_date,
+  r.rental_fee,
+  r.security_deposit,
+  r.platform_fee,
+  r.total_eth,
+  r.owner_confirmed,
+  r.completed_by_renter,
+  r.completed_by_owner,
+  r.is_completed,
+  r.created_at,
+  r.updated_at,
+  r.status,
   l.images,
   l.title
   FROM Rentals r
@@ -23,11 +41,10 @@ export async function listRentals() {
       .prepare(SQL_QUERY)
       .all()
       .map((rental: any) => ({
-        id: rental.id,
+        id: rental.rental_id,
         title: rental.title,
         listingId: rental.listing_id,
         renterId: rental.renter_id,
-        ownerId: rental.owner_id,
         renterAddress: rental.renter_address,
         ownerAddress: rental.owner_address,
         startDate: new Date(rental.start_date),
@@ -49,6 +66,8 @@ export async function listRentals() {
     if (!result) {
       throw new Error("No rentals found");
     }
+
+    console.log("List Rentals Result:", result);
 
     return result;
   } catch (error) {

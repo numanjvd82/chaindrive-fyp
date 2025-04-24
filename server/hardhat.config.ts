@@ -5,7 +5,7 @@ import "dotenv/config";
 import { HardhatUserConfig } from "hardhat/types";
 
 const config: HardhatUserConfig = {
-  defaultNetwork: "localhost",
+  // defaultNetwork: "",
   solidity: {
     version: "0.8.20",
     settings: {
@@ -15,6 +15,18 @@ const config: HardhatUserConfig = {
       },
       viaIR: true,
     },
+  },
+  networks: {
+    sepolia: {
+      url: process.env.ALCHEMY_RPC_URL || "",
+      accounts: process.env.CHAINDRIVE_PRIVATE_WALLET_KEY
+        ? [process.env.CHAINDRIVE_PRIVATE_WALLET_KEY]
+        : [],
+    },
+  },
+  typechain: {
+    outDir: "./src/typechain-types",
+    target: "ethers-v6",
   },
 };
 

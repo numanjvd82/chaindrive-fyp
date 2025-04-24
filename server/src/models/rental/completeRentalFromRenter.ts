@@ -53,7 +53,6 @@ export async function completeRentalFromRenter(
       throw new Error("Rental not found or already completed by renter");
     }
 
-    // Update the rental to mark it as completed from the renter's side
     const result = db
       .prepare(sql`UPDATE Rentals SET completed_by_renter = 1 WHERE id = ?`)
       .run(input);
@@ -62,11 +61,10 @@ export async function completeRentalFromRenter(
       throw new Error("Failed to update rental");
     }
 
-    // Check if the owner has already confirmed the rental
+    // If the owner has confirmed, mark the rental as fully completed
     if (rental.completedByOwner) {
-      // If the owner has confirmed, mark the rental as fully completed
       const completeResult = db
-        .prepare(sql`UPDATE Rentals SET is_completed = 1 WHERE id = ?`)
+        .prepare(sql`UPDATE Rentals SET status = 'completed' WHERE id = ?`)
         .run(input);
 
       if (completeResult.changes === 0) {

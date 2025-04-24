@@ -9,9 +9,7 @@ async function storeWallet(walletAddress: string) {
     });
     return data;
   } catch (error: any) {
-    throw new Error(
-      error.response?.data?.message || "An unexpected error occurred"
-    );
+    throw new Error(error.response?.data?.message);
   }
 }
 
@@ -22,6 +20,7 @@ export function useStoreWallet() {
       toast.success("Wallet added successfully");
     },
     onError: (error: any) => {
+      console.log(error);
       toast.error(
         error.message || "An error occurred while storing the wallet"
       );
