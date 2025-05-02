@@ -34,7 +34,6 @@ export async function confirmRental(input: ConfirmRentalInput) {
 
     return rentalId;
   } catch (error) {
-    console.error("Error confirming rental:", error);
     throw new Error("Failed to confirm rental");
   }
 }

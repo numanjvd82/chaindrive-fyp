@@ -43,7 +43,6 @@ export const createRental = async (req: Request, res: Response) => {
 
     res.status(201).json(rental);
   } catch (error: any) {
-    console.error("Error creating rental:", error);
     res.status(500).json({
       error: error.message || "An unexpected error occurred",
     });

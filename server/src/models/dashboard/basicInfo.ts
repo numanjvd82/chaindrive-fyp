@@ -41,7 +41,6 @@ export async function dashboardBasicInfo(id: GetDashboardDataInput) {
       totalListings: dashboardData?.totalListings || 0,
     };
   } catch (error) {
-    console.error("Error fetching dashboard data:", error);
     throw new Error("Failed to fetch dashboard data");
   }
 }

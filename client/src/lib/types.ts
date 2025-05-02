@@ -97,3 +97,12 @@ export type RentalWithImages = Rental & {
   images: string[];
   title: string;
 };
+
+export type Device = {
+  id: number;
+  deviceId: string;
+  listingId: number;
+  userId: number;
+  createdAt: Date;
+  updatedAt: Date;
+};

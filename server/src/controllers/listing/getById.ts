@@ -26,7 +26,6 @@ export const getListingById = async (req: Request, res: Response) => {
 
     res.status(200).json(listing);
   } catch (error: any) {
-    console.error("Error in getListingById controller:", error.message);
     res.status(500).json({ message: error.message || "Internal Server Error" });
   }
 };

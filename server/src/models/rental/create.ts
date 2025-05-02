@@ -158,7 +158,6 @@ INSERT INTO rentals (
 
     return rental;
   } catch (error) {
-    console.error("Error creating rental:", error);
     throw new Error("Failed to create rental");
   }
 }

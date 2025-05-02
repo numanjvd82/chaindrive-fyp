@@ -90,3 +90,12 @@ export type Rental = {
   status: "pending" | "active" | "cancelled";
   updatedAt: Date;
 };
+
+export type Device = {
+  id: number;
+  deviceId: string;
+  listingId: number;
+  userId: number;
+  createdAt: Date;
+  updatedAt: Date;
+};

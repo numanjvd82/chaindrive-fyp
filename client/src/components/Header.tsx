@@ -53,6 +53,12 @@ const Header: React.FC = () => {
             >
               Bookings
             </Link>
+            <Link
+              to="/devices"
+              className="font-semibold text-gray-600 hover:text-primary"
+            >
+              Devices
+            </Link>
           </>
         ) : (
           <Link to="/become-host">

@@ -39,7 +39,6 @@ export async function getById(
       updatedAt: new Date(listing.updated_at),
     } as Listing;
   } catch (error: any) {
-    console.error("Error fetching listing by ID:", error.message);
     throw new Error("Failed to fetch listing");
   }
 }

@@ -41,7 +41,6 @@ export async function getbyId(rentalId: GetRentalByIdInput) {
       updatedAt: new Date(rental.updated_at),
     } as Rental;
   } catch (error: any) {
-    console.error("Error fetching rental:", error.message);
     throw new Error("Failed to fetch rental");
   }
 }

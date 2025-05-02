@@ -35,7 +35,6 @@ export const confirmRentalFromOwner = async (req: Request, res: Response) => {
 
     res.status(200).json({ message: "Rental successfully confirmed by owner" });
   } catch (error: any) {
-    console.error("Error confirming rental from owner:", error.message);
     res.status(500).json({ message: error.message || "Internal Server Error" });
   }
 };

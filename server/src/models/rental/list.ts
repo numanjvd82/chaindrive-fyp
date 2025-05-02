@@ -67,11 +67,8 @@ export async function listRentals() {
       throw new Error("No rentals found");
     }
 
-    console.log("List Rentals Result:", result);
-
     return result;
   } catch (error) {
-    console.error("Error listing rentals:", error);
     throw new Error("Error listing rentals");
   }
 }

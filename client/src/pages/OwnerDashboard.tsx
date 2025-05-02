@@ -1,4 +1,3 @@
-import ESP32Reader from "@/components/ESP32Reader";
 import { hoverTransition } from "@/components/pages/OwnerDashboard/ActiveRentalCard";
 import ActiveRentals from "@/components/pages/OwnerDashboard/ActiveRentals";
 import useAuthUser from "@/hooks/useAuthUser";
@@ -24,10 +23,8 @@ const OwnerDashboard: React.FC = () => {
   const name = `${user.firstName} ${user.lastName}`;
 
   return (
-    <div className="p-8 space-y-8 bg-gray-100 min-h-screen">
+    <div className="p-8 space-y-8 bg-gray-100 min-h-[calc(100vh-4rem)]">
       <h1 className="text-2xl font-bold">Welcome, {name}</h1>
-
-      <ESP32Reader />
 
       <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
         {[

@@ -1,6 +1,7 @@
 import authRouter from "./auth";
 import conversationRouter from "./conversation";
 import dashboardRouter from "./dashboard";
+import deviceRouter from "./device";
 import listingRouter from "./listing";
 import messageRouter from "./message";
 import notificationRouter from "./notification";
@@ -18,6 +19,7 @@ const router = {
   notification: notificationRouter,
   listing: listingRouter,
   rental: rentalRouter,
+  device: deviceRouter,
 };
 
 export default router;

@@ -20,7 +20,6 @@ export const listRentals = async (req: Request, res: Response) => {
 
     res.status(200).json(rentals);
   } catch (error: any) {
-    console.error("Error listing rentals:", error.message);
     res.status(500).json({ message: error.message || "Internal Server Error" });
   }
 };

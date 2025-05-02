@@ -90,7 +90,6 @@ export async function addListing(input: AddListingInput) {
 
     return true;
   } catch (error: any) {
-    console.error("Error in addListing model:", error.message); // Log the error
     throw new Error(error.message || "Internal Server Error");
   }
 }

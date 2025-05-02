@@ -59,7 +59,6 @@ export async function editListing(input: EditListingInput) {
 
     return true;
   } catch (error: any) {
-    console.error("Error in editListing model:", error.message); // Log the error
     throw new Error(error.message || "Internal Server Error");
   }
 }

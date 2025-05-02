@@ -54,6 +54,7 @@ app.use("/api/messages", router.message);
 app.use("/api/notifications", router.notification);
 app.use("/api/listings", router.listing);
 app.use("/api/rentals", router.rental);
+app.use("/api/devices", router.device);
 
 const PORT = process.env.PORT || 3000;
 
