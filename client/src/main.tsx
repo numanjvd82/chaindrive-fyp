@@ -1,5 +1,6 @@
 import App from "@/App.tsx";
 import { UserProvider } from "@/providers/UserProvider.tsx";
+import "leaflet/dist/leaflet.css";
 import { StrictMode } from "react";
 import { createRoot } from "react-dom/client";
 import { QueryClient, QueryClientProvider } from "react-query";

@@ -99,3 +99,11 @@ export type Device = {
   createdAt: Date;
   updatedAt: Date;
 };
+
+export type Location = {
+  id: number;
+  deviceId: string;
+  latitude: number;
+  longitude: number;
+  timestamp: Date;
+};

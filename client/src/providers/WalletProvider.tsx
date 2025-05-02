@@ -55,6 +55,7 @@ export const WalletProvider = ({ children }: { children: React.ReactNode }) => {
       window.ethereum.on("accountsChanged", (accounts: string[]) => {
         if (accounts.length > 0) {
           setAccount(accounts[0]);
+          window.location.reload();
         } else {
           setAccount(null);
           setSigner(null);

@@ -3,6 +3,7 @@ import { authTablesInit } from "./authTablesInit";
 import { chatTablesInit } from "./chatTablesInit";
 import { deviceTableInit } from "./deviceTableInit";
 import { listingTableInit } from "./listingTableInit";
+import { locationTableInit } from "./locationTableInit";
 import { notificationTableInit } from "./notificationTableInit";
 import { rentalTableInit } from "./rentalTableInit";
 import { walletTableInit } from "./walletTableInit";
@@ -30,6 +31,7 @@ export function connectDb() {
     walletTableInit(db);
     rentalTableInit(db);
     deviceTableInit(db);
+    locationTableInit(db);
 
     console.log("Database schema created successfully.");
   } catch (err) {

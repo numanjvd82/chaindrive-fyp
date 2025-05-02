@@ -1,6 +1,8 @@
 import AboutVehicleOwner from "@/components/AboutVehicleOwner";
 import Button from "@/components/Button";
+import Map from "@/components/Map";
 import { useCompleteRentalByOwner } from "@/hooks/useCompleteRentalByOwner";
+import { useLatestLocation } from "@/hooks/useLatestLocation";
 import { useWallet } from "@/hooks/useWallet";
 import { getContractInstance } from "@/lib/contract";
 import { Listing, RentalWithImages } from "@/lib/types";
@@ -34,6 +36,9 @@ export const RentalDetailForOwner: React.FC<Props> = ({
     useCompleteRentalByOwner();
 
   const { signer, provider } = useWallet();
+  const { latestLocation, isLocationLoading } = useLatestLocation(
+    listing.expectedDeviceId || ""
+  );
 
   const handleCompleteRentalByOwner = async () => {
     if (!signer || !provider) {
@@ -100,10 +105,25 @@ export const RentalDetailForOwner: React.FC<Props> = ({
     completed: "bg-green-200 text-green-800",
   };
 
+  const renderMap = () => {
+    if (isLocationLoading) {
+      return <p className="text-gray-500">Loading location...</p>;
+    }
+
+    if (!latestLocation) {
+      return <p className="text-gray-500">No location data available.</p>;
+    }
+
+    <Map
+      latitude={latestLocation.latitude}
+      longitude={latestLocation.longitude}
+    />;
+  };
+
   return (
     <div className="p-6 max-w-6xl mx-auto bg-gray-100 h-[calc(100vh-4rem)] overflow-y-auto">
       <h1 className="text-3xl font-bold text-gray-800 mb-4">
-        Active Rental Details
+        Active Renta l Details
       </h1>
 
       {/* Status Badge */}
@@ -118,6 +138,15 @@ export const RentalDetailForOwner: React.FC<Props> = ({
         </span>
         {renderCompletionStatus()}
       </div>
+
+      {rental.status === "active" ? (
+        <div className="bg-white shadow-lg rounded-lg p-6 mb-6">
+          <h2 className="text-xl font-semibold text-gray-700 mb-4">
+            Vehicle Location
+          </h2>
+          {renderMap()}
+        </div>
+      ) : null}
 
       {/* Rental Info Card */}
       <div className="bg-gray-800 shadow-lg rounded-lg p-6 mb-6">
@@ -158,18 +187,8 @@ export const RentalDetailForOwner: React.FC<Props> = ({
         </div>
       </div>
 
-      {/* Renter Info */}
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-6">
         <AboutVehicleOwner id={rental.renterId} />
-      </div>
-
-      {/* Placeholder for Map */}
-      <div className="bg-white shadow-lg rounded-lg p-6 mb-6">
-        <h2 className="text-xl font-semibold text-gray-700 mb-4">
-          Vehicle Location
-        </h2>
-        {/* <Map latitude={rental.location.latitude} longitude={rental.location.longitude} /> */}
-        <p className="text-gray-500 italic">Map integration coming soon...</p>
       </div>
 
       {/* Complete Rental Button */}

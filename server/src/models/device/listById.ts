@@ -1,5 +1,6 @@
 import { z } from "zod";
 import { getDbInstance } from "../../lib/db/sqlite";
+import { Device } from "../../lib/types";
 import { sql } from "../../utils/utils";
 
 export const listDeviceByIdSchema = z.number().int().positive();
@@ -30,7 +31,7 @@ export const listDeviceById = async (
       throw new Error("Device not found");
     }
 
-    return devices;
+    return devices as Device[];
   } catch (error) {
     throw new Error("Failed to list devices by ID");
   }

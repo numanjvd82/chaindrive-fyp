@@ -1,7 +1,7 @@
 import Button from "@/components/Button";
 import { Conversation } from "@/lib/types";
 import { convertDateToString, truncateText } from "@/lib/utils";
-import { AnimatePresence, motion } from "framer-motion";
+import { AnimatePresence, motion } from "motion/react";
 import { FiSearch } from "react-icons/fi";
 import { IoCloseSharp } from "react-icons/io5";
 

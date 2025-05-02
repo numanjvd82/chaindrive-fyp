@@ -34,6 +34,7 @@ export async function availableRentals() {
           transmissionType: listing.transmission_type,
           fuelType: listing.fuel_type,
           ownerId: listing.owner_id,
+          expectedDeviceId: listing.expected_device_id,
           images: JSON.parse(listing.images),
           createdAt: new Date(listing.created_at),
           updatedAt: new Date(listing.updated_at),

@@ -9,6 +9,7 @@ import { connectDb } from "./lib/db/sqlite";
 import errorLogger from "./middlewares/errorLogger";
 import { ensureAuthenticated } from "./middlewares/session";
 import router from "./routes";
+import { mqttHandler } from "./services/mqttHandler";
 import socketServer from "./services/socketServer";
 
 dotenv.config();
@@ -18,6 +19,7 @@ const server = http.createServer(app);
 
 // Socket.io
 socketServer(server);
+mqttHandler();
 
 // Middleware
 app.use(express.json());
@@ -55,6 +57,7 @@ app.use("/api/notifications", router.notification);
 app.use("/api/listings", router.listing);
 app.use("/api/rentals", router.rental);
 app.use("/api/devices", router.device);
+app.use("/api/locations", router.location);
 
 const PORT = process.env.PORT || 3000;
 

@@ -3,6 +3,7 @@ import conversationRouter from "./conversation";
 import dashboardRouter from "./dashboard";
 import deviceRouter from "./device";
 import listingRouter from "./listing";
+import locationRouter from "./locations";
 import messageRouter from "./message";
 import notificationRouter from "./notification";
 import rentalRouter from "./rental";
@@ -20,6 +21,7 @@ const router = {
   listing: listingRouter,
   rental: rentalRouter,
   device: deviceRouter,
+  location: locationRouter,
 };
 
 export default router;
