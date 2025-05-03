@@ -23,7 +23,7 @@ const BookingCalculator: React.FC<BookingSummaryProps> = ({ rental }) => {
     if (dates.length === 0) return;
     const startDate = dayjs(dates[0]);
     const endDate = dayjs(dates[dates.length - 1]);
-    const totalDays = endDate.diff(startDate, "day") + 1; // +1 to include start date
+    const totalDays = endDate.diff(startDate, "day"); // Exclusive duration
     return {
       totalPrice: totalDays * pricePerDay,
       totalDays,

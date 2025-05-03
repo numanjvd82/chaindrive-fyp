@@ -3,6 +3,9 @@ import { useQuery } from "react-query";
 
 interface DashboardBasicInfo {
   activeBookings: number;
+  pendingBookings: number;
+  completedBookings: number;
+  cancelledBookings: number;
   totalEarnings: number;
   totalListings: number;
 }

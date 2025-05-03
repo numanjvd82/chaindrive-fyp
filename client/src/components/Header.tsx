@@ -42,17 +42,19 @@ const Header: React.FC = () => {
           Dashboard
         </Link>
 
+        <Link
+          to="/rentals"
+          className="font-semibold text-gray-600 hover:text-primary"
+        >
+          Rentals
+        </Link>
+
         {user.role === "owner" ? (
           <>
             <Link to="/listings/create">
               <Button variant="primary">List Vehicle</Button>
             </Link>
-            <Link
-              to="/renter-bookings"
-              className="font-semibold text-gray-600 hover:text-primary"
-            >
-              Bookings
-            </Link>
+
             <Link
               to="/devices"
               className="font-semibold text-gray-600 hover:text-primary"

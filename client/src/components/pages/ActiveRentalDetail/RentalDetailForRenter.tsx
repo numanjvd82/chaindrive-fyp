@@ -1,5 +1,6 @@
 import AboutVehicleOwner from "@/components/AboutVehicleOwner";
 import Button from "@/components/Button";
+import { useCancelRental } from "@/hooks/useCancelRental";
 import { useCompleteRentalByRenter } from "@/hooks/useCompleteRentalByRenter";
 import { useWallet } from "@/hooks/useWallet";
 import { getContractInstance } from "@/lib/contract";
@@ -28,6 +29,7 @@ export const RentalDetailForRenter: React.FC<Props> = ({
 }) => {
   const { completeRentalByRenter, isCompleteRentalByRenterLoading } =
     useCompleteRentalByRenter();
+  const { cancelRental, isCancelRentalLoading } = useCancelRental();
 
   const { signer, provider } = useWallet();
 
@@ -95,11 +97,48 @@ export const RentalDetailForRenter: React.FC<Props> = ({
     completed: "bg-green-200 text-green-800",
   };
 
+  const handleCancelRental = async () => {
+    if (!signer || !provider) {
+      toast.error("Please connect your wallet to cancel the rental.");
+      return;
+    }
+
+    if (!rental) {
+      toast.error("Rental not found.");
+      return;
+    }
+
+    if (rental.status !== "pending") {
+      toast.error("Rental cannot be cancelled.");
+      return;
+    }
+
+    try {
+      const contract = getContractInstance(signer);
+      const tx = await contract.cancelRental(rental.id);
+      toast.loading("Cancelling rental on the blockchain...");
+      const receipt = await tx.wait();
+
+      if (!receipt || receipt.status !== 1) {
+        toast.error("Failed to cancel rental on the blockchain.");
+        return;
+      }
+
+      await cancelRental(rental.id);
+      toast.dismiss();
+      toast.success(`Rental is Cancelled.\n
+              Transaction Hash: ${tx.hash}
+              View on Etherscan: https://sepolia.etherscan.io/tx/${tx.hash}
+              `);
+    } catch (error) {
+      console.error("Error cancelling rental:", error);
+      toast.error("Error cancelling rental");
+    }
+  };
+
   return (
     <div className="p-6 max-w-6xl mx-auto bg-gray-100 h-[calc(100vh-4rem)] overflow-y-auto">
-      <h1 className="text-3xl font-bold text-gray-800 mb-4">
-        Active Rental Details
-      </h1>
+      <h1 className="text-3xl font-bold text-gray-800 mb-4">Rental Details</h1>
 
       {/* Status Badge */}
       <div className="mb-6 flex items-center gap-4">
@@ -158,9 +197,20 @@ export const RentalDetailForRenter: React.FC<Props> = ({
         <AboutVehicleOwner id={listing.ownerId} />
       </div>
 
-      {/* Complete Rental Button */}
-      {!rental.completedByRenter ? (
-        <div className="flex justify-end mt-6">
+      <div className="flex justify-end mt-6">
+        {rental.status === "pending" ? (
+          <Button
+            variant="primary"
+            onClick={handleCancelRental}
+            isLoading={isCancelRentalLoading}
+            disabled={isCancelRentalLoading}
+          >
+            Cancel Rental
+          </Button>
+        ) : null}
+
+        {/* Complete Rental Button */}
+        {!rental.completedByRenter || rental.status === "active" ? (
           <Button
             isLoading={isCompleteRentalByRenterLoading}
             onClick={handleCompleteRentalByRenter}
@@ -169,8 +219,8 @@ export const RentalDetailForRenter: React.FC<Props> = ({
           >
             Complete Rental (Renter)
           </Button>
-        </div>
-      ) : null}
+        ) : null}
+      </div>
     </div>
   );
 };

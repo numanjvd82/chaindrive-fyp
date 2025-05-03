@@ -1,3 +1,4 @@
+import { cancelRental } from "./cancelRental";
 import { completeRentalFromOwner } from "./completeRentalFromOwner";
 import { completeRentalFromRenter } from "./completeRentalFromRenter";
 import { confirmRental } from "./confirmRental";
@@ -12,4 +13,5 @@ export const rentalModel = {
   list: listRentals,
   completeFromOwner: completeRentalFromOwner,
   completeFromRenter: completeRentalFromRenter,
+  cancel: cancelRental,
 };

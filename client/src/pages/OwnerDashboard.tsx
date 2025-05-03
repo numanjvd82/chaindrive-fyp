@@ -30,6 +30,18 @@ const OwnerDashboard: React.FC = () => {
         {[
           { label: "Active Rentals", value: dashboardBasicInfo.activeBookings },
           {
+            label: "Pending Rentals",
+            value: dashboardBasicInfo.pendingBookings,
+          },
+          {
+            label: "Completed Rentals",
+            value: dashboardBasicInfo.completedBookings,
+          },
+          {
+            label: "Cancelled Rentals",
+            value: dashboardBasicInfo.cancelledBookings,
+          },
+          {
             label: "Total Earnings (PKR)",
             value: `${dashboardBasicInfo.totalEarnings}`,
           },
