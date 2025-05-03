@@ -36,7 +36,7 @@ export interface Message {
 
 export interface Notification {
   id: number;
-  type: string;
+  type: "rental_confirmation" | "message";
   content: string;
   created_at: string;
   rentalId: number | null;

@@ -1,7 +1,7 @@
 import { z } from "zod";
 import { getDbInstance } from "../../lib/db/sqlite";
 import { Listing, Rental } from "../../lib/types";
-import { notificationDbFunctions } from "../../services/notfication";
+import { notificationDbFunctions } from "../../services/notification";
 import { sql } from "../../utils/utils";
 import { userModel } from "../user";
 

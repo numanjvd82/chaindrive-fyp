@@ -1,7 +1,9 @@
 import { useConfirmRental } from "@/hooks/useConfirmRental";
+import { Notification } from "@/lib/types";
 import { useNotificationProvider } from "@/providers/NotificationProvider";
 import { useState } from "react";
 import { FaRegBell } from "react-icons/fa";
+import { Link } from "react-router-dom";
 import { toast } from "react-toastify";
 import Button from "./Button";
 import Divider from "./Divider";
@@ -14,14 +16,59 @@ export const NotificationDropdown = () => {
 
   const handleConfirmRental = async (rentalId: number) => {
     try {
-      await confirmRental({
-        rentalId,
-      });
-      setIsOpen(false);
+      await confirmRental({ rentalId });
       toast.success("Rental confirmed successfully!");
       markAllAsRead();
+      setIsOpen(false);
     } catch (error) {
       console.error("Error confirming rental:", error);
+    }
+  };
+
+  const renderNotificationContent = (notification: Notification) => {
+    switch (notification.type) {
+      case "rental_confirmation":
+        return (
+          <>
+            <p className="font-semibold text-gray-800">Rental Confirmation</p>
+            <p className="text-sm text-gray-600">{notification.content}</p>
+            <Button
+              className="mt-2 bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600 transition"
+              onClick={() => {
+                if (isConfirmRentalLoading || !notification.rentalId) return;
+                handleConfirmRental(notification.rentalId);
+              }}
+              disabled={isConfirmRentalLoading}
+              isLoading={isConfirmRentalLoading}
+            >
+              {isConfirmRentalLoading ? "Confirming..." : "Confirm Rental"}
+            </Button>
+          </>
+        );
+
+      case "message":
+        return (
+          <Link
+            to={notification.link || "#"}
+            onClick={() => {
+              if (notification.link) {
+                setIsOpen(false);
+              }
+            }}
+            className="cursor-pointer hover:bg-gray-100 p-2 rounded transition"
+          >
+            <p className="font-semibold text-gray-800">New Message</p>
+            <p className="text-sm text-gray-600">{notification.content}</p>
+          </Link>
+        );
+
+      default:
+        return (
+          <>
+            <p className="font-semibold text-gray-800">Notification</p>
+            <p className="text-sm text-gray-600">{notification.content}</p>
+          </>
+        );
     }
   };
 
@@ -31,10 +78,9 @@ export const NotificationDropdown = () => {
       button={
         <span
           onClick={() => setIsOpen(!isOpen)}
-          className="bg-gray-200 cursor-pointer p-2 rounded-xl transition duration-300 ease-in-out hover:text-primary hover:bg-gray-300 relative"
+          className="bg-gray-200 cursor-pointer p-2 rounded-xl transition hover:text-primary hover:bg-gray-300 relative"
         >
           <FaRegBell className="text-xl" />
-
           {notifications?.length > 0 && (
             <span className="absolute top-0 -right-0 bg-primary rounded-full w-2 h-2" />
           )}
@@ -66,41 +112,7 @@ export const NotificationDropdown = () => {
                 key={notification.id}
                 className="flex flex-col gap-2 p-3 border-b last:border-b-0"
               >
-                {notification.type === "rental_confirmation" ? (
-                  <>
-                    <p className="font-semibold text-gray-800">
-                      Rental Confirmation
-                    </p>
-                    <p className="text-sm text-gray-600">
-                      {notification.content}
-                    </p>
-                    <Button
-                      className="mt-2 bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600 transition"
-                      onClick={() => {
-                        if (isConfirmRentalLoading) return;
-                        if (!notification.rentalId) return;
-                        handleConfirmRental(notification.rentalId);
-                      }}
-                      disabled={isConfirmRentalLoading}
-                      isLoading={isConfirmRentalLoading}
-                    >
-                      {isConfirmRentalLoading
-                        ? "Confirming..."
-                        : "Confirm Rental"}
-                    </Button>
-                  </>
-                ) : (
-                  <>
-                    <p className="font-semibold text-gray-800">
-                      {notification.type === "message"
-                        ? "New Message"
-                        : "New Notification"}
-                    </p>
-                    <p className="text-sm text-gray-600">
-                      {notification.content}
-                    </p>
-                  </>
-                )}
+                {renderNotificationContent(notification)}
               </li>
             ))}
           </ul>

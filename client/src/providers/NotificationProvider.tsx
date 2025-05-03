@@ -4,6 +4,7 @@ import { useNotification } from "@/hooks/useNotification";
 import { useSocket } from "@/hooks/useSocket";
 import { Notification } from "@/lib/types";
 import { useContext, useEffect, useState } from "react";
+import { Link } from "react-router-dom";
 import { toast } from "react-toastify";
 
 export const NotificationProvider = ({
@@ -30,10 +31,24 @@ export const NotificationProvider = ({
     const handleNotification = (notification: Notification) => {
       setNotifications((prev) => [notification, ...prev]);
       if (location.pathname !== "/chat") {
-        toast.info(notification.content, {
-          position: "top-right",
-          autoClose: 5000,
-        });
+        toast.info(
+          <div className="flex flex-col">
+            {notification.link ? (
+              <Link to={notification.link}>
+                You have a new message. Click here to view it.
+                <blockquote className="text-sm text-gray-500 font-bold italic text-center">
+                  "{notification.content}"
+                </blockquote>
+              </Link>
+            ) : (
+              <span>You have a new message</span>
+            )}
+          </div>,
+          {
+            position: "top-right",
+            autoClose: 5000,
+          }
+        );
       }
 
       const audio = new Audio("/notification.mp3");

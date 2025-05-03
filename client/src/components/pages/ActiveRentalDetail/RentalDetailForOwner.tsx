@@ -16,7 +16,6 @@ import {
   FaMapMarkerAlt,
   FaUsers,
 } from "react-icons/fa";
-import { useNavigate } from "react-router-dom";
 import { toast } from "react-toastify";
 
 type Props = {
@@ -30,8 +29,6 @@ export const RentalDetailForOwner: React.FC<Props> = ({
   rental,
   refetchRentalDetail,
 }) => {
-  const navigate = useNavigate();
-
   const { completeRentalByOwner, isCompleteRentalByOwnerLoading } =
     useCompleteRentalByOwner();
 
@@ -114,16 +111,20 @@ export const RentalDetailForOwner: React.FC<Props> = ({
       return <p className="text-gray-500">No location data available.</p>;
     }
 
-    <Map
-      latitude={latestLocation.latitude}
-      longitude={latestLocation.longitude}
-    />;
+    if (latestLocation) {
+      return (
+        <Map
+          latitude={latestLocation.latitude}
+          longitude={latestLocation.longitude}
+        />
+      );
+    }
   };
 
   return (
     <div className="p-6 max-w-6xl mx-auto bg-gray-100 h-[calc(100vh-4rem)] overflow-y-auto">
       <h1 className="text-3xl font-bold text-gray-800 mb-4">
-        Active Renta l Details
+        Active Rental Details
       </h1>
 
       {/* Status Badge */}
