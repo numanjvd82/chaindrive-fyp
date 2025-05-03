@@ -24,7 +24,7 @@ const RentalConfirmation = React.lazy(
   () => import("./pages/RentalConfirmation")
 );
 const RentalSuccessful = React.lazy(() => import("./pages/RentalSuccessful"));
-
+//////
 const ROUTES = [
   {
     link: "/",
