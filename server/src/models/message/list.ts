@@ -16,7 +16,7 @@ export const listMessages = async (input: ListMessagesInput) => {
   try {
     // Fetch messages from the database
     const stmt = sqliteInstance.prepare(
-      sql`SELECT * FROM messages WHERE conversation_id = ?`
+      sql`SELECT * FROM Messages WHERE conversation_id = ?`
     );
     const messages = stmt
       .all(parsedInput.conversationId)

@@ -1,7 +1,9 @@
 import Database, { Database as DbType } from "better-sqlite3";
 import { authTablesInit } from "./authTablesInit";
 import { chatTablesInit } from "./chatTablesInit";
+import { deviceTableInit } from "./deviceTableInit";
 import { listingTableInit } from "./listingTableInit";
+import { locationTableInit } from "./locationTableInit";
 import { notificationTableInit } from "./notificationTableInit";
 import { rentalTableInit } from "./rentalTableInit";
 import { walletTableInit } from "./walletTableInit";
@@ -28,6 +30,8 @@ export function connectDb() {
     listingTableInit(db);
     walletTableInit(db);
     rentalTableInit(db);
+    deviceTableInit(db);
+    locationTableInit(db);
 
     console.log("Database schema created successfully.");
   } catch (err) {

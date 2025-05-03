@@ -121,7 +121,6 @@ VALUES (?, ?, ?, ?, ?)`
 
     return true;
   } catch (error: any) {
-    console.error("Transaction failed:", error.message);
     throw new Error(error.message);
   }
 };

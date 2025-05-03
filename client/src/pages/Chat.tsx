@@ -12,27 +12,39 @@ import { AnimatePresence, motion } from "framer-motion";
 import { useEffect, useRef, useState } from "react";
 import { FaBars } from "react-icons/fa";
 import { IoSendSharp } from "react-icons/io5";
+import { useSearchParams } from "react-router-dom";
 
 const Chat = () => {
-  const [selectedChat, setSelectedChat] = useState<Conversation | null>(null);
+  const [searchParams, setSearchParams] = useSearchParams();
+  const conversationIdParam = searchParams.get("conversationId");
+  const conversationId = conversationIdParam
+    ? parseInt(conversationIdParam, 10)
+    : null;
+
+  // const [selectedChat, setSelectedChat] = useState<Conversation | null>(null);
   const [isSidebarOpen, setIsSidebarOpen] = useState(true);
+  const [newMessage, setNewMessage] = useState("");
+
   const {
     conversations,
     isLoading: isConversationsLoading,
     refetch,
   } = useListConversations();
-  const [newMessage, setNewMessage] = useState("");
+  const selectedChat =
+    conversations?.find((c) => c.id === conversationId) || null;
+
   const { messages, sendMessage } = useChatSocket(selectedChat);
   const { onlineUsers } = useOnlineStatus();
   const { user } = useUser();
+
   const chatRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
-    if (!conversations || conversations.length === 0) return;
-    if (!selectedChat && conversations.length > 0) {
-      setSelectedChat(conversations[0]);
+    if (!conversations) return;
+    if (!conversationId && conversations?.length > 0) {
+      setSearchParams({ conversationId: conversations[0].id.toString() });
     }
-  }, [conversations, selectedChat]);
+  }, [conversationId, conversations, setSearchParams]);
 
   useEffect(() => {
     if (chatRef.current) {
@@ -44,6 +56,10 @@ const Chat = () => {
 
   const isOnline =
     selectedChat && onlineUsers.has(selectedChat.otherUserId) ? true : false;
+
+  const handleSelectChat = (chat: Conversation) => {
+    setSearchParams({ conversationId: chat.id.toString() });
+  };
 
   // Inline Components
   const NoChatSelected = () => (
@@ -79,7 +95,7 @@ const Chat = () => {
               conversations={conversations || []}
               isLoading={isConversationsLoading}
               selectedChat={selectedChat}
-              setSelectedChat={setSelectedChat}
+              setSelectedChat={handleSelectChat}
               isSidebarOpen={isSidebarOpen}
               setIsSidebarOpen={setIsSidebarOpen}
             />

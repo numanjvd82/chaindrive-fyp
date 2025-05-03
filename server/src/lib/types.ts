@@ -87,6 +87,23 @@ export type Rental = {
   completedByOwner: boolean;
   isCompleted: boolean;
   createdAt: Date;
-  status: "pending" | "active" | "cancelled";
+  status: "pending" | "active" | "cancelled" | "completed";
   updatedAt: Date;
+};
+
+export type Device = {
+  id: number;
+  deviceId: string;
+  listingId: number;
+  userId: number;
+  createdAt: Date;
+  updatedAt: Date;
+};
+
+export type Location = {
+  id: number;
+  deviceId: string;
+  latitude: number;
+  longitude: number;
+  timestamp: Date;
 };

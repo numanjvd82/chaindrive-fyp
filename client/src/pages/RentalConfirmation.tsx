@@ -190,9 +190,6 @@ const RentalConfirmation: React.FC = () => {
         `Rental created successfully!
         \nTransaction Hash: ${receipt.hash}
         \nRental ID: ${createdRental.id}
-        \nRental Fee: ${rentalFeeEth} ETH
-        \nSecurity Deposit: ${securityDepositEth} ETH
-        \nPlatform Fee: ${platformFeeEth} ETH
         `,
         {
           onClose: () => navigate(`/rental-successful/${createdRental.id}`),

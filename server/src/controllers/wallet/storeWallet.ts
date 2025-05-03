@@ -30,7 +30,6 @@ export const storeWallet = async (req: Request, res: Response) => {
 
     res.status(200).json(wallet);
   } catch (error: any) {
-    console.error("Error storing wallet:", error);
     res.status(500).json({
       error: error.message || "An unexpected error occurred",
     });

@@ -62,7 +62,7 @@ export const CarCard: React.FC<Listing> = (props) => {
         <img
           src={`data:image/jpeg;base64,${images[0]}`}
           alt={title}
-          className="rounded-lg h-full object-fill"
+          className="rounded-lg h-full object-cover w-full"
         />
       </div>
       <div>

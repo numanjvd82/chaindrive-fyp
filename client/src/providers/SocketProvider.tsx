@@ -1,10 +1,10 @@
 import { SocketContext } from "@/contexts/SocketContext";
-import { useUser } from "@/hooks/useUser";
+import useAuthUser from "@/hooks/useAuthUser";
 import { socket } from "@/lib/socket";
 import { ReactNode, useEffect, useState } from "react";
 
 export const SocketProvider = ({ children }: { children: ReactNode }) => {
-  const { user } = useUser();
+  const { user } = useAuthUser();
   const [isConnected, setIsConnected] = useState(socket.connected);
 
   useEffect(() => {

@@ -1,5 +1,6 @@
 import { z } from "zod";
 import { getDbInstance } from "../../lib/db/sqlite";
+import { Rental } from "../../lib/types";
 import { sql } from "../../utils/utils";
 
 export const getRentalByIdSchema = z.number().positive().int();
@@ -38,9 +39,8 @@ export async function getbyId(rentalId: GetRentalByIdInput) {
       createdAt: new Date(rental.created_at),
       status: rental.status,
       updatedAt: new Date(rental.updated_at),
-    };
+    } as Rental;
   } catch (error: any) {
-    console.error("Error fetching rental:", error.message);
     throw new Error("Failed to fetch rental");
   }
 }

@@ -17,15 +17,16 @@ export async function completeRentalFromRenter(
   }
   try {
     const db = getDbInstance();
+    const rentalId = completeRentalFromRenterSchema.parse(input);
 
     // Check if the rental exists and is not already completed
     const rental = db
       .prepare(
         sql`SELECT * FROM Rentals WHERE id = ? 
         AND is_completed = 0 
-        AND completed_by_renter = 1`
+        AND completed_by_renter = 0`
       )
-      .all(input)
+      .all(rentalId)
       .map((rental: any) => ({
         id: rental.id,
         listingId: rental.listing_id,
@@ -52,7 +53,6 @@ export async function completeRentalFromRenter(
       throw new Error("Rental not found or already completed by renter");
     }
 
-    // Update the rental to mark it as completed from the renter's side
     const result = db
       .prepare(sql`UPDATE Rentals SET completed_by_renter = 1 WHERE id = ?`)
       .run(input);
@@ -61,11 +61,10 @@ export async function completeRentalFromRenter(
       throw new Error("Failed to update rental");
     }
 
-    // Check if the owner has already confirmed the rental
+    // If the owner has confirmed, mark the rental as fully completed
     if (rental.completedByOwner) {
-      // If the owner has confirmed, mark the rental as fully completed
       const completeResult = db
-        .prepare(sql`UPDATE Rentals SET is_completed = 1 WHERE id = ?`)
+        .prepare(sql`UPDATE Rentals SET status = 'completed' WHERE id = ?`)
         .run(input);
 
       if (completeResult.changes === 0) {
@@ -75,7 +74,6 @@ export async function completeRentalFromRenter(
 
     return true;
   } catch (error) {
-    console.error("Error completing rental from renter:", error);
     throw new Error("Failed to complete rental from renter");
   }
 }

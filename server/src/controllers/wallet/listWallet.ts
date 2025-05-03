@@ -37,7 +37,6 @@ export const listWallet = async (req: Request, res: Response) => {
 
     res.status(200).json(wallet);
   } catch (error: any) {
-    console.error("Error listing Wallet:", error);
     res.status(500).json({ error: error.message || "Internal Server Error" });
   }
 };

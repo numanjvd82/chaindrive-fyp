@@ -24,6 +24,11 @@ const RentalConfirmation = React.lazy(
   () => import("./pages/RentalConfirmation")
 );
 const RentalSuccessful = React.lazy(() => import("./pages/RentalSuccessful"));
+const RentalsPage = React.lazy(() => import("./pages/Rentals"));
+const ActiveRentalDetail = React.lazy(
+  () => import("./pages/ActiveRentalDetail")
+);
+const DevicesPage = React.lazy(() => import("./pages/Devices"));
 
 const ROUTES = [
   {
@@ -72,6 +77,16 @@ const ROUTES = [
     roles: ["owner"],
   },
   {
+    link: "/rentals",
+    component: <RentalsPage />,
+    roles: ["owner", "renter"],
+  },
+  {
+    link: "/rentals/:id",
+    component: <ActiveRentalDetail />,
+    roles: ["owner", "renter"],
+  },
+  {
     link: "/listings/create",
     component: <CreateListing />,
     roles: ["owner"],
@@ -79,6 +94,11 @@ const ROUTES = [
   {
     link: "/listings",
     component: <ListingsPage />,
+    roles: ["owner"],
+  },
+  {
+    link: "/devices",
+    component: <DevicesPage />,
     roles: ["owner"],
   },
   {

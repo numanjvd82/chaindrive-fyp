@@ -75,6 +75,11 @@ const Calendar: React.FC<CalendarProps> = ({
       if (minDay && start.isBefore(minDay)) start = minDay;
       if (maxDay && end.isAfter(maxDay)) end = maxDay;
 
+      // If it's a single-day selection, make end = start + 1 day
+      if (start.isSame(end, "day")) {
+        end = end.add(1, "day");
+      }
+
       setRangeStart(start);
       setRangeEnd(end);
       onDateSelect?.(getSelectedDates(start, end));

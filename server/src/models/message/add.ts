@@ -17,7 +17,7 @@ export const insertMessage = async (input: InsertMessageInput) => {
   try {
     // Insert message to the database
     const stmt = sqliteInstance.prepare(
-      sql`INSERT INTO messages (conversation_id, sender_id, message) VALUES (?, ?, ?)`
+      sql`INSERT INTO Messages (conversation_id, sender_id, message) VALUES (?, ?, ?)`
     );
 
     const result = stmt.run(
