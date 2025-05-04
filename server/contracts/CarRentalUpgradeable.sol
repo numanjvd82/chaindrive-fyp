@@ -94,7 +94,6 @@ contract CarRentalUpgradeable is Initializable, ReentrancyGuardUpgradeable {
 
     function cancelRental(uint256 rentalId) external nonReentrant {
         Rental storage rental = rentals[rentalId];
-        require(msg.sender == rental.renter, "Only renter can cancel");
         require(!rental.isCompleted, "Rental already completed");
         require(!rental.ownerConfirmed, "Cannot cancel after owner confirmed");
 

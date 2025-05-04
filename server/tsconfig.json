@@ -3,11 +3,13 @@
     "target": "es6",
     "module": "CommonJS",
     "outDir": "./dist",
-    "rootDir": "./src",
+    "rootDirs": ["./src", "./scripts"],
     "strict": true,
     "esModuleInterop": true
   },
-  "include": ["src/**/*", "global.d.ts", 
-  "src/scripts"],
+  "include": [
+    "./src",
+    "./scripts",
+  ],
   "files": ["./hardhat.config.ts"]
 }

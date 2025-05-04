@@ -5,11 +5,11 @@ const Header: React.FC = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
 
   return (
-    <nav className="flex items-center justify-between px-6 py-4 bg-gray-100 shadow-md">
-      <Link to={"/"}>
+    <nav className="flex items-center justify-between px-6 py-4 bg-gray-100 shadow-md sticky top-0 z-50">
+      <Link to="/">
         <div className="flex items-center space-x-2">
           <img src="/logo.svg" alt="ChainDrive Logo" className="h-8" />
-          <span className="text-lg font-bold text-dodgerblue-100">
+          <span className="text-lg font-bold text-blue-600">
             Chain<span className="text-lg font-bold text-black">Drive</span>
           </span>
         </div>
@@ -36,14 +36,13 @@ const Header: React.FC = () => {
           </a>
         </li>
         <li>
-          <Link className="nav-link active" aria-current="page" to={"/"}>
-            How it works{" "}
-          </Link>
-          {/* <a
+          <a
             href="#how-it-works"
             className="text-gray-600 hover:text-blue-600 transition"
             aria-label="How it works"
-          > */}
+          >
+            How it works
+          </a>
         </li>
         <li>
           <a
@@ -59,14 +58,14 @@ const Header: React.FC = () => {
       {/* Auth Buttons (Desktop) */}
       <div className="hidden md:flex space-x-4">
         <Link
-          to="sign-in"
+          to="/sign-in"
           className="px-4 py-2 text-gray-600 rounded-md hover:text-blue-600 transition"
           aria-label="Sign in"
         >
           Sign in
         </Link>
         <Link
-          to="signup"
+          to="/signup"
           className="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition"
           aria-label="Sign up"
         >
@@ -138,8 +137,8 @@ const Header: React.FC = () => {
             </li>
             <li>
               <Link
-                to="/login"
-                className="px-4 py-2 text-gray-600 rounded-md hover:text-blue-600 transition duration-200"
+                to="/sign-in"
+                className="px-4 py-2 text-gray-600 rounded-md hover:text-blue-600 transition"
                 aria-label="Sign in"
               >
                 Sign in
@@ -148,7 +147,7 @@ const Header: React.FC = () => {
             <li>
               <Link
                 to="/signup"
-                className="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition duration-200"
+                className="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition"
                 aria-label="Sign up"
               >
                 Sign up
