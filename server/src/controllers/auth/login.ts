@@ -1,4 +1,5 @@
 import { Request, Response } from "express";
+import { otpModel } from "../../models/otp";
 import { sessionModel } from "../../models/session";
 import { userModel } from "../../models/user";
 import { signUpSchema } from "../../models/user/createOne";
@@ -31,7 +32,15 @@ export const login = async (req: Request, res: Response) => {
       return;
     }
 
-    // create a session
+    // Check if the user has two-factor authentication enabled
+    if (user.twoFactorEnabled) {
+      // Generate and send OTP
+      await otpModel.send({ email });
+      res.status(200).json({ message: "OTP sent to your email" });
+      return;
+    }
+
+    // create a session if two-factor authentication is not enabled
     const sessionId = await sessionModel.createOne(user.id);
 
     res.cookie("sessionId", sessionId, {
@@ -42,6 +51,7 @@ export const login = async (req: Request, res: Response) => {
 
     res.status(200).json({ message: "Logged in successfully" });
   } catch (error: any) {
+    console.log("Error during login:", error);
     res.status(500).json({ error: error.message });
   }
 };

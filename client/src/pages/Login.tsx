@@ -36,7 +36,18 @@ const Login = () => {
 
   const onSubmit: SubmitHandler<LoginForm> = async (data) => {
     try {
-      await axiosInstance.post("/api/auth/login", data);
+      const response = await axiosInstance.post("/api/auth/login", data);
+
+      // Check if OTP is required
+      if (response.data.message === "OTP sent to your email") {
+        toast.success("OTP sent to your email", {
+          onClose: () =>
+            navigate("/otp-input", { state: { email: data.email } }),
+        });
+        return;
+      }
+
+      // If no OTP is required, fetch user data and redirect
       const user = await fetchUser(); // Fetch and update user context
       if (user.data) {
         const role = user.data.role;

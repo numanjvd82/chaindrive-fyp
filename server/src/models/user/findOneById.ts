@@ -45,6 +45,7 @@ export const findOneById = async (id: z.infer<typeof idSchema>) => {
           selfie: convertBufferToBase64(row.selfie),
           createdAt: new Date(row.created_at),
           updatedAt: new Date(row.updated_at),
+          twoFactorEnabled: row.two_factor_enabled === 1,
         };
 
         delete changedRow.first_name;

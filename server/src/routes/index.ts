@@ -6,6 +6,7 @@ import listingRouter from "./listing";
 import locationRouter from "./locations";
 import messageRouter from "./message";
 import notificationRouter from "./notification";
+import otpRouter from "./otp";
 import rentalRouter from "./rental";
 import userRouter from "./user";
 import walletRouter from "./wallet";
@@ -22,6 +23,7 @@ const router = {
   rental: rentalRouter,
   device: deviceRouter,
   location: locationRouter,
+  otp: otpRouter,
 };
 
 export default router;

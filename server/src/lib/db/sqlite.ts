@@ -5,6 +5,7 @@ import { deviceTableInit } from "./deviceTableInit";
 import { listingTableInit } from "./listingTableInit";
 import { locationTableInit } from "./locationTableInit";
 import { notificationTableInit } from "./notificationTableInit";
+import { otpTableInit } from "./otpTableInit";
 import { rentalTableInit } from "./rentalTableInit";
 import { walletTableInit } from "./walletTableInit";
 
@@ -32,6 +33,7 @@ export function connectDb() {
     rentalTableInit(db);
     deviceTableInit(db);
     locationTableInit(db);
+    otpTableInit(db);
 
     console.log("Database schema created successfully.");
   } catch (err) {
