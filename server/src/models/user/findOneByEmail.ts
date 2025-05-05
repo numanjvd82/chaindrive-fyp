@@ -15,6 +15,7 @@ export const findOneByEmail = async (email: findOneByEmailType) => {
       .map((row: any) => ({
         ...row,
         twoFactorEnabled: row.two_factor_enabled === 1,
+        isVerified: row.is_verified === 1,
       }))[0] as PartialUser | undefined;
 
     if (!user) {

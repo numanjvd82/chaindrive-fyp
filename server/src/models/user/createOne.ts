@@ -19,7 +19,8 @@ export const signUpSchema = z.object({
   email: z
     .string()
     .nonempty({ message: "Email is required" })
-    .email("Invalid email address"),
+    .email("Invalid email address")
+    .transform((v) => v.toLowerCase()),
   phone: z
     .string()
     .nonempty("Phone number is required")

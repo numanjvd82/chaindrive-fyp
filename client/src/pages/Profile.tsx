@@ -40,13 +40,11 @@ const ProfilePage: React.FC = () => {
     }
   };
 
-  console.log("user", user);
-
   return (
     <div className="p-8 space-y-8 bg-gray-100 min-h-screen">
       <h1 className="text-3xl font-bold">Profile</h1>
       <AccountInfo {...user} />
-      <KycVerificationStatus />
+      <KycVerificationStatus profileVerified={user.isVerified} />
       <IdCardImages
         idCardFront={user.idCardFront}
         idCardBack={user.idCardBack}

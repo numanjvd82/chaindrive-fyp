@@ -14,6 +14,7 @@ CREATE TABLE IF NOT EXISTS Users (
   salt TEXT NOT NULL,
   role TEXT CHECK(role IN ('owner', 'renter')) NOT NULL,
   is_online BOOLEAN DEFAULT 0,
+  is_verified BOOLEAN DEFAULT 0,
   two_factor_enabled BOOLEAN DEFAULT 0,
   created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
   updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP

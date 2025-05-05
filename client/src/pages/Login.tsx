@@ -55,7 +55,15 @@ const Login = () => {
           role === "renter" ? "/renter-dashboard" : "/owner-dashboard";
         navigate(path);
       }
-    } catch (err) {
+    } catch (err: any) {
+      if (err.response?.status === 403) {
+        toast.info("User not verified. Redirecting to OTP page.", {
+          onClose: () => {
+            navigate("/otp-input", { state: { email: data.email } });
+          },
+        });
+        return;
+      }
       console.error(err);
       toast.error("Invalid credentials");
       reset();

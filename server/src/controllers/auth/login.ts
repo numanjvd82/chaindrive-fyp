@@ -32,6 +32,15 @@ export const login = async (req: Request, res: Response) => {
       return;
     }
 
+    // Check if the user not verified
+    if (!user.isVerified) {
+      await otpModel.send({ email });
+      res.status(403).json({
+        message: "User not verified. Please check your email for verification.",
+      });
+      return;
+    }
+
     // Check if the user has two-factor authentication enabled
     if (user.twoFactorEnabled) {
       // Generate and send OTP

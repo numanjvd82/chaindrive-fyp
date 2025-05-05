@@ -134,7 +134,7 @@ const OtpInput: React.FC = () => {
           </button>
         </form>
         <p className="mt-6 text-sm text-center text-gray-500">
-          Entered wrong email?{" "}
+          Entered wrong email? Didn't receive the OTP?{" "}
           <button
             onClick={() => navigate("/login")}
             className="text-blue-600 hover:underline"

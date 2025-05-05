@@ -15,6 +15,7 @@ export type User = {
   createdAt: Date;
   updatedAt: Date;
   twoFactorEnabled: boolean;
+  isVerified: boolean;
 };
 
 export interface Conversation {

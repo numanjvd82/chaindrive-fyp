@@ -20,8 +20,6 @@ export async function verify(input: VerifyOtpInput) {
       )
       .get(email, otp);
 
-    console.log("Record: ", doesOtpExist);
-
     if (!doesOtpExist) {
       throw new Error("Invalid or expired OTP");
     }
