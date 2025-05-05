@@ -109,8 +109,7 @@ export const CarCard: React.FC<Listing> = (props) => {
       </div>
       <Button onClick={handleViewDetails} className="mt-4 w-full">
         Rent Now →
-      </Button></Link>
-      
+      </Button>
     </div>
   );
 };
