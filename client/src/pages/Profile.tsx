@@ -5,16 +5,20 @@ import KycVerificationStatus from "@/components/pages/Profile/KycVerificationSta
 import Splash from "@/components/Splash";
 import { useListWallet } from "@/hooks/useListWallet";
 import { useStoreWallet } from "@/hooks/useStoreWallet";
+import { useToggleTwoFactor } from "@/hooks/useToggleTwoFactor";
 import { useUser } from "@/hooks/useUser";
 import { useWallet } from "@/hooks/useWallet";
+import { toast } from "react-toastify";
 
 const ProfilePage: React.FC = () => {
-  const { user, loading } = useUser();
+  const { user, loading, fetchUser } = useUser();
   const { wallet, refetch } = useListWallet({
     id: user ? user.id : 0,
   });
   const { account, connectWallet, provider, signer } = useWallet();
   const { storeWallet, isLoadingStoreWallet } = useStoreWallet();
+
+  const { isToggleTwoFactorLoading, toggleTwoFactor } = useToggleTwoFactor();
 
   if (loading) {
     return <Splash />;
@@ -36,6 +40,8 @@ const ProfilePage: React.FC = () => {
     }
   };
 
+  console.log("user", user);
+
   return (
     <div className="p-8 space-y-8 bg-gray-100 min-h-screen">
       <h1 className="text-3xl font-bold">Profile</h1>
@@ -49,8 +55,28 @@ const ProfilePage: React.FC = () => {
       <div className="p-6 bg-accent rounded-lg shadow-md space-y-4">
         <h2 className="text-xl font-bold">Actions</h2>
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-          <Button variant="secondary">Edit Profile</Button>
-          <Button variant="secondary">Change Password</Button>
+          <Button>Edit Profile</Button>
+          <Button>Change Password</Button>
+          <Button
+            isLoading={isToggleTwoFactorLoading}
+            onClick={async () => {
+              try {
+                await toggleTwoFactor({
+                  enabled: !user.twoFactorEnabled,
+                });
+                fetchUser();
+                toast.success(
+                  `Two-factor authentication ${
+                    user.twoFactorEnabled ? "disabled" : "enabled"
+                  } successfully!`
+                );
+              } finally {
+                // Pass
+              }
+            }}
+          >
+            {user.twoFactorEnabled ? "Disable 2FA" : "Enable 2FA"}
+          </Button>
         </div>
       </div>
 

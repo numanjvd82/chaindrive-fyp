@@ -12,6 +12,7 @@ export const SQL_QUERY = sql`
   u.role,
   u.created_at,
   u.updated_at,
+  u.two_factor_enabled,
   pi.first_name,
   pi.last_name,
   pi.phone,
@@ -54,6 +55,7 @@ export const findOneById = async (id: z.infer<typeof idSchema>) => {
         delete changedRow.updated_at;
         delete changedRow.id_card_front;
         delete changedRow.id_card_back;
+        delete changedRow.two_factor_enabled;
 
         return changedRow;
       })[0] as User;
