@@ -1,4 +1,5 @@
 /** @type import('hardhat/config').HardhatUserConfig */
+import "@nomicfoundation/hardhat-ethers";
 import "@nomicfoundation/hardhat-toolbox";
 import "@openzeppelin/hardhat-upgrades";
 import "dotenv/config";
@@ -25,7 +26,7 @@ const config: HardhatUserConfig = {
     },
   },
   typechain: {
-    outDir: "./src/typechain-types",
+    outDir: "./typechain-types",
     target: "ethers-v6",
   },
 };

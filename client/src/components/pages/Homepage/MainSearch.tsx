@@ -14,37 +14,39 @@ const MainSearch: React.FC<MainSearchProps> = ({ onSearch }) => {
   };
 
   return (
-    <div className="ml-32 items-center bottom-auto absolute  mx-auto flex w-auto md:px-5 bg-white">
-      <div className="flex items-center p-4 bg-white shadow-md rounded-lg space-x-10">
-        {/* Location */}
-        <div className="w-auto flex items-center gap-4 md:w-full">
+    <div className="relative mx-auto flex w-auto md:px-5 bg-white shadow-lg rounded-lg mt-8">
+      <div className="flex flex-wrap items-center p-4 gap-4 md:gap-10">
+        <div className="w-full md:w-auto flex items-center gap-4">
           <img
-            className="h-auto mb-1.5 self-end"
+            className="h-6 md:h-auto mb-1.5 self-end"
             src="/locationicon.svg"
             alt="Location"
             loading="lazy"
           />
           <div className="flex flex-1 flex-col items-start">
-            <p className="text-[16px] font-medium text-gray-800_01">Location</p>
+            <p className="text-sm md:text-base font-medium text-gray-800_01">
+              Location
+            </p>
             <input
               type="text"
               id="location"
               placeholder="Search your location"
               value={location}
               onChange={(e) => setLocation(e.target.value)}
-              className="text-sm text-gray-500 focus:outline-none bg-transparent"
+              className="text-sm md:text-base text-gray-500 focus:outline-none bg-transparent"
             />
           </div>
         </div>
-        <div className="w-auto flex items-center gap-4 md:w-full">
+
+        <div className="w-full md:w-auto flex items-center gap-4">
           <img
-            className="h-[32px] mb-1.5 self-end"
+            className="h-6 md:h-[32px] mb-1.5 self-end"
             src="/calandaricon.svg"
             alt="Pickup Date"
             loading="lazy"
           />
           <div className="flex flex-1 flex-col items-start">
-            <p className="text-[16px] font-medium text-gray-800_01">
+            <p className="text-sm md:text-base font-medium text-gray-800_01">
               Pickup date
             </p>
             <input
@@ -52,22 +54,20 @@ const MainSearch: React.FC<MainSearchProps> = ({ onSearch }) => {
               id="pickup-date"
               value={pickupDate}
               onChange={(e) => setPickupDate(e.target.value)}
-              className="text-sm text-gray-700 focus:outline-none bg-transparent cursor-pointer"
+              className="text-sm md:text-base text-gray-700 focus:outline-none bg-transparent cursor-pointer"
             />
           </div>
         </div>
 
-        {/* Return Date */}
-
-        <div className="w-auto flex items-center gap-4 md:w-full">
+        <div className="w-full md:w-auto flex items-center gap-4">
           <img
-            className="h-[32px] mb-1.5 self-end"
+            className="h-6 md:h-[32px] mb-1.5 self-end"
             src="/calandaricon.svg"
             alt="Return Date"
             loading="lazy"
           />
           <div className="flex flex-1 flex-col items-start">
-            <p className="text-[16px] font-medium text-gray-800_01">
+            <p className="text-sm md:text-base font-medium text-gray-800_01">
               Return date
             </p>
             <input
@@ -75,15 +75,14 @@ const MainSearch: React.FC<MainSearchProps> = ({ onSearch }) => {
               id="return-date"
               value={returnDate}
               onChange={(e) => setReturnDate(e.target.value)}
-              className="text-sm text-gray-700 focus:outline-none bg-transparent cursor-pointer"
+              className="text-sm md:text-base text-gray-700 focus:outline-none bg-transparent cursor-pointer"
             />
           </div>
         </div>
 
-        {/* Search Button */}
         <button
           onClick={handleSearch}
-          className="px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition"
+          className="px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition text-sm md:text-base"
         >
           Search
         </button>

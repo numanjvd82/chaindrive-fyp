@@ -10,12 +10,184 @@
       "address": "0x6F14E56C8d427EE3d49BF74eA72ADf9e78D56843",
       "txHash": "0xa53b664aacb3c706ca275d217e2f22b7caf82e3c89b2c1eb85d6e0a0d002fa18",
       "kind": "transparent"
+    },
+    {
+      "address": "0x91627316F38f8e6e7d661b3294c30Cc9FE49623d",
+      "txHash": "0x77472cb6674e0d2de92bf2160bbc81ac639b8eb73d8f18664453606d9cf12d1c",
+      "kind": "transparent"
     }
   ],
   "impls": {
     "a8abad6a289e73e7639cf592b0ea2f1096635bcf108e8611582a16a0affa7d90": {
       "address": "0x67Fe61065C266F4FBC1E0D56f97D381B705F88b5",
       "txHash": "0x7eaf21416816a7f689d5f38222adc04defd7b49bd92cb47d742d350544002479",
+      "layout": {
+        "solcVersion": "0.8.20",
+        "storage": [
+          {
+            "label": "chaindriveWallet",
+            "offset": 0,
+            "slot": "0",
+            "type": "t_address_payable",
+            "contract": "CarRentalUpgradeable",
+            "src": "contracts/CarRentalUpgradeable.sol:8"
+          },
+          {
+            "label": "rentals",
+            "offset": 0,
+            "slot": "1",
+            "type": "t_mapping(t_uint256,t_struct(Rental)425_storage)",
+            "contract": "CarRentalUpgradeable",
+            "src": "contracts/CarRentalUpgradeable.sol:22"
+          }
+        ],
+        "types": {
+          "t_bool": {
+            "label": "bool",
+            "numberOfBytes": "1"
+          },
+          "t_struct(InitializableStorage)7_storage": {
+            "label": "struct Initializable.InitializableStorage",
+            "members": [
+              {
+                "label": "_initialized",
+                "type": "t_uint64",
+                "offset": 0,
+                "slot": "0"
+              },
+              {
+                "label": "_initializing",
+                "type": "t_bool",
+                "offset": 8,
+                "slot": "0"
+              }
+            ],
+            "numberOfBytes": "32"
+          },
+          "t_struct(ReentrancyGuardStorage)69_storage": {
+            "label": "struct ReentrancyGuardUpgradeable.ReentrancyGuardStorage",
+            "members": [
+              {
+                "label": "_status",
+                "type": "t_uint256",
+                "offset": 0,
+                "slot": "0"
+              }
+            ],
+            "numberOfBytes": "32"
+          },
+          "t_uint256": {
+            "label": "uint256",
+            "numberOfBytes": "32"
+          },
+          "t_uint64": {
+            "label": "uint64",
+            "numberOfBytes": "8"
+          },
+          "t_address_payable": {
+            "label": "address payable",
+            "numberOfBytes": "20"
+          },
+          "t_mapping(t_uint256,t_struct(Rental)425_storage)": {
+            "label": "mapping(uint256 => struct CarRentalUpgradeable.Rental)",
+            "numberOfBytes": "32"
+          },
+          "t_struct(Rental)425_storage": {
+            "label": "struct CarRentalUpgradeable.Rental",
+            "members": [
+              {
+                "label": "id",
+                "type": "t_uint256",
+                "offset": 0,
+                "slot": "0"
+              },
+              {
+                "label": "renter",
+                "type": "t_address_payable",
+                "offset": 0,
+                "slot": "1"
+              },
+              {
+                "label": "owner",
+                "type": "t_address_payable",
+                "offset": 0,
+                "slot": "2"
+              },
+              {
+                "label": "rentalFee",
+                "type": "t_uint256",
+                "offset": 0,
+                "slot": "3"
+              },
+              {
+                "label": "securityDeposit",
+                "type": "t_uint256",
+                "offset": 0,
+                "slot": "4"
+              },
+              {
+                "label": "platformFee",
+                "type": "t_uint256",
+                "offset": 0,
+                "slot": "5"
+              },
+              {
+                "label": "renterConfirmed",
+                "type": "t_bool",
+                "offset": 0,
+                "slot": "6"
+              },
+              {
+                "label": "ownerConfirmed",
+                "type": "t_bool",
+                "offset": 1,
+                "slot": "6"
+              },
+              {
+                "label": "isCompleted",
+                "type": "t_bool",
+                "offset": 2,
+                "slot": "6"
+              }
+            ],
+            "numberOfBytes": "224"
+          }
+        },
+        "namespaces": {
+          "erc7201:openzeppelin.storage.ReentrancyGuard": [
+            {
+              "contract": "ReentrancyGuardUpgradeable",
+              "label": "_status",
+              "type": "t_uint256",
+              "src": "@openzeppelin/contracts-upgradeable/utils/ReentrancyGuardUpgradeable.sol:43",
+              "offset": 0,
+              "slot": "0"
+            }
+          ],
+          "erc7201:openzeppelin.storage.Initializable": [
+            {
+              "contract": "Initializable",
+              "label": "_initialized",
+              "type": "t_uint64",
+              "src": "@openzeppelin/contracts-upgradeable/proxy/utils/Initializable.sol:69",
+              "offset": 0,
+              "slot": "0"
+            },
+            {
+              "contract": "Initializable",
+              "label": "_initializing",
+              "type": "t_bool",
+              "src": "@openzeppelin/contracts-upgradeable/proxy/utils/Initializable.sol:73",
+              "offset": 8,
+              "slot": "0"
+            }
+          ]
+        }
+      }
+    },
+    "b32c38bfa0be4ea20aea196d2aba5862428da0d8c3d2353506cc289a102ce0dc": {
+      "address": "0x8b9aAa29C7119640B1c261C5c2Fd432DCde12118",
+      "txHash": "0x55eb5e93587a03e47f5efd483ca30d49f8f0a556a784315b33d3dbd67a3d5dcd",
       "layout": {
         "solcVersion": "0.8.20",
         "storage": [
