@@ -34,6 +34,9 @@ const ProfilePage: React.FC = () => {
       const address = await signer.getAddress();
 
       await storeWallet(address);
+      toast.success(
+        "Wallet address stored successfully! You can now use it for transactions."
+      );
       refetch();
     } finally {
       // Pass
@@ -89,10 +92,31 @@ const ProfilePage: React.FC = () => {
               <p className="text-gray-800 font-mono text-sm">
                 <strong>Wallet Address:</strong> {wallet.walletAddress}
               </p>
+              {wallet.walletAddress !== account ? (
+                <p className="text-red-500 font-mono text-sm mt-2">
+                  <strong>Warning:</strong> The wallet address does not match
+                  your connected wallet.
+                  <br />
+                  Please ensure you are using the correct wallet address.
+                  <br />
+                  If you have changed your wallet address, please update it
+                </p>
+              ) : (
+                <p className="text-green-500 font-mono text-sm mt-2">
+                  <strong>Success:</strong> The wallet address matches your
+                  connected wallet.
+                </p>
+              )}
             </div>
             {user.role === "owner" ? (
               <Button
-                disabled={!account || !signer || !provider}
+                disabled={
+                  !account ||
+                  !signer ||
+                  !provider ||
+                  isLoadingStoreWallet ||
+                  wallet.walletAddress === account
+                }
                 variant="primary"
                 isLoading={isLoadingStoreWallet}
                 onClick={async () => handleAddWallet()}
@@ -128,7 +152,9 @@ const ProfilePage: React.FC = () => {
               </Button>
               {user.role === "owner" ? (
                 <Button
-                  disabled={!account || !signer || !provider}
+                  disabled={
+                    !account || !signer || !provider || isLoadingStoreWallet
+                  }
                   variant="primary"
                   isLoading={isLoadingStoreWallet}
                   onClick={async () => handleAddWallet()}

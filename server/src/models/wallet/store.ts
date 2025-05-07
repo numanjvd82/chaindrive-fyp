@@ -18,6 +18,7 @@ export const store = async (input: StoreInput) => {
   try {
     const parsedInput = storeSchema.parse(input);
     const db = getDbInstance();
+
     // Check if the wallet address already exists
     const existingWallet = await walletModel.list({
       walletAddress: parsedInput.walletAddress,
@@ -47,6 +48,12 @@ WHERE
 
       return true;
     }
+
+    // Ensure only one wallet is stored for the user
+    const deleteExistingWalletStmt = db.prepare(
+      sql`DELETE FROM Wallets WHERE user_id = ?`
+    );
+    deleteExistingWalletStmt.run(input.userId);
 
     // Insert the new wallet into the database
     const stmt = db.prepare(
