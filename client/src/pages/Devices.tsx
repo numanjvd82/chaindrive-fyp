@@ -51,11 +51,9 @@ const Devices: React.FC = () => {
         if (match) {
           setDeviceId(match[1]);
           break; // Stop reading after getting id
-        } else {
-          toast.error("Failed to read device ID");
-          setDeviceId(null);
         }
       }
+
       reader.releaseLock();
 
       await port.close();

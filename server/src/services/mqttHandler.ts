@@ -3,7 +3,7 @@ require("dotenv").config();
 import mqtt from "mqtt";
 import { getDbInstance } from "../lib/db/sqlite";
 import { sql } from "../utils/utils";
-import { getDeviceById } from "./device";
+import { getActiveRentalByDeviceId, getDeviceById } from "./device";
 
 export function mqttHandler() {
   const MQTT_USERNAME = process.env.MQTT_USERNAME;
@@ -37,10 +37,19 @@ export function mqttHandler() {
 
       const device = await getDeviceById(deviceId);
       if (device) {
+        const activeRental = await getActiveRentalByDeviceId(device?.deviceId);
+
+        // Check if the device is assigned to an active rental
+        if (!activeRental) {
+          console.error(
+            `No active rental found for device ${deviceId}. Ignoring message.`
+          );
+          return;
+        }
+
         const { timestamp, latitude, longitude } = JSON.parse(
           message.toString()
         );
-        console.log(`Received message from ${deviceId}: ${message.toString()}`);
 
         const insertQuery = sql`
           INSERT INTO Locations (timestamp, latitude, longitude, device_id)
