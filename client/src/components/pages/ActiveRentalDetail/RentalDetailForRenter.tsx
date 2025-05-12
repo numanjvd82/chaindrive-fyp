@@ -6,6 +6,7 @@ import { useWallet } from "@/hooks/useWallet";
 import { getContractInstance } from "@/lib/contract";
 import { Listing, RentalWithImages } from "@/lib/types";
 import clsx from "clsx";
+import dayjs from "dayjs";
 import {
   FaCheckCircle,
   FaCogs,
@@ -64,7 +65,9 @@ export const RentalDetailForRenter: React.FC<Props> = ({
   };
 
   const disabledCompleteRentalByRenter =
-    rental.status !== "active" || rental.completedByRenter;
+    rental.status !== "active" ||
+    rental.completedByRenter ||
+    dayjs(rental.endDate).isAfter(dayjs());
 
   const renderCompletionStatus = () => {
     if (rental.completedByOwner && rental.completedByRenter) {
