@@ -40,6 +40,7 @@ export function mqttHandler() {
         const { timestamp, latitude, longitude } = JSON.parse(
           message.toString()
         );
+        console.log(`Received message from ${deviceId}: ${message.toString()}`);
 
         const insertQuery = sql`
           INSERT INTO Locations (timestamp, latitude, longitude, device_id)

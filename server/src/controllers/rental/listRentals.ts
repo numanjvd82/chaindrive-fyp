@@ -10,8 +10,14 @@ export const listRentals = async (req: Request, res: Response) => {
     return;
   }
 
+  const isOwner = req.query.isOwner === "true";
+  const isRenter = req.query.isRenter === "true";
   try {
-    const rentals = await rentalModel.list();
+    const rentals = await rentalModel.list({
+      userId,
+      isOwner,
+      isRenter,
+    });
 
     if (!rentals || rentals.length === 0) {
       res.status(404).json({ message: "No rentals found" });

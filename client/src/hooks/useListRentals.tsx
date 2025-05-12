@@ -2,10 +2,18 @@ import { axiosInstance } from "@/lib/axios";
 import { RentalWithImages } from "@/lib/types";
 import { useQuery } from "react-query";
 
-async function fetchListRentals() {
+type FetchRentalsInput = {
+  isOwner?: boolean;
+  isRenter?: boolean;
+};
+
+async function fetchListRentals(params: FetchRentalsInput) {
   try {
     const { data } = await axiosInstance.get<RentalWithImages[]>(
-      "/api/rentals"
+      "/api/rentals",
+      {
+        params,
+      }
     );
     return data;
   } catch (error: any) {
@@ -13,10 +21,17 @@ async function fetchListRentals() {
   }
 }
 
-export function useListRentals() {
+export function useListRentals(input: FetchRentalsInput & { userId?: number }) {
+  const filter = {
+    isOwner: input.isOwner,
+    isRenter: input.isRenter,
+  };
   const { data, error, isLoading, refetch } = useQuery(
-    "listRentals",
-    fetchListRentals
+    ["listRentals", input],
+    () => fetchListRentals(filter),
+    {
+      enabled: !!input.userId,
+    }
   );
 
   return {

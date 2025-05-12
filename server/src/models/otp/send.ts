@@ -1,5 +1,6 @@
 import nodemailer from "nodemailer";
 import { otpModel } from ".";
+import { otpSentEmailTemplate } from "../../lib/templates/otp-sent-email";
 import { GenerateOtpInput } from "./generate";
 require("dotenv").config();
 
@@ -21,7 +22,7 @@ export async function send(input: SendOtpInput) {
       from: `From ChainDrive <${process.env.SMTP_EMAIL}>`,
       to: input.email,
       subject: "Your OTP Code for ChainDrive",
-      text: `Your OTP code is ${otp}. It will expire in 5 minutes.`,
+      html: otpSentEmailTemplate(otp, input.email),
     });
 
     if (sentEmail.rejected.length > 0) {

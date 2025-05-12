@@ -56,7 +56,6 @@ const ProfilePage: React.FC = () => {
       <div className="p-6 bg-accent rounded-lg shadow-md space-y-4">
         <h2 className="text-xl font-bold">Actions</h2>
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-          <Button>Edit Profile</Button>
           <Button>Change Password</Button>
           <Button
             isLoading={isToggleTwoFactorLoading}

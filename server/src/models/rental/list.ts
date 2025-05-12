@@ -1,8 +1,53 @@
+import { z } from "zod";
 import { getDbInstance } from "../../lib/db/sqlite";
 import { Rental } from "../../lib/types";
 import { sql } from "../../utils/utils";
 
-const SQL_QUERY = sql`
+export const listRentalsFilterSchema = z.object({
+  isOwner: z.boolean().optional(),
+  isRenter: z.boolean().optional(),
+});
+
+export type ListInput = z.infer<typeof listRentalsFilterSchema> & {
+  userId: string;
+};
+
+const generateWhereClause = (input: ListInput) => {
+  const whereClause = [];
+  const params = [];
+
+  if (input.isOwner) {
+    whereClause.push("l.owner_id = ?");
+    params.push(input.userId);
+  }
+
+  if (input.isRenter) {
+    whereClause.push("r.renter_id = ?");
+    params.push(input.userId);
+  }
+
+  return {
+    where: whereClause.length > 0 ? `WHERE ${whereClause.join(" AND ")}` : "",
+    params,
+  };
+};
+
+export type RentalWithImages = Rental & {
+  images: string[];
+  title: string;
+};
+
+export async function listRentals(input: ListInput) {
+  try {
+    const parsedInput = listRentalsFilterSchema.parse(input);
+    const db = getDbInstance();
+    const { params, where } = generateWhereClause({
+      userId: input.userId,
+      isOwner: parsedInput.isOwner,
+      isRenter: parsedInput.isRenter,
+    });
+
+    const SQL_QUERY = sql`
  SELECT 
   r.id AS rental_id,
   r.listing_id,
@@ -26,20 +71,12 @@ const SQL_QUERY = sql`
   l.title
   FROM Rentals r
   JOIN Listings l ON r.listing_id = l.id
+  ${where}
 `;
-
-export type RentalWithImages = Rental & {
-  images: string[];
-  title: string;
-};
-
-export async function listRentals() {
-  try {
-    const db = getDbInstance();
 
     const result = db
       .prepare(SQL_QUERY)
-      .all()
+      .all(...params)
       .map((rental: any) => ({
         id: rental.rental_id,
         title: rental.title,

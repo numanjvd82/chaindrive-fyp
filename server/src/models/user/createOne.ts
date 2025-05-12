@@ -34,11 +34,11 @@ export const signUpSchema = z.object({
     .string()
     .nonempty("Password is required")
     .min(8, "Password must be at least 8 characters long")
-    .max(32, "Password must be at most 32 characters long")
-    .regex(
-      /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$/,
-      "Password must contain at least one uppercase letter, one lowercase letter, one number, and one special character"
-    ),
+    .max(32, "Password must be at most 32 characters long"),
+  // .regex(
+  //   /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$/,
+  //   "Password must contain at least one uppercase letter, one lowercase letter, one number, and one special character"
+  // ),
   dob: z
     .string()
     .nonempty("Date of birth is required")
