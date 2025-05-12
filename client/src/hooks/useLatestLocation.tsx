@@ -20,7 +20,7 @@ export function useLatestLocation(deviceId: string) {
     queryKey: ["latestLocation", deviceId],
     queryFn: () => fetchLatestLocation(deviceId),
     enabled: !!deviceId,
-    refetchInterval: 15000, // Refetch every 10 seconds
+    refetchInterval: 10000, // Refetch every 10 seconds
   });
 
   return {

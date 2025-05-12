@@ -14,6 +14,8 @@ export type User = {
   selfie: string;
   createdAt: Date;
   updatedAt: Date;
+  twoFactorEnabled: boolean;
+  isVerified: boolean;
 };
 
 export interface Conversation {

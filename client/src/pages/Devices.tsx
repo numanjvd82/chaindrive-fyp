@@ -18,7 +18,7 @@ const Devices: React.FC = () => {
   } = useListDevices();
   const { listings, isLoading: isListingsLoading } = useListings();
   const [selectedListing, setSelectedListing] = useState<number | null>(null);
-  const [deviceId, setDeviceId] = useState<string>("");
+  const [deviceId, setDeviceId] = useState<string | null>("");
   const [isConnected, setIsConnected] = useState(false);
 
   const { createDevice, isCreateDeviceLoading } = useCreateDevice();
@@ -35,7 +35,7 @@ const Devices: React.FC = () => {
       let accumulatedData = ""; // To accumulate data from chunks
 
       if (!reader) {
-        setDeviceId("Failed to get reader");
+        setDeviceId(null);
         return;
       }
 
@@ -53,13 +53,16 @@ const Devices: React.FC = () => {
           break; // Stop reading after getting id
         }
       }
+
       reader.releaseLock();
 
       await port.close();
       setIsConnected(false);
     } catch (error) {
       console.error("Serial connection error:", error);
-      setDeviceId("Failed to read id");
+      setDeviceId(null);
+      setIsConnected(false);
+      toast.error("Failed to connect to ESP32");
     }
   };
 

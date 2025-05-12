@@ -15,8 +15,13 @@ const loginSchema = z.object({
     .transform((v) => v.toLowerCase()),
   password: z
     .string()
+    .nonempty("Password is required")
     .min(8, "Password must be at least 8 characters long")
     .max(32, "Password must be at most 32 characters long"),
+  // .regex(
+  //   /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$/,
+  //   "Password must contain at least one uppercase letter, one lowercase letter, one number, and one special character"
+  // ),
 });
 
 type LoginForm = z.infer<typeof loginSchema>;
@@ -36,7 +41,18 @@ const Login = () => {
 
   const onSubmit: SubmitHandler<LoginForm> = async (data) => {
     try {
-      await axiosInstance.post("/api/auth/login", data);
+      const response = await axiosInstance.post("/api/auth/login", data);
+
+      // Check if OTP is required
+      if (response.data.message === "OTP sent to your email") {
+        toast.success("OTP sent to your email", {
+          onClose: () =>
+            navigate("/otp-input", { state: { email: data.email } }),
+        });
+        return;
+      }
+
+      // If no OTP is required, fetch user data and redirect
       const user = await fetchUser(); // Fetch and update user context
       if (user.data) {
         const role = user.data.role;
@@ -44,7 +60,15 @@ const Login = () => {
           role === "renter" ? "/renter-dashboard" : "/owner-dashboard";
         navigate(path);
       }
-    } catch (err) {
+    } catch (err: any) {
+      if (err.response?.status === 403) {
+        toast.info("User not verified. Redirecting to OTP page.", {
+          onClose: () => {
+            navigate("/otp-input", { state: { email: data.email } });
+          },
+        });
+        return;
+      }
       console.error(err);
       toast.error("Invalid credentials");
       reset();

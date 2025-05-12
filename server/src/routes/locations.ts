@@ -18,9 +18,9 @@ locationRouter.get("/:deviceId", (req, res) => {
 
     const query = sql`
       SELECT * FROM Locations
-      WHERE id = (
-        SELECT MAX(id) FROM Locations
-      ) AND device_id = ?
+      WHERE device_id = ?
+      ORDER BY id DESC
+      LIMIT 1
     `;
 
     const latestLocation = db

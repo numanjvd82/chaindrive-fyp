@@ -5,16 +5,20 @@ import KycVerificationStatus from "@/components/pages/Profile/KycVerificationSta
 import Splash from "@/components/Splash";
 import { useListWallet } from "@/hooks/useListWallet";
 import { useStoreWallet } from "@/hooks/useStoreWallet";
+import { useToggleTwoFactor } from "@/hooks/useToggleTwoFactor";
 import { useUser } from "@/hooks/useUser";
 import { useWallet } from "@/hooks/useWallet";
+import { toast } from "react-toastify";
 
 const ProfilePage: React.FC = () => {
-  const { user, loading } = useUser();
+  const { user, loading, fetchUser } = useUser();
   const { wallet, refetch } = useListWallet({
     id: user ? user.id : 0,
   });
   const { account, connectWallet, provider, signer } = useWallet();
   const { storeWallet, isLoadingStoreWallet } = useStoreWallet();
+
+  const { isToggleTwoFactorLoading, toggleTwoFactor } = useToggleTwoFactor();
 
   if (loading) {
     return <Splash />;
@@ -30,6 +34,9 @@ const ProfilePage: React.FC = () => {
       const address = await signer.getAddress();
 
       await storeWallet(address);
+      toast.success(
+        "Wallet address stored successfully! You can now use it for transactions."
+      );
       refetch();
     } finally {
       // Pass
@@ -40,7 +47,7 @@ const ProfilePage: React.FC = () => {
     <div className="p-8 space-y-8 bg-gray-100 min-h-screen">
       <h1 className="text-3xl font-bold">Profile</h1>
       <AccountInfo {...user} />
-      <KycVerificationStatus />
+      <KycVerificationStatus profileVerified={user.isVerified} />
       <IdCardImages
         idCardFront={user.idCardFront}
         idCardBack={user.idCardBack}
@@ -49,8 +56,27 @@ const ProfilePage: React.FC = () => {
       <div className="p-6 bg-accent rounded-lg shadow-md space-y-4">
         <h2 className="text-xl font-bold">Actions</h2>
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-          <Button variant="secondary">Edit Profile</Button>
-          <Button variant="secondary">Change Password</Button>
+          <Button>Change Password</Button>
+          <Button
+            isLoading={isToggleTwoFactorLoading}
+            onClick={async () => {
+              try {
+                await toggleTwoFactor({
+                  enabled: !user.twoFactorEnabled,
+                });
+                fetchUser();
+                toast.success(
+                  `Two-factor authentication ${
+                    user.twoFactorEnabled ? "disabled" : "enabled"
+                  } successfully!`
+                );
+              } finally {
+                // Pass
+              }
+            }}
+          >
+            {user.twoFactorEnabled ? "Disable 2FA" : "Enable 2FA"}
+          </Button>
         </div>
       </div>
 
@@ -65,10 +91,31 @@ const ProfilePage: React.FC = () => {
               <p className="text-gray-800 font-mono text-sm">
                 <strong>Wallet Address:</strong> {wallet.walletAddress}
               </p>
+              {wallet.walletAddress !== account ? (
+                <p className="text-red-500 font-mono text-sm mt-2">
+                  <strong>Warning:</strong> The wallet address does not match
+                  your connected wallet.
+                  <br />
+                  Please ensure you are using the correct wallet address.
+                  <br />
+                  If you have changed your wallet address, please update it
+                </p>
+              ) : (
+                <p className="text-green-500 font-mono text-sm mt-2">
+                  <strong>Success:</strong> The wallet address matches your
+                  connected wallet.
+                </p>
+              )}
             </div>
             {user.role === "owner" ? (
               <Button
-                disabled={!account || !signer || !provider}
+                disabled={
+                  !account ||
+                  !signer ||
+                  !provider ||
+                  isLoadingStoreWallet ||
+                  wallet.walletAddress === account
+                }
                 variant="primary"
                 isLoading={isLoadingStoreWallet}
                 onClick={async () => handleAddWallet()}
@@ -104,7 +151,9 @@ const ProfilePage: React.FC = () => {
               </Button>
               {user.role === "owner" ? (
                 <Button
-                  disabled={!account || !signer || !provider}
+                  disabled={
+                    !account || !signer || !provider || isLoadingStoreWallet
+                  }
                   variant="primary"
                   isLoading={isLoadingStoreWallet}
                   onClick={async () => handleAddWallet()}

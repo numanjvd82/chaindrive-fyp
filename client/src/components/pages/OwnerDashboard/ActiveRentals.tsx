@@ -1,10 +1,16 @@
+import useAuthUser from "@/hooks/useAuthUser";
 import { useListRentals } from "@/hooks/useListRentals";
 import ActiveRentalCard from "./ActiveRentalCard";
 
 const ActiveRentals = () => {
-  const { rentals, isLoading } = useListRentals();
+  const { user, loading } = useAuthUser();
+  const { rentals, isLoading } = useListRentals({
+    userId: user?.id,
+    isOwner: user?.role === "owner" ? true : false,
+    isRenter: user?.role === "renter" ? true : false,
+  });
 
-  if (isLoading) {
+  if (isLoading || loading) {
     return (
       <div className="mt-4 flex items-center justify-between p-4 bg-accent rounded-lg shadow">
         <p className="text-lg">Loading...</p>

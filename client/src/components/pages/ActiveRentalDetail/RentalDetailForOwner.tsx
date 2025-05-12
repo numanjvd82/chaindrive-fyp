@@ -71,6 +71,7 @@ export const RentalDetailForOwner: React.FC<Props> = ({
 
   const disabledCompleteRentalByOwner =
     rental.status !== "active" || rental.completedByOwner;
+  // dayjs(rental.endDate).isAfter(dayjs());
 
   const renderCompletionStatus = () => {
     if (rental.completedByOwner && rental.completedByRenter) {

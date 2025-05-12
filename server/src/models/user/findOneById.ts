@@ -12,6 +12,8 @@ export const SQL_QUERY = sql`
   u.role,
   u.created_at,
   u.updated_at,
+  u.is_verified,
+  u.two_factor_enabled,
   pi.first_name,
   pi.last_name,
   pi.phone,
@@ -45,6 +47,8 @@ export const findOneById = async (id: z.infer<typeof idSchema>) => {
           selfie: convertBufferToBase64(row.selfie),
           createdAt: new Date(row.created_at),
           updatedAt: new Date(row.updated_at),
+          twoFactorEnabled: row.two_factor_enabled === 1,
+          isVerified: row.is_verified === 1,
         };
 
         delete changedRow.first_name;
@@ -53,6 +57,8 @@ export const findOneById = async (id: z.infer<typeof idSchema>) => {
         delete changedRow.updated_at;
         delete changedRow.id_card_front;
         delete changedRow.id_card_back;
+        delete changedRow.two_factor_enabled;
+        delete changedRow.is_verified;
 
         return changedRow;
       })[0] as User;

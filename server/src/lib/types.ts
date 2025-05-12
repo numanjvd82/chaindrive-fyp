@@ -3,6 +3,8 @@ export type PartialUser = {
   email: string;
   password_hash: string;
   salt: string;
+  twoFactorEnabled: boolean;
+  isVerified: boolean;
   role: "owner" | "renter";
   created_at: Date;
   updated_at: Date;
@@ -18,12 +20,14 @@ export type User = {
   dob: string;
   address: string;
   city: string;
+  twoFactorEnabled: boolean;
   state: string;
   idCardFront: string;
   idCardBack: string;
   selfie: string;
   createdAt: Date;
   updatedAt: Date;
+  isVerified: boolean;
 };
 
 export interface Conversation {

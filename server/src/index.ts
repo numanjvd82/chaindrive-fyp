@@ -45,6 +45,7 @@ app.get("/api/health", (req: Request, res: Response) => {
 });
 
 app.use("/api/auth", router.auth);
+app.use("/api/otp", router.otp);
 
 app.use(ensureAuthenticated);
 

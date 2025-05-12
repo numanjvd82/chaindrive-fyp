@@ -7,23 +7,29 @@ import { FaCalendarAlt, FaUser } from "react-icons/fa";
 import { Link } from "react-router-dom";
 
 const Rentals = () => {
-  const { rentals, isLoading, error } = useListRentals();
   const { user } = useAuthUser();
+  const { rentals, isLoading, error } = useListRentals({
+    userId: user?.id,
+    isOwner: user?.role === "owner" ? true : false,
+    isRenter: user?.role === "renter" ? true : false,
+  });
 
   if (isLoading) {
-    return <div className="text-center">Loading...</div>;
-  }
-
-  if (error) {
     return (
-      <div className="text-center text-red-500">Something went wrong:</div>
+      <div className="bg-gray-100 min-h-screen flex items-center justify-center">
+        <p className="text-gray-500 text-lg">Loading...</p>
+      </div>
     );
   }
 
   if (!rentals || rentals.length === 0) {
     return (
-      <div className="text-center">
-        <h2 className="text-xl font-semibold">No Rentals Found</h2>
+      <div className="bg-gray-100 min-h-screen flex items-center justify-center">
+        <p className={`${error ? "text-red-500" : ""} text-lg`}>
+          {error
+            ? "An error occurred while fetching rentals."
+            : "No rentals found."}
+        </p>
       </div>
     );
   }

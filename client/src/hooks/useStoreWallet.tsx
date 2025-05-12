@@ -16,9 +16,6 @@ async function storeWallet(walletAddress: string) {
 export function useStoreWallet() {
   const { mutateAsync, isLoading } = useMutation({
     mutationFn: storeWallet,
-    onSuccess: () => {
-      toast.success("Wallet added successfully");
-    },
     onError: (error: any) => {
       console.log(error);
       toast.error(

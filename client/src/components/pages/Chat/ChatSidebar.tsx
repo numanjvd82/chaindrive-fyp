@@ -2,7 +2,6 @@ import Button from "@/components/Button";
 import { Conversation } from "@/lib/types";
 import { convertDateToString, truncateText } from "@/lib/utils";
 import { AnimatePresence, motion } from "motion/react";
-import { FiSearch } from "react-icons/fi";
 import { IoCloseSharp } from "react-icons/io5";
 
 interface Props {
@@ -90,7 +89,6 @@ export const ChatSidebar: React.FC<Props> = ({
           <div className="flex justify-between items-center h-16 p-4 border-b relative">
             <h2 className="text-lg font-semibold">All messages</h2>
             <div className="flex items-center space-x-4">
-              <FiSearch className="text-gray-500 cursor-pointer" />
               <Button
                 type="button"
                 onClick={() => setIsSidebarOpen(false)}
