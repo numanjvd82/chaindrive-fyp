@@ -1,4 +1,4 @@
-import AboutVehicleOwner from "@/components/AboutVehicleOwner";
+import UserProfile from "@/components/UserProfile";
 import Footer from "@/components/Footer";
 import ImageSlider from "@/components/ImageSlider";
 import BookingCalculator from "@/components/pages/RenterDashboard/BookingCalculator";
@@ -39,7 +39,7 @@ const ListingDetails = () => {
             <CarDetail rental={rentalDetails} />
           </div>
           <div className="w-full lg:w-1/4">
-            <AboutVehicleOwner id={rentalDetails.ownerId} />
+            <UserProfile id={rentalDetails.ownerId} title="Owner Information" />
           </div>
         </div>
 

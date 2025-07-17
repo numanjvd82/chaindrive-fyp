@@ -7,7 +7,7 @@ import { getContractInstance } from "@/lib/contract";
 import { useNotificationProvider } from "@/providers/NotificationProvider";
 import dayjs from "dayjs";
 import { toast } from "react-toastify";
-import AboutVehicleOwner from "./AboutVehicleOwner";
+import UserProfile from "./UserProfile";
 import Button from "./Button";
 import DialogModal from "./DialogModal";
 
@@ -124,7 +124,7 @@ export const ConfirmRentalModal = ({
       {/* Show Renter information */}
       <div className="mb-4">
         <h3 className="text-lg font-semibold">Renter Information</h3>
-        <AboutVehicleOwner id={rental.renterId} />
+        <UserProfile id={rental.renterId} title="Renter Information" />
       </div>
       {/* Show Rental Details */}
       <div className="mb-4">
