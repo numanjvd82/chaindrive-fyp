@@ -6,6 +6,8 @@
   "scripts": {
     "start": "node dist/index.js",
     "dev": "nodemon src/index.ts",
+    "migrate": "npx ts-node src/scripts/migrate.ts",
+    "test-migration": "npx ts-node src/scripts/test-migration.ts",
     "local-node": "npx hardhat node --verbose",
     "compile": "npx hardhat compile",
     "deploy": "npx hardhat run scripts/deploy-upgradeable.ts --network localhost",

@@ -24,19 +24,35 @@ export function connectDb() {
   try {
     const db = getDbInstance();
     process.stdout.write("Connected to database\n");
-
-    authTablesInit(db);
-    chatTablesInit(db);
-    notificationTableInit(db);
-    listingTableInit(db);
-    walletTableInit(db);
-    rentalTableInit(db);
-    deviceTableInit(db);
-    locationTableInit(db);
-    otpTableInit(db);
-
-    console.log("Database schema created successfully.");
+    return db;
   } catch (err) {
-    console.error(err);
+    console.error("Failed to connect to database:", err);
+    throw err;
   }
+}
+
+export async function runMigrations(): Promise<void> {
+  return new Promise((resolve, reject) => {
+    try {
+      const db = getDbInstance();
+      console.log("Running database migrations...");
+
+      // Run all table initializations
+      authTablesInit(db);
+      chatTablesInit(db);
+      notificationTableInit(db);
+      listingTableInit(db);
+      walletTableInit(db);
+      rentalTableInit(db);
+      deviceTableInit(db);
+      locationTableInit(db);
+      otpTableInit(db);
+
+      console.log("Database migrations completed successfully.");
+      resolve();
+    } catch (err) {
+      console.error("Database migration failed:", err);
+      reject(err);
+    }
+  });
 }
