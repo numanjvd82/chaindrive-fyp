@@ -3,6 +3,8 @@ export type PartialUser = {
   email: string;
   password_hash: string;
   salt: string;
+  twoFactorEnabled: boolean;
+  isVerified: boolean;
   role: "owner" | "renter";
   created_at: Date;
   updated_at: Date;
@@ -18,12 +20,14 @@ export type User = {
   dob: string;
   address: string;
   city: string;
+  twoFactorEnabled: boolean;
   state: string;
   idCardFront: string;
   idCardBack: string;
   selfie: string;
   createdAt: Date;
   updatedAt: Date;
+  isVerified: boolean;
 };
 
 export interface Conversation {
@@ -60,3 +64,50 @@ export interface Listing {
   createdAt: Date;
   updatedAt: Date;
 }
+
+export interface Wallet {
+  id: number;
+  userId: number;
+  walletAddress: string;
+  balance: number;
+  createdAt: Date;
+  updatedAt: Date;
+}
+
+export type Rental = {
+  id: number;
+  listingId: number;
+  renterId: number;
+  renterAddress: string;
+  ownerAddress: string;
+  startDate: Date;
+  endDate: Date;
+  rentalFee: number;
+  securityDeposit: number;
+  platformFee: number;
+  totalEth: string;
+  ownerConfirmed: boolean;
+  completedByRenter: boolean;
+  completedByOwner: boolean;
+  isCompleted: boolean;
+  createdAt: Date;
+  status: "pending" | "active" | "cancelled" | "completed";
+  updatedAt: Date;
+};
+
+export type Device = {
+  id: number;
+  deviceId: string;
+  listingId: number;
+  userId: number;
+  createdAt: Date;
+  updatedAt: Date;
+};
+
+export type Location = {
+  id: number;
+  deviceId: string;
+  latitude: number;
+  longitude: number;
+  timestamp: Date;
+};

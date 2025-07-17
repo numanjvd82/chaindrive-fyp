@@ -2,7 +2,7 @@ import { z } from "zod";
 import { getDbInstance } from "../../lib/db/sqlite";
 import { convertBufferToBase64, sql } from "../../utils/utils";
 
-const schema = z.object({
+export const schema = z.object({
   title: z
     .string()
     .min(3, {
@@ -90,7 +90,6 @@ export async function addListing(input: AddListingInput) {
 
     return true;
   } catch (error: any) {
-    console.error("Error in addListing model:", error.message); // Log the error
     throw new Error(error.message || "Internal Server Error");
   }
 }

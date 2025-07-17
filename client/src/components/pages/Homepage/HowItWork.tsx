@@ -23,32 +23,29 @@ const HowItWork: React.FC = () => {
   ];
 
   return (
-    <div className="my-36 items-center mb-52">
-      <h1 className="text-dodgerblue-100 text-center bg-slate-300">
-        HOW IT WORK
+    <div className="my-36 items-center mb-52 px-4 md:px-12">
+      <h1 className="text-2xl md:text-4xl font-bold text-center text-gray-800">
+        HOW IT WORKS
       </h1>
-      <p className="my-4 text-center text-3xl">
-        Rent with following 3 working steps
+      <p className="my-4 text-center text-lg md:text-2xl text-gray-600">
+        Rent with the following 3 working steps
       </p>
 
-      <div className="flex flex-wrap justify-center space-x-5 px-3 mt-2">
-        {data.map((e, i) => {
-          return (
-            <div key={i}>
-              <div className="text-center items-center card font-medium p-2 mt-6 ">
-                <img
-                  className="ml-12 h-32 md:h-32"
-                  src={e.image}
-                  alt={e.title}
-                />
-                <h1 className="mt-2 text-lg">{e.title}</h1>
-                <h1 className="flex items-center mt-1 w-56">
-                  <span className="text-gray-500 mr-1">{e.description}</span>
-                </h1>
-              </div>
-            </div>
-          );
-        })}
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-8 mt-8">
+        {data.map((e) => (
+          <div
+            key={e.id}
+            className="text-center items-center card font-medium p-4 shadow-lg rounded-lg"
+          >
+            <img className="mx-auto h-24 md:h-32" src={e.image} alt={e.title} />
+            <h1 className="mt-4 text-lg md:text-xl font-semibold text-gray-800">
+              {e.title}
+            </h1>
+            <p className="mt-2 text-sm md:text-base text-gray-600">
+              {e.description}
+            </p>
+          </div>
+        ))}
       </div>
     </div>
   );

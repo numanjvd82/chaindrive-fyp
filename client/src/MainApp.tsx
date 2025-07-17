@@ -3,9 +3,10 @@ import { Route, Routes, useLocation, useNavigate } from "react-router-dom";
 import { ToastContainer } from "react-toastify";
 import Header from "./components/Header";
 import Splash from "./components/Splash";
-import useUser from "./hooks/useUser";
+import { useUser } from "./hooks/useUser";
 
 const LoginPage = React.lazy(() => import("./pages/Login"));
+const OTPInputPage = React.lazy(() => import("./pages/OtpInput"));
 const NotFoundPage = React.lazy(() => import("./pages/NotFound"));
 const NotAuthorizedPage = React.lazy(() => import("./pages/NotAuthorized"));
 const OwnerDashboardPage = React.lazy(() => import("./pages/OwnerDashboard"));
@@ -16,16 +17,25 @@ const HomePage = React.lazy(() => import("./pages/Homepage"));
 const Chat = React.lazy(() => import("./pages/Chat"));
 const ListingsPage = React.lazy(() => import("./pages/Listings"));
 const CreateListing = React.lazy(() => import("./pages/CreateListing"));
-const DummyContract = React.lazy(() => import("./pages/DummyContract"));
+const ListingDetails = React.lazy(() => import("./pages/ListingDetails"));
+const RentalConfirmation = React.lazy(
+  () => import("./pages/RentalConfirmation")
+);
+const RentalSuccessful = React.lazy(() => import("./pages/RentalSuccessful"));
+const RentalsPage = React.lazy(() => import("./pages/Rentals"));
+const ActiveRentalDetail = React.lazy(
+  () => import("./pages/ActiveRentalDetail")
+);
+const DevicesPage = React.lazy(() => import("./pages/Devices"));
 
-const ROUTES = [
+const ROUTES: {
+  link: string;
+  component: React.ReactNode;
+  roles?: string[];
+}[] = [
   {
     link: "/",
     component: <HomePage />,
-  },
-  {
-    link: "/dummy-contract",
-    component: <DummyContract />,
   },
   {
     link: "/signup",
@@ -36,14 +46,43 @@ const ROUTES = [
     component: <LoginPage />,
   },
   {
+    link: "/otp-input",
+    component: <OTPInputPage />,
+  },
+  {
     link: "/renter-dashboard",
     component: <RenterDashboardPage />,
+    roles: ["renter"],
+  },
+  {
+    link: "/listing-detail/:id",
+    component: <ListingDetails />,
+    roles: ["renter"],
+  },
+  {
+    link: "/rental-confirmation/:id",
+    component: <RentalConfirmation />,
+    roles: ["renter"],
+  },
+  {
+    link: "/rental-successful/:id",
+    component: <RentalSuccessful />,
     roles: ["renter"],
   },
   {
     link: "/owner-dashboard",
     component: <OwnerDashboardPage />,
     roles: ["owner"],
+  },
+  {
+    link: "/rentals",
+    component: <RentalsPage />,
+    roles: ["owner", "renter"],
+  },
+  {
+    link: "/rentals/:id",
+    component: <ActiveRentalDetail />,
+    roles: ["owner", "renter"],
   },
   {
     link: "/listings/create",
@@ -53,6 +92,11 @@ const ROUTES = [
   {
     link: "/listings",
     component: <ListingsPage />,
+    roles: ["owner"],
+  },
+  {
+    link: "/devices",
+    component: <DevicesPage />,
     roles: ["owner"],
   },
   {
@@ -76,7 +120,12 @@ const MainApp: React.FC = () => {
   const location = useLocation();
   const navigate = useNavigate();
 
-  const noRedirectPaths = ["/login", "/signup", "/not-authorized"];
+  const noRedirectPaths = [
+    "/login",
+    "/signup",
+    "/not-authorized",
+    "/otp-input",
+  ];
 
   useEffect(() => {
     if (!loading && !user && !noRedirectPaths.includes(location.pathname)) {
@@ -90,7 +139,7 @@ const MainApp: React.FC = () => {
       const currentRoute = ROUTES.find(
         (route) => route.link === location.pathname
       );
-      if (location.pathname === "/") {
+      if (location.pathname === "/" || location.pathname === "/otp-input") {
         navigate(
           user.role === "owner" ? "/owner-dashboard" : "/renter-dashboard"
         );
@@ -107,7 +156,11 @@ const MainApp: React.FC = () => {
 
   return (
     <Suspense fallback={<Splash />}>
-      <ToastContainer pauseOnFocusLoss={false} pauseOnHover={false} />
+      <ToastContainer
+        pauseOnFocusLoss={false}
+        pauseOnHover={false}
+        autoClose={3000}
+      />
 
       <Header />
       <Routes>

@@ -3,19 +3,14 @@ import { Server } from "socket.io";
 import { Message } from "../lib/types";
 import { conversationModel } from "../models/conversation";
 import { messageModel } from "../models/message";
-import { notificationDbFunctions } from "./notfication";
+import { notificationDbFunctions } from "./notification";
 import { onlineUsersDbFunctions } from "./userOnlineStatus";
 
 export default function socketServer(server: http.Server) {
   const { addOnlineUser, getOnlineUsers, removeInactiveUsers } =
     onlineUsersDbFunctions;
 
-  const {
-    deleteNotification,
-    getUnreadNotifications,
-    insertNotification,
-    markNotificationAsRead,
-  } = notificationDbFunctions;
+  const { insertNotification } = notificationDbFunctions;
 
   const io = new Server(server, {
     cors: {
@@ -83,16 +78,24 @@ export default function socketServer(server: http.Server) {
       const isRecipientOnline = onlineUsersSocket.has(recipientId);
       const recipeintSocketId = onlineUsersSocket.get(recipientId);
 
+      const truncatedMessage =
+        message.message.length > 50
+          ? message.message.substring(0, 50) + "..."
+          : message.message;
+
       if (isRecipientOnline && recipeintSocketId) {
         io.to(recipeintSocketId).emit("notification", {
           type: "message",
-          content: `New message from ${conversation.name}`,
+          content: truncatedMessage,
+          link: `/chat?conversationId=${message.conversationId}`,
         });
       } else {
         insertNotification.run(
           recipientId,
           "message",
-          `New message from ${conversation.name}`
+          truncatedMessage,
+          `/chat?conversationId=${message.conversationId}`,
+          null
         );
       }
     });

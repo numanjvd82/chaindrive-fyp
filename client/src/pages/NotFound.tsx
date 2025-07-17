@@ -1,5 +1,5 @@
 import Splash from "@/components/Splash";
-import useUser from "@/hooks/useUser";
+import { useUser } from "@/hooks/useUser";
 import React from "react";
 import { Link } from "react-router-dom";
 

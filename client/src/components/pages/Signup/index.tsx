@@ -38,20 +38,30 @@ const MultiStepForm: React.FC = () => {
     mode: "onTouched",
   });
 
+  const watch = methods.watch;
+  const password = watch("password");
+  const confirmPassword = watch("confirmPassword");
+
   const nextStep = async () => {
     let isValid = false;
 
     if (step === 1) {
       isValid = await methods.trigger("role");
     } else if (step === 2) {
-      isValid = await methods.trigger([
-        "firstName",
-        "lastName",
-        "email",
-        "phone",
-        "password",
-        "confirmPassword",
-      ]);
+      isValid =
+        (await methods.trigger([
+          "firstName",
+          "lastName",
+          "email",
+          "phone",
+          "password",
+          "confirmPassword",
+        ])) && password === confirmPassword;
+
+      // throw error if password and confirm password do not match
+      if (!isValid) {
+        toast.error("Password and Confirm Password do not match");
+      }
     } else if (step === 3) {
       isValid = await methods.trigger(["dob", "address", "city", "state"]);
     }

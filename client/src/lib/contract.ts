@@ -1,7 +1,7 @@
 import { CONTRACT_ADDRESS } from "@/constants";
-import contractABI from "@/constants/CarRental.json";
+import { CarRentalUpgradeable__factory } from "@/constants/typechain-types";
 import { ethers } from "ethers";
 
 export const getContractInstance = (signer: ethers.Signer) => {
-  return new ethers.Contract(CONTRACT_ADDRESS, contractABI, signer);
+  return CarRentalUpgradeable__factory.connect(CONTRACT_ADDRESS, signer);
 };

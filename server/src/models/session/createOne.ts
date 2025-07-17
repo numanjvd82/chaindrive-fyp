@@ -25,7 +25,6 @@ export const createOne = async (userId: SessionInput) => {
 
     return sessionId;
   } catch (e) {
-    console.error("Failed to create session", e);
     throw new Error("Failed to create session");
   }
 };

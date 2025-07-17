@@ -1,14 +1,14 @@
 import { createContext } from "react";
+import { QueryObserverResult } from "react-query";
 import { User } from "../lib/types";
 
 export const UserContext = createContext<{
   user: User | null;
-  setUser: React.Dispatch<React.SetStateAction<User | null>>;
-  fetchUser: () => Promise<User | null>;
+  fetchUser: () => Promise<QueryObserverResult<User | null, unknown>>;
   loading: boolean;
 }>({
   user: null,
-  setUser: () => {},
-  fetchUser: async () => null,
+  fetchUser: async () =>
+    ({ data: null } as QueryObserverResult<User | null, unknown>),
   loading: true,
 });

@@ -19,7 +19,8 @@ export const signUpSchema = z.object({
   email: z
     .string()
     .nonempty({ message: "Email is required" })
-    .email("Invalid email address"),
+    .email("Invalid email address")
+    .transform((v) => v.toLowerCase()),
   phone: z
     .string()
     .nonempty("Phone number is required")
@@ -32,7 +33,12 @@ export const signUpSchema = z.object({
   password: z
     .string()
     .nonempty("Password is required")
-    .min(8, "Password must be at least 8 characters long"),
+    .min(8, "Password must be at least 8 characters long")
+    .max(32, "Password must be at most 32 characters long"),
+  // .regex(
+  //   /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$/,
+  //   "Password must contain at least one uppercase letter, one lowercase letter, one number, and one special character"
+  // ),
   dob: z
     .string()
     .nonempty("Date of birth is required")
@@ -121,7 +127,6 @@ VALUES (?, ?, ?, ?, ?)`
 
     return true;
   } catch (error: any) {
-    console.error("Transaction failed:", error.message);
     throw new Error(error.message);
   }
 };

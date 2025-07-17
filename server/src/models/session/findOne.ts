@@ -13,7 +13,6 @@ export const findOne = async (sessionId: string) => {
 
     return session;
   } catch (error) {
-    console.error(error);
     return null;
   }
 };

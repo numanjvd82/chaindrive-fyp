@@ -25,13 +25,13 @@ const Button: React.FC<
 }) => {
   // Base styles
   const baseStyles =
-    "font-semibold py-2 px-4 rounded-lg focus:outline-none focus:ring-2 disabled:bg-gray-100 disabled:cursor-not-allowed flex items-center justify-center";
+    "font-semibold py-2 px-4 rounded-lg focus:outline-none focus:ring-2 disabled:bg-gray-300 disabled:cursor-not-allowed flex items-center justify-center";
 
   // Variant styles
   const variantStyles = {
     primary: "bg-blue-500 text-white hover:bg-blue-600 focus:ring-blue-500",
     secondary:
-      "bg-gray-300 text-gray-700 hover:bg-gray-400 focus:ring-gray-300",
+      "bg-gray-500 text-gray-700 hover:bg-gray-400 focus:ring-gray-300",
     link: "bg-transparent text-blue-500 hover:underline focus:ring-transparent",
   };
 

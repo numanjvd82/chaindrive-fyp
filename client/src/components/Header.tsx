@@ -1,8 +1,9 @@
 import logo from "@/assets/images/logo.svg";
-import useUser from "@/hooks/useUser";
+import { useUser } from "@/hooks/useUser";
 import { axiosInstance } from "@/lib/axios";
-import React from "react";
-import { FaRegCommentDots } from "react-icons/fa";
+import { motion } from "motion/react";
+import React, { useState } from "react";
+import { FaBars, FaRegCommentDots, FaTimes } from "react-icons/fa";
 import { useQueryClient } from "react-query";
 import { Link, useNavigate } from "react-router-dom";
 import Button from "./Button";
@@ -13,6 +14,7 @@ const Header: React.FC = () => {
   const queryClient = useQueryClient();
   const navigate = useNavigate();
   const { user } = useUser();
+  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
 
   if (!user) return null;
 
@@ -22,7 +24,6 @@ const Header: React.FC = () => {
     try {
       await axiosInstance.post("/api/auth/logout", {});
       queryClient.setQueryData("user", null); // Clear user data
-      navigate("/login");
     } catch (err) {
       console.error(err);
     }
@@ -34,18 +35,40 @@ const Header: React.FC = () => {
         <img src={logo} alt="Chaindrive Logo" className="h-15 w-15" />
       </div>
 
-      <nav className="hidden sm:flex items-center space-x-6">
-        {user.role === "owner" ? (
-          <Link to="/listings/create">
-            <Button variant="primary">List Vehicle</Button>
-          </Link>
-        ) : null}
+      {/* Desktop Navigation */}
+      <nav className="hidden md:flex items-center space-x-6">
         <Link
           to={user.role === "owner" ? "/owner-dashboard" : "/renter-dashboard"}
           className="font-semibold text-gray-600 hover:text-primary"
         >
           Dashboard
         </Link>
+
+        <Link
+          to="/rentals"
+          className="font-semibold text-gray-600 hover:text-primary"
+        >
+          Rentals
+        </Link>
+
+        {user.role === "owner" ? (
+          <>
+            <Link to="/listings/create">
+              <Button variant="primary">List Vehicle</Button>
+            </Link>
+
+            <Link
+              to="/devices"
+              className="font-semibold text-gray-600 hover:text-primary"
+            >
+              Devices
+            </Link>
+          </>
+        ) : (
+          <Link to="/become-host">
+            <Button variant="primary">Become a host</Button>
+          </Link>
+        )}
 
         <div className="flex items-center space-x-4">
           <Link
@@ -71,17 +94,112 @@ const Header: React.FC = () => {
               >
                 Profile
               </Link>
-              <Link
-                to="/settings"
+              {user.role === "owner" ? (
+                <Link
+                  to="/listings"
+                  className="block px-4 py-2 text-gray-600 hover:bg-gray-100"
+                >
+                  Listings
+                </Link>
+              ) : null}
+              <div
                 onClick={handleLogout}
                 className="block px-4 py-2 bg-primary text-white transition-all hover:brightness-110"
               >
                 Logout
-              </Link>
+              </div>
             </div>
           </Dropdown>
         </div>
       </nav>
+
+      {/* Mobile Menu Toggle */}
+      <button
+        className="md:hidden text-gray-600 hover:text-primary focus:outline-none"
+        onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
+        aria-label="Toggle menu"
+      >
+        {isMobileMenuOpen ? (
+          <FaTimes className="text-2xl transition-transform transform hover:scale-110" />
+        ) : (
+          <FaBars className="text-2xl transition-transform transform hover:scale-110" />
+        )}
+      </button>
+
+      {/* Mobile Navigation */}
+      <motion.div
+        initial={{ x: "100%" }}
+        animate={{ x: isMobileMenuOpen ? 0 : "100%" }}
+        transition={{ type: "spring", stiffness: 300, damping: 30 }}
+        className="fixed top-0 right-0 w-1/2 h-full bg-white shadow-lg z-50 md:hidden"
+      >
+        <div className="flex flex-col items-end space-y-6 p-6">
+          <button
+            className="self-end text-gray-600 hover:text-primary focus:outline-none"
+            onClick={() => setIsMobileMenuOpen(false)}
+            aria-label="Close menu"
+          >
+            <FaTimes className="text-2xl transition-transform transform hover:scale-110" />
+          </button>
+          <Link
+            to={
+              user.role === "owner" ? "/owner-dashboard" : "/renter-dashboard"
+            }
+            className="font-semibold text-gray-600 hover:text-primary transition-transform transform hover:scale-105"
+            onClick={() => setIsMobileMenuOpen(false)}
+          >
+            Dashboard
+          </Link>
+          <Link
+            to="/rentals"
+            className="font-semibold text-gray-600 hover:text-primary transition-transform transform hover:scale-105"
+            onClick={() => setIsMobileMenuOpen(false)}
+          >
+            Rentals
+          </Link>
+          {user.role === "owner" ? (
+            <Link
+              to="/listings/create"
+              className="font-semibold text-gray-600 hover:text-primary transition-transform transform hover:scale-105"
+              onClick={() => setIsMobileMenuOpen(false)}
+            >
+              List Vehicle
+            </Link>
+          ) : (
+            <Link
+              to="/become-host"
+              className="font-semibold text-gray-600 hover:text-primary transition-transform transform hover:scale-105"
+              onClick={() => setIsMobileMenuOpen(false)}
+            >
+              Become a host
+            </Link>
+          )}
+          <Link
+            to="/profile"
+            className="font-semibold text-gray-600 hover:text-primary transition-transform transform hover:scale-105"
+            onClick={() => setIsMobileMenuOpen(false)}
+          >
+            Profile
+          </Link>
+          <div className="flex items-center space-x-4 mt-4">
+            <Link
+              to="/chat"
+              className="bg-gray-200 cursor-pointer p-2 rounded-xl transition duration-300 ease-in-out hover:text-primary hover:bg-gray-300"
+              onClick={() => setIsMobileMenuOpen(false)}
+            >
+              <FaRegCommentDots className="text-xl" />
+            </Link>
+            <NotificationDropdown />
+            <img
+              src={imageUrl}
+              alt="Profile"
+              className="h-12 w-12 rounded-full cursor-pointer"
+              onClick={() => setIsMobileMenuOpen(false)}
+            />
+          </div>
+          <Button onClick={handleLogout}>Logout</Button>
+        </div>
+      </motion.div>
     </header>
   );
 };

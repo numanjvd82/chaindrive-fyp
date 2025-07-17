@@ -18,6 +18,26 @@ export const addConversation = async (input: AddConversationInput) => {
   const parsedInput = addConversationSchema.parse(input);
 
   try {
+    // Check if the conversation already exists
+    const checkStmt = sqliteInstance.prepare(
+      sql`SELECT id FROM Conversations WHERE (user1 = ? AND user2 = ?) OR (user1 = ? AND user2 = ?);`
+    );
+
+    const existingConversation = checkStmt
+      .all(
+        parsedInput.user1,
+        parsedInput.user2,
+        parsedInput.user2,
+        parsedInput.user1
+      )
+      .map((row: any) => ({
+        id: row.id,
+      }))[0];
+
+    if (existingConversation) {
+      return existingConversation.id as number;
+    }
+
     const stmt = sqliteInstance.prepare(INSERT_QUERY);
     const result = stmt.run(parsedInput.user1, parsedInput.user2);
 
@@ -25,7 +45,9 @@ export const addConversation = async (input: AddConversationInput) => {
       throw new Error("Failed to add conversation");
     }
 
-    return true;
+    // return the ID of the newly created conversation
+    const conversationId = result.lastInsertRowid;
+    return conversationId as number;
   } catch (error: any) {
     throw new Error(error.message);
   }

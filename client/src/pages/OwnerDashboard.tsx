@@ -1,31 +1,51 @@
 import { hoverTransition } from "@/components/pages/OwnerDashboard/ActiveRentalCard";
 import ActiveRentals from "@/components/pages/OwnerDashboard/ActiveRentals";
+import useAuthUser from "@/hooks/useAuthUser";
+import { useDashboardBasicInfo } from "@/hooks/useDashboardBasicInfo";
 import { motion } from "framer-motion";
-import { Link } from "react-router-dom";
 
 const OwnerDashboard: React.FC = () => {
-  const user = {
-    name: "Alexa",
-    activeRentals: 5,
-    totalEarnings: 7200,
-    vehiclesListed: 8,
-  };
+  const { user } = useAuthUser();
+  const { dashboardBasicInfo, isLoading } = useDashboardBasicInfo();
+
+  if (isLoading) {
+    return (
+      <div className="flex items-center justify-center min-h-screen">
+        <p className="text-lg">Loading...</p>
+      </div>
+    );
+  }
+
+  if (!user || !dashboardBasicInfo) {
+    return null;
+  }
+
+  const name = `${user.firstName} ${user.lastName}`;
 
   return (
-    <div className="p-8 space-y-8 bg-gray-100 min-h-screen">
-      <h1 className="text-2xl font-bold">Welcome, {user.name}</h1>
-      <Link to="/dummy-contract" className="text-blue-500">
-        Dummy Contract
-      </Link>
+    <div className="p-8 space-y-8 bg-gray-100 min-h-[calc(100vh-4rem)]">
+      <h1 className="text-2xl font-bold">Welcome, {name}</h1>
 
       <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
         {[
-          { label: "Active Rentals", value: user.activeRentals },
+          { label: "Active Rentals", value: dashboardBasicInfo.activeBookings },
           {
-            label: "Total Earnings",
-            value: `$${user.totalEarnings.toLocaleString()}`,
+            label: "Pending Rentals",
+            value: dashboardBasicInfo.pendingBookings,
           },
-          { label: "Vehicles Listed", value: user.vehiclesListed },
+          {
+            label: "Completed Rentals",
+            value: dashboardBasicInfo.completedBookings,
+          },
+          {
+            label: "Cancelled Rentals",
+            value: dashboardBasicInfo.cancelledBookings,
+          },
+          {
+            label: "Total Earnings (PKR)",
+            value: `${dashboardBasicInfo.totalEarnings}`,
+          },
+          { label: "Vehicles Listed", value: dashboardBasicInfo.totalListings },
         ].map((stat, index) => (
           <motion.div
             key={index}

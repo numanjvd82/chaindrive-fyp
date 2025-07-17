@@ -31,14 +31,14 @@ export async function list(id: ListInput) {
           transmissionType: listing.transmission_type,
           fuelType: listing.fuel_type,
           ownerId: listing.owner_id,
+          expectedDeviceId: listing.expected_device_id,
           images: JSON.parse(listing.images),
-          createdAt: listing.created_at,
-          updatedAt: listing.updated_at,
+          createdAt: new Date(listing.created_at),
+          updatedAt: new Date(listing.updated_at),
         };
       });
     return listings as Listing[];
   } catch (err: any) {
-    console.error(`Error fetching listings: ${err.message}`);
     throw new Error(`Unable to fetch listings: ${err.message}`);
   }
 }

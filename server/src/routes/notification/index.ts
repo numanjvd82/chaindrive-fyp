@@ -18,7 +18,7 @@ notificationRouter.get("/", (req: Request, res: Response) => {
     const notifications = db
       .prepare(
         sql`
-    SELECT id, type, content, created_at FROM Notifications WHERE user_id = ? AND is_read = false ORDER BY created_at DESC
+    SELECT id, type, content, created_at, rentalId, link FROM Notifications WHERE user_id = ? AND is_read = 0 ORDER BY created_at DESC
   `
       )
       .all(userId);
@@ -46,14 +46,14 @@ notificationRouter.post("/mark-read", (req, res) => {
   try {
     db.prepare(
       sql`
-      UPDATE Notifications SET is_read = true WHERE user_id = ?
+      UPDATE Notifications SET is_read = 1 WHERE user_id = ?
     `
     ).run(userId);
 
     // delete all notifications
     db.prepare(
       sql`
-      DELETE FROM Notifications WHERE user_id = ? AND is_read = true
+      DELETE FROM Notifications WHERE user_id = ? AND is_read = 1
     `
     ).run(userId);
 

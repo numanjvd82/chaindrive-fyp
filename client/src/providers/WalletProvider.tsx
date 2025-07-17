@@ -1,5 +1,5 @@
 import { WalletContext } from "@/contexts/WalletContext";
-import useUser from "@/hooks/useUser";
+import { useUser } from "@/hooks/useUser";
 import { ethers } from "ethers";
 import { useEffect, useState } from "react";
 import { toast } from "react-toastify";
@@ -55,6 +55,7 @@ export const WalletProvider = ({ children }: { children: React.ReactNode }) => {
       window.ethereum.on("accountsChanged", (accounts: string[]) => {
         if (accounts.length > 0) {
           setAccount(accounts[0]);
+          window.location.reload();
         } else {
           setAccount(null);
           setSigner(null);
