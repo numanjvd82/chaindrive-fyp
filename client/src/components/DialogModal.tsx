@@ -38,7 +38,7 @@ const DialogModal: React.FC<DialogModalProps> = ({
     <AnimatePresence>
       {isOpen && (
         <motion.div
-          className={`fixed overflow-y-auto inset-0 z-[1000] flex items-center justify-center bg-black bg-opacity-50`}
+          className={`fixed overflow-y-auto inset-0 z-[1000] flex items-center justify-center bg-black bg-opacity-50 p-4`}
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           exit={{ opacity: 0 }}
@@ -46,27 +46,27 @@ const DialogModal: React.FC<DialogModalProps> = ({
         >
           {/* Modal container */}
           <motion.div
-            className="bg-white rounded-lg shadow-lg w-full max-h-screen overflow-y-auto max-w-md p-6 relative "
+            className="bg-white rounded-2xl shadow-2xl w-full max-h-[90vh] overflow-y-auto max-w-4xl relative border border-gray-100"
             initial={{ scale: 0.8, opacity: 0 }}
             animate={{ scale: 1, opacity: 1 }}
             exit={{ scale: 0.8, opacity: 0 }}
             transition={{ duration: 0.3 }}
           >
             {/* Header */}
-            <div className="flex justify-between items-center mb-4">
-              <div className="flex flex-col justify-center-center">
+            <div className="flex justify-between items-start p-6 border-b border-gray-100 bg-gradient-to-r from-blue-50 to-purple-50">
+              <div className="flex flex-col">
                 {title && (
-                  <h3 className="text-lg font-semibold text-gray-800">
+                  <h3 className="text-xl font-bold text-gray-800 mb-1">
                     {title}
                   </h3>
                 )}
                 {description && (
-                  <p className="text-sm text-gray-500">{description}</p>
+                  <p className="text-sm text-gray-600">{description}</p>
                 )}
               </div>
               <button
                 onClick={onClose}
-                className="text-gray-500 hover:text-gray-800 transition"
+                className="text-gray-400 hover:text-gray-600 transition-colors p-2 hover:bg-white/50 rounded-lg"
                 aria-label="Close"
                 type="button"
               >
@@ -75,10 +75,14 @@ const DialogModal: React.FC<DialogModalProps> = ({
             </div>
 
             {/* Content */}
-            <div className="mb-4">{children}</div>
+            <div className="p-6">{children}</div>
 
             {/* Footer */}
-            {footer && <div className="mt-4">{footer}</div>}
+            {footer && (
+              <div className="px-6 py-4 border-t border-gray-100 bg-gray-50/50">
+                {footer}
+              </div>
+            )}
           </motion.div>
         </motion.div>
       )}

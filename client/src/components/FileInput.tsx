@@ -21,6 +21,9 @@ export const FileInput: React.FC<FileInputProps> = ({
   const { setValue } = useFormContext();
   const [preview, setPreview] = useState<string | null>(null);
   const [fileName, setFileName] = useState<string>("Select File");
+  
+  // Generate unique ID for the input
+  const inputId = props.id || `file-input-${fieldName}`;
 
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
@@ -43,56 +46,93 @@ export const FileInput: React.FC<FileInputProps> = ({
   };
 
   return (
-    <div className="mb-4">
+    <div className="space-y-2">
       {label && (
         <label
-          htmlFor={props.id}
-          className="block mb-1 text-sm font-medium text-gray-700"
+          htmlFor={inputId}
+          className="block text-sm font-medium text-gray-700"
         >
           {label}
-          {props.required && <span>*</span>}
+          {props.required && <span className="text-red-500 ml-1">*</span>}
         </label>
       )}
-      <div
-        className={`flex items-center w-full px-4 py-2 border rounded-lg ${
-          error
-            ? "border-red-500 text-red-500"
-            : "border-gray-300 text-primary hover:border-primary hover:bg-gray-100"
-        }`}
-      >
-        {preview && (
-          <div className="w-12 h-12 mr-3 flex-shrink-0">
-            <img
-              src={preview}
-              alt="File Preview"
-              className="w-full h-full object-cover rounded"
-            />
-          </div>
-        )}
+      
+      <div className="relative">
+        <input
+          type="file"
+          id={inputId}
+          {...register(fieldName, { required: props.required })}
+          className="hidden"
+          onChange={handleFileChange}
+          accept="image/*"
+          {...props}
+        />
+        
         <label
-          htmlFor={props.id}
-          className="flex-1 flex items-center justify-between cursor-pointer"
+          htmlFor={inputId}
+          className={`relative block w-full border-2 border-dashed rounded-xl p-6 transition-all duration-200 cursor-pointer group ${
+            error 
+              ? "border-red-300 bg-red-50 hover:border-red-400" 
+              : preview 
+                ? "border-green-300 bg-green-50 hover:border-green-400"
+                : "border-gray-300 bg-gray-50 hover:border-blue-400 hover:bg-blue-50"
+          }`}
         >
-          <span className="text-sm">{fileName}</span>
           {preview ? (
-            <FaTimes
-              className="text-lg text-red-500 cursor-pointer"
-              onClick={resetFile}
-            />
+            <div className="space-y-4">
+              <div className="flex items-center justify-center">
+                <img
+                  src={preview}
+                  alt="Preview"
+                  className="w-32 h-32 object-cover rounded-xl border-2 border-gray-200 shadow-md"
+                />
+              </div>
+              <div className="text-center">
+                <p className="text-sm font-medium text-gray-700">{fileName}</p>
+                <p className="text-xs text-gray-500 mt-1">Click to change file</p>
+              </div>
+              <button
+                type="button"
+                onClick={(e) => {
+                  e.preventDefault();
+                  e.stopPropagation();
+                  resetFile();
+                }}
+                className="absolute top-3 right-3 w-7 h-7 bg-red-500 hover:bg-red-600 text-white rounded-full flex items-center justify-center transition-colors shadow-lg"
+              >
+                <FaTimes size={14} />
+              </button>
+            </div>
           ) : (
-            <FaUpload className="text-lg text-gray-500" />
+            <div className="text-center space-y-2">
+              <div className="flex justify-center">
+                <div className={`w-12 h-12 rounded-full flex items-center justify-center transition-colors ${
+                  error ? "bg-red-100 text-red-500" : "bg-gray-100 text-gray-500 group-hover:bg-blue-100 group-hover:text-blue-500"
+                }`}>
+                  <FaUpload size={20} />
+                </div>
+              </div>
+              <div>
+                <p className="text-sm font-medium text-gray-700">
+                  {fileName !== "Select File" ? fileName : "Select File"}
+                </p>
+                <p className="text-xs text-gray-500 mt-1">
+                  JPG, PNG only • Max 2MB
+                </p>
+              </div>
+            </div>
           )}
-          <input
-            type="file"
-            id={props.id}
-            {...register(fieldName, { required: props.required })}
-            className="hidden"
-            onChange={handleFileChange}
-            {...props}
-          />
         </label>
       </div>
-      {error && <p className="mt-2 text-red-500 text-sm">{error}</p>}
+      
+      {error && (
+        <p className="text-sm text-red-600 flex items-center gap-1">
+          <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+          </svg>
+          {error}
+        </p>
+      )}
     </div>
   );
 };
