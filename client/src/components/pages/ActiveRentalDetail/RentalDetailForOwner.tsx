@@ -10,7 +10,7 @@ import { getContractInstance } from "@/lib/contract";
 import { Listing, RentalWithImages } from "@/lib/types";
 import dayjs from "dayjs";
 import { motion } from "motion/react";
-import React from "react";
+import React, { useState } from "react";
 import {
   FaCheckCircle,
   FaCogs,
@@ -23,8 +23,10 @@ import {
   FaTimes,
   FaCircle,
   FaDollarSign,
+  FaExclamationTriangle,
 } from "react-icons/fa";
 import { toast } from "react-toastify";
+import ViolationReportingModal from "./ViolationReportingModal";
 
 type Props = {
   rental: RentalWithImages;
@@ -37,6 +39,7 @@ export const RentalDetailForOwner: React.FC<Props> = ({
   rental,
   refetchRentalDetail,
 }) => {
+  const [isViolationModalOpen, setIsViolationModalOpen] = useState(false);
   const { completeRentalByOwner, isCompleteRentalByOwnerLoading } =
     useCompleteRentalByOwner();
   const { confirmRental, isConfirmRentalLoading } = useConfirmRental();
@@ -120,7 +123,9 @@ export const RentalDetailForOwner: React.FC<Props> = ({
         `);
     } catch (error: unknown) {
       toast.error(
-        error instanceof Error ? error.message : "Failed to complete rental. Please try again."
+        error instanceof Error
+          ? error.message
+          : "Failed to complete rental. Please try again."
       );
     }
   };
@@ -214,17 +219,25 @@ export const RentalDetailForOwner: React.FC<Props> = ({
             className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-6"
           >
             <div>
-              <h1 className="text-4xl font-bold text-gray-900 mb-2">Rental Management</h1>
-              <p className="text-lg text-gray-600">Manage your vehicle rental request</p>
+              <h1 className="text-4xl font-bold text-gray-900 mb-2">
+                Rental Management
+              </h1>
+              <p className="text-lg text-gray-600">
+                Manage your vehicle rental request
+              </p>
             </div>
-            
+
             {/* Status Badge */}
             <motion.div
               initial={{ opacity: 0, scale: 0.8 }}
               animate={{ opacity: 1, scale: 1 }}
               transition={{ delay: 0.1 }}
             >
-              <span className={`inline-flex items-center gap-2 px-4 py-2 rounded-full text-sm font-medium border ${getStatusColor(rental.status)}`}>
+              <span
+                className={`inline-flex items-center gap-2 px-4 py-2 rounded-full text-sm font-medium border ${getStatusColor(
+                  rental.status
+                )}`}
+              >
                 {getStatusIcon(rental.status)}
                 {rental.status.charAt(0).toUpperCase() + rental.status.slice(1)}
               </span>
@@ -258,9 +271,7 @@ export const RentalDetailForOwner: React.FC<Props> = ({
               <FaMapMarkerAlt className="text-blue-600" />
               Vehicle Location
             </h2>
-            <div className="bg-gray-50 rounded-xl p-4">
-              {renderMap()}
-            </div>
+            <div className="bg-gray-50 rounded-xl p-4">{renderMap()}</div>
           </motion.div>
         )}
 
@@ -276,11 +287,13 @@ export const RentalDetailForOwner: React.FC<Props> = ({
               <h2 className="text-2xl font-bold mb-2">Vehicle Details</h2>
               <p className="text-blue-100">{listing.title}</p>
             </div>
-            
+
             <div className="p-6">
               {/* Rental Timeline */}
               <div className="mb-6">
-                <h3 className="text-lg font-semibold text-gray-900 mb-4">Rental Period</h3>
+                <h3 className="text-lg font-semibold text-gray-900 mb-4">
+                  Rental Period
+                </h3>
                 <div className="flex items-center gap-4 p-4 bg-gray-50 rounded-xl">
                   <div className="flex items-center gap-2 text-gray-600">
                     <FaCalendarAlt className="text-blue-600" />
@@ -298,7 +311,9 @@ export const RentalDetailForOwner: React.FC<Props> = ({
 
               {/* Vehicle Specifications */}
               <div>
-                <h3 className="text-lg font-semibold text-gray-900 mb-4">Specifications</h3>
+                <h3 className="text-lg font-semibold text-gray-900 mb-4">
+                  Specifications
+                </h3>
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                   <div className="flex items-center gap-3 p-3 bg-gray-50 rounded-lg">
                     <FaMapMarkerAlt className="text-blue-600" />
@@ -311,14 +326,20 @@ export const RentalDetailForOwner: React.FC<Props> = ({
                     <FaGasPump className="text-blue-600" />
                     <div>
                       <span className="text-sm text-gray-500">Fuel Type</span>
-                      <p className="font-medium">{listing.fuelType.toUpperCase()}</p>
+                      <p className="font-medium">
+                        {listing.fuelType.toUpperCase()}
+                      </p>
                     </div>
                   </div>
                   <div className="flex items-center gap-3 p-3 bg-gray-50 rounded-lg">
                     <FaCogs className="text-blue-600" />
                     <div>
-                      <span className="text-sm text-gray-500">Transmission</span>
-                      <p className="font-medium">{listing.transmissionType.toUpperCase()}</p>
+                      <span className="text-sm text-gray-500">
+                        Transmission
+                      </span>
+                      <p className="font-medium">
+                        {listing.transmissionType.toUpperCase()}
+                      </p>
                     </div>
                   </div>
                   <div className="flex items-center gap-3 p-3 bg-gray-50 rounded-lg">
@@ -331,15 +352,21 @@ export const RentalDetailForOwner: React.FC<Props> = ({
                   <div className="flex items-center gap-3 p-3 bg-gray-50 rounded-lg sm:col-span-2">
                     <FaIdCard className="text-blue-600" />
                     <div>
-                      <span className="text-sm text-gray-500">License Plate</span>
+                      <span className="text-sm text-gray-500">
+                        License Plate
+                      </span>
                       <p className="font-medium">{listing.licensePlate}</p>
                     </div>
                   </div>
                   <div className="flex items-center gap-3 p-3 bg-gray-50 rounded-lg sm:col-span-2">
                     <FaDollarSign className="text-green-600" />
                     <div>
-                      <span className="text-sm text-gray-500">Price per Day</span>
-                      <p className="font-medium text-green-600">{listing.pricePerDay} PKR</p>
+                      <span className="text-sm text-gray-500">
+                        Price per Day
+                      </span>
+                      <p className="font-medium text-green-600">
+                        {listing.pricePerDay} PKR
+                      </p>
                     </div>
                   </div>
                 </div>
@@ -355,10 +382,12 @@ export const RentalDetailForOwner: React.FC<Props> = ({
             className="space-y-6"
           >
             <UserProfile id={rental.renterId} title="Renter Information" />
-            
+
             {/* Action Buttons */}
             <div className="bg-white rounded-2xl shadow-lg p-6">
-              <h3 className="text-lg font-semibold text-gray-900 mb-4">Actions</h3>
+              <h3 className="text-lg font-semibold text-gray-900 mb-4">
+                Actions
+              </h3>
               <div className="space-y-3">
                 {!rental.ownerConfirmed && rental.status === "pending" && (
                   <Button
@@ -390,7 +419,7 @@ export const RentalDetailForOwner: React.FC<Props> = ({
                   </Button>
                 )}
 
-                {(!rental.completedByOwner && rental.status === "active") && (
+                {!rental.completedByOwner && rental.status === "active" && (
                   <Button
                     isLoading={isCompleteRentalByOwnerLoading}
                     onClick={handleCompleteRentalByOwner}
@@ -404,10 +433,31 @@ export const RentalDetailForOwner: React.FC<Props> = ({
                     </div>
                   </Button>
                 )}
+
+                {rental.status === "active" && (
+                  <Button
+                    onClick={() => setIsViolationModalOpen(true)}
+                    variant="secondary"
+                    className="w-full bg-red-600 hover:bg-red-700 text-white py-3 rounded-xl shadow-lg hover:shadow-xl transition-all duration-300"
+                  >
+                    <div className="flex items-center justify-center gap-2">
+                      <FaExclamationTriangle className="w-4 h-4" />
+                      Report Violation
+                    </div>
+                  </Button>
+                )}
               </div>
             </div>
           </motion.div>
         </div>
+
+        {/* Violation Reporting Modal */}
+        <ViolationReportingModal
+          isOpen={isViolationModalOpen}
+          onClose={() => setIsViolationModalOpen(false)}
+          rentalId={rental.id.toString()}
+          onReportSubmitted={refetchRentalDetail}
+        />
       </div>
     </div>
   );

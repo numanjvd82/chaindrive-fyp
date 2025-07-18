@@ -1,4 +1,5 @@
 import Button from "@/components/Button";
+import TermsAndConditions from "@/components/TermsAndConditions";
 import useAuthUser from "@/hooks/useAuthUser";
 import { useCreateRental } from "@/hooks/useCreateRental";
 import { useListWallet } from "@/hooks/useListWallet";
@@ -8,18 +9,18 @@ import { getContractInstance } from "@/lib/contract";
 import { AvailableRental } from "@/lib/types";
 import dayjs from "dayjs";
 import { ethers } from "ethers";
-import React from "react";
+import React, { useState } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import { toast } from "react-toastify";
 import { motion } from "motion/react";
-import { 
-  FaCreditCard, 
-  FaEthereum, 
-  FaWallet, 
+import {
+  FaCreditCard,
+  FaEthereum,
+  FaWallet,
   FaShieldAlt,
   FaCalendarAlt,
   FaCar,
-  FaCheckCircle
+  FaCheckCircle,
 } from "react-icons/fa";
 import Loader from "@/components/Loader";
 
@@ -35,6 +36,7 @@ type LocationState = {
 
 const RentalConfirmation: React.FC = () => {
   const navigate = useNavigate();
+  const [showTermsModal, setShowTermsModal] = useState(false);
 
   const { user } = useAuthUser();
   const { account, provider, signer, connectWallet } = useWallet();
@@ -51,13 +53,15 @@ const RentalConfirmation: React.FC = () => {
   if (isEthInPkrLoading) {
     return (
       <div className="min-h-screen bg-gradient-to-br from-slate-50 to-blue-50 flex items-center justify-center">
-        <motion.div 
+        <motion.div
           initial={{ opacity: 0, scale: 0.9 }}
           animate={{ opacity: 1, scale: 1 }}
           className="bg-white rounded-2xl shadow-lg p-8 text-center"
         >
           <Loader size="lg" variant="spinner" />
-          <p className="text-gray-600 mt-4 text-lg">Loading conversion rate...</p>
+          <p className="text-gray-600 mt-4 text-lg">
+            Loading conversion rate...
+          </p>
         </motion.div>
       </div>
     );
@@ -99,7 +103,7 @@ const RentalConfirmation: React.FC = () => {
   const startDate = dayjs(bookingData.startDate).format("DD MMM YYYY HH:mm");
   const endDate = dayjs(bookingData.endDate).format("DD MMM YYYY HH:mm");
 
-  const handleCreateRental = async () => {
+  const handleInitiateRental = () => {
     if (!account || !provider || !signer) {
       toast.error("Please connect your wallet to proceed.");
       return;
@@ -115,12 +119,26 @@ const RentalConfirmation: React.FC = () => {
       return;
     }
 
+    // Show terms and conditions modal
+    setShowTermsModal(true);
+  };
+
+  const handleAcceptTerms = () => {
+    setShowTermsModal(false);
+    handleCreateRental();
+  };
+
+  const handleDeclineTerms = () => {
+    setShowTermsModal(false);
+  };
+
+  const handleCreateRental = async () => {
     try {
       toast.loading("Creating rental...");
       // Now create rental in DB
       const rentalData = {
         listingId: rental.id,
-        renterAddress: account,
+        renterAddress: account as string,
         ownerAddress: ownerWallet.walletAddress,
         startDate: bookingData.startDate.toISOString(),
         endDate: bookingData.endDate.toISOString(),
@@ -143,7 +161,7 @@ const RentalConfirmation: React.FC = () => {
       toast.dismiss();
       toast.loading("Creating rental on blockchain...");
 
-      const rentalContract = getContractInstance(signer);
+      const rentalContract = getContractInstance(signer!);
 
       const rentalFeeEth = bookingData.totalPrice / ethInPkr;
       const securityDepositEth = securityDeposit / ethInPkr;
@@ -207,16 +225,17 @@ const RentalConfirmation: React.FC = () => {
     } catch (err: unknown) {
       console.error("Error creating rental:", err);
       toast.dismiss(); // Clear loading if shown
-      const errorMessage = err instanceof Error 
-        ? err.message 
-        : "Rental creation failed. Please try again.";
+      const errorMessage =
+        err instanceof Error
+          ? err.message
+          : "Rental creation failed. Please try again.";
       toast.error(errorMessage);
     }
   };
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-50 to-blue-50 flex items-center">
-      <motion.div 
+      <motion.div
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
         className="basis-[550px] mx-auto p-6 bg-white rounded-2xl shadow-lg my-5"
@@ -227,7 +246,9 @@ const RentalConfirmation: React.FC = () => {
             <FaCar className="w-6 h-6" />
             Pay & Get Your Ride!!
           </h1>
-          <p className="text-blue-100 text-center mt-1">Complete your rental booking</p>
+          <p className="text-blue-100 text-center mt-1">
+            Complete your rental booking
+          </p>
         </div>
 
         {/* Booking Summary */}
@@ -254,8 +275,12 @@ const RentalConfirmation: React.FC = () => {
                 Rental Fee
               </span>
               <div className="text-right">
-                <div className="font-semibold">PKR {bookingData.totalPrice}</div>
-                <div className="text-sm text-gray-500">{bookingData.totalDays} days × PKR {rental.pricePerDay}/day</div>
+                <div className="font-semibold">
+                  PKR {bookingData.totalPrice}
+                </div>
+                <div className="text-sm text-gray-500">
+                  {bookingData.totalDays} days × PKR {rental.pricePerDay}/day
+                </div>
               </div>
             </div>
 
@@ -336,13 +361,17 @@ const RentalConfirmation: React.FC = () => {
                   <div className="flex-1">
                     <div className="flex items-center gap-2">
                       <FaEthereum className="text-indigo-600" />
-                      <span className="font-semibold text-gray-900">Ethereum Wallet</span>
+                      <span className="font-semibold text-gray-900">
+                        Ethereum Wallet
+                      </span>
                       <span className="px-2 py-1 bg-green-100 text-green-600 text-xs rounded-full font-medium">
                         Connected
                       </span>
                     </div>
                     <span className="text-gray-500">
-                      {account?.slice(0, 8) + "..." + account?.slice(account.length - 6)}
+                      {account?.slice(0, 8) +
+                        "..." +
+                        account?.slice(account.length - 6)}
                     </span>
                   </div>
                 </div>
@@ -353,17 +382,37 @@ const RentalConfirmation: React.FC = () => {
 
         {/* Confirm Button */}
         <Button
-          disabled={isOwnerWalletLoading || isCreateRentalLoading || !account || !provider || !signer}
+          disabled={
+            isOwnerWalletLoading ||
+            isCreateRentalLoading ||
+            !account ||
+            !provider ||
+            !signer
+          }
           isLoading={isCreateRentalLoading}
-          onClick={handleCreateRental}
+          onClick={handleInitiateRental}
           className="w-full py-4 text-xl font-bold bg-gradient-to-r from-green-600 to-blue-600 hover:from-green-700 hover:to-blue-700 disabled:from-gray-400 disabled:to-gray-500 rounded-2xl shadow-lg transition-all duration-300"
         >
           <div className="flex items-center justify-center gap-3">
             <FaCheckCircle />
-            {!account || !provider || !signer ? "Connect Wallet to Continue" : "Confirm Payment & Book Now"}
+            {!account || !provider || !signer
+              ? "Connect Wallet to Continue"
+              : "Confirm Payment & Book Now"}
           </div>
         </Button>
       </motion.div>
+
+      {/* Terms and Conditions Modal */}
+      {showTermsModal && (
+        <TermsAndConditions
+          onAccept={handleAcceptTerms}
+          onDecline={handleDeclineTerms}
+          rentalFee={bookingData.totalPrice.toString()}
+          lateFeePerHour="50"
+          securityDeposit={securityDeposit.toString()}
+          maxLateFeeMultiplier={3}
+        />
+      )}
     </div>
   );
 };

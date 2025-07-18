@@ -44,30 +44,32 @@ export const WalletManagement: React.FC<WalletManagementProps> = ({
   const isWalletMatched = wallet?.walletAddress === account;
   const isConnected = !!(account && signer && provider);
 
-  return (
-    <motion.div
-      initial={{ opacity: 0, y: 20 }}
-      animate={{ opacity: 1, y: 0 }}
-      transition={{ duration: 0.5 }}
-      className="bg-white rounded-2xl shadow-lg p-8 space-y-6"
-    >
-      <div className="flex items-center space-x-3">
-        <div className="p-3 bg-gradient-to-br from-blue-500 to-purple-600 rounded-xl text-white">
-          <FaWallet className="text-xl" />
-        </div>
-        <div>
-          <h2 className="text-2xl font-bold text-gray-800">
-            {wallet ? "Payment Method" : "Add Payment Method"}
-          </h2>
-          <p className="text-gray-600">
-            {wallet
-              ? "Manage your connected wallet"
-              : "Connect your wallet to get started"}
-          </p>
-        </div>
-      </div>
+  // Get header content based on user role and wallet status
+  const getHeaderContent = () => {
+    if (wallet) {
+      return {
+        title: "Payment Method",
+        description: "Manage your connected wallet",
+      };
+    }
 
-      {wallet ? (
+    if (user.role === "owner") {
+      return {
+        title: "Add Payment Method",
+        description: "Connect your wallet to get started",
+      };
+    }
+
+    return {
+      title: "Wallet Connection",
+      description: "Connect your wallet for transactions",
+    };
+  };
+
+  // Render owner-specific wallet management UI
+  const renderOwnerWalletUI = () => {
+    if (wallet) {
+      return (
         <div className="space-y-6">
           <div className="bg-gradient-to-br from-gray-50 to-blue-50 p-6 rounded-xl border border-gray-200">
             <div className="flex items-start justify-between mb-4">
@@ -148,7 +150,7 @@ export const WalletManagement: React.FC<WalletManagementProps> = ({
               </Button>
             )}
 
-            {user.role === "owner" && isConnected && (
+            {isConnected && (
               <Button
                 disabled={isLoadingStoreWallet || isWalletMatched}
                 variant="primary"
@@ -170,55 +172,155 @@ export const WalletManagement: React.FC<WalletManagementProps> = ({
             )}
           </div>
         </div>
-      ) : (
+      );
+    }
+
+    // No wallet stored for owner
+    return (
+      <div className="space-y-6">
+        <div className="bg-gradient-to-br from-blue-50 to-purple-50 p-6 rounded-xl border border-blue-200">
+          <div className="text-center space-y-4">
+            <div className="w-16 h-16 bg-gradient-to-br from-blue-500 to-purple-600 rounded-full flex items-center justify-center mx-auto">
+              <FaWallet className="text-2xl text-white" />
+            </div>
+            <div>
+              <h3 className="text-xl font-semibold text-gray-800 mb-2">
+                No Payment Method Added
+              </h3>
+              <p className="text-gray-600 mb-4">
+                To rent a car or use our services, please add a payment method
+                by connecting your wallet.
+              </p>
+              <p className="text-sm text-gray-500">
+                Your wallet address will be used for secure blockchain
+                transactions.
+              </p>
+            </div>
+          </div>
+        </div>
+
+        <div className="flex flex-col sm:flex-row gap-4">
+          <Button
+            disabled={isConnected}
+            onClick={connectWallet}
+            variant="primary"
+            className="flex items-center justify-center space-x-2"
+          >
+            <FaPlug className="text-sm" />
+            <span>{account ? "Wallet Connected" : "Connect Wallet"}</span>
+          </Button>
+
+          <Button
+            disabled={!isConnected || isLoadingStoreWallet}
+            variant="primary"
+            isLoading={isLoadingStoreWallet}
+            onClick={handleAddWallet}
+            className="flex items-center justify-center space-x-2"
+          >
+            <FaWallet className="text-sm" />
+            <span>Store Wallet Address</span>
+          </Button>
+        </div>
+      </div>
+    );
+  };
+
+  // Render renter-specific wallet management UI
+  const renderRenterWalletUI = () => {
+    if (wallet) {
+      // Renter has wallet stored (should not happen, but handle gracefully)
+      return (
         <div className="space-y-6">
-          <div className="bg-gradient-to-br from-blue-50 to-purple-50 p-6 rounded-xl border border-blue-200">
-            <div className="text-center space-y-4">
-              <div className="w-16 h-16 bg-gradient-to-br from-blue-500 to-purple-600 rounded-full flex items-center justify-center mx-auto">
-                <FaWallet className="text-2xl text-white" />
-              </div>
-              <div>
-                <h3 className="text-xl font-semibold text-gray-800 mb-2">
-                  No Payment Method Added
-                </h3>
-                <p className="text-gray-600 mb-4">
-                  To rent a car or use our services, please add a payment method
-                  by connecting your wallet.
-                </p>
-                <p className="text-sm text-gray-500">
-                  Your wallet address will be used for secure blockchain
-                  transactions.
-                </p>
-              </div>
+          <div className="bg-gradient-to-br from-gray-50 to-blue-50 p-6 rounded-xl border border-gray-200">
+            <h3 className="text-lg font-semibold text-gray-800 mb-4">
+              Wallet Information
+            </h3>
+            <div>
+              <p className="text-sm text-gray-600 mb-1">Connected Address:</p>
+              <p className="font-mono text-sm bg-white p-3 rounded-lg border break-all">
+                {account || "Not Connected"}
+              </p>
             </div>
           </div>
 
           <div className="flex flex-col sm:flex-row gap-4">
-            <Button
-              disabled={isConnected}
-              onClick={connectWallet}
-              variant="primary"
-              className="flex items-center justify-center space-x-2"
-            >
-              <FaPlug className="text-sm" />
-              <span>{account ? "Wallet Connected" : "Connect Wallet"}</span>
-            </Button>
-
-            {user.role === "owner" && (
+            {!isConnected && (
               <Button
-                disabled={!isConnected || isLoadingStoreWallet}
+                onClick={connectWallet}
                 variant="primary"
-                isLoading={isLoadingStoreWallet}
-                onClick={handleAddWallet}
                 className="flex items-center justify-center space-x-2"
               >
-                <FaWallet className="text-sm" />
-                <span>Store Wallet Address</span>
+                <FaPlug className="text-sm" />
+                <span>Connect Wallet</span>
               </Button>
             )}
           </div>
         </div>
-      )}
+      );
+    }
+
+    // No wallet stored for renter (normal case)
+    return (
+      <div className="space-y-6">
+        <div className="bg-gradient-to-br from-blue-50 to-purple-50 p-6 rounded-xl border border-blue-200">
+          <div className="text-center space-y-4">
+            <div className="w-16 h-16 bg-gradient-to-br from-blue-500 to-purple-600 rounded-full flex items-center justify-center mx-auto">
+              <FaWallet className="text-2xl text-white" />
+            </div>
+            <div>
+              <h3 className="text-xl font-semibold text-gray-800 mb-2">
+                {isConnected ? "Wallet Connected" : "Wallet Not Connected"}
+              </h3>
+              <p className="text-gray-600 mb-4">
+                {isConnected
+                  ? "You can now rent cars and make transactions."
+                  : "To rent cars and make transactions, please connect your wallet."}
+              </p>
+              <p className="text-sm text-gray-500">
+                Your wallet address will be used for secure blockchain
+                transactions.
+              </p>
+            </div>
+          </div>
+        </div>
+
+        <div className="flex flex-col sm:flex-row gap-4">
+          <Button
+            disabled={isConnected}
+            onClick={connectWallet}
+            variant="primary"
+            className="flex items-center justify-center space-x-2"
+          >
+            <FaPlug className="text-sm" />
+            <span>{account ? "Wallet Connected" : "Connect Wallet"}</span>
+          </Button>
+        </div>
+      </div>
+    );
+  };
+
+  const headerContent = getHeaderContent();
+
+  return (
+    <motion.div
+      initial={{ opacity: 0, y: 20 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ duration: 0.5 }}
+      className="bg-white rounded-2xl shadow-lg p-8 space-y-6"
+    >
+      <div className="flex items-center space-x-3">
+        <div className="p-3 bg-gradient-to-br from-blue-500 to-purple-600 rounded-xl text-white">
+          <FaWallet className="text-xl" />
+        </div>
+        <div>
+          <h2 className="text-2xl font-bold text-gray-800">
+            {headerContent.title}
+          </h2>
+          <p className="text-gray-600">{headerContent.description}</p>
+        </div>
+      </div>
+
+      {user.role === "owner" ? renderOwnerWalletUI() : renderRenterWalletUI()}
     </motion.div>
   );
 };
