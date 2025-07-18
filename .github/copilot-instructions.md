@@ -1,11 +1,13 @@
 # GitHub Copilot Instructions for ChainDrive - Car Rental Platform
 
 ## Project Overview
+
 ChainDrive is a decentralized car rental platform built with a modern tech stack. The project consists of a React frontend client and a Node.js backend server with blockchain integration using Ethereum smart contracts.
 
 ## Architecture & Tech Stack
 
 ### Frontend (Client)
+
 - **Framework**: React 18 with TypeScript
 - **Build Tool**: Vite
 - **Styling**: Tailwind CSS with modern design patterns
@@ -14,10 +16,11 @@ ChainDrive is a decentralized car rental platform built with a modern tech stack
 - **Routing**: React Router v6
 - **Blockchain Integration**: Ethers.js v6
 - **Real-time Communication**: Socket.io-client
-- **Animations**: Framer Motion for smooth transitions and interactions
-- **Icons**: React Icons (prefer react-icons over SVG)
+- **Animations**: Motion for smooth transitions and interactions (note: uses 'motion' package, not 'framer-motion')
+- **Icons**: React Icons (prefer react-icons over SVG, NO EMOJIS - always use React Icons instead)
 
 ### Backend (Server)
+
 - **Runtime**: Node.js with TypeScript
 - **Framework**: Express.js
 - **Database**: SQLite with direct SQL queries
@@ -57,6 +60,7 @@ chaindrive-fyp/
 ## Key Features & Functionality
 
 ### Core Features
+
 1. **User Authentication**: Email/OTP-based authentication with role-based access (owner/renter)
 2. **Car Listings**: CRUD operations for vehicle listings with image uploads
 3. **Rental Management**: Booking, confirmation, and completion workflows
@@ -66,12 +70,14 @@ chaindrive-fyp/
 7. **Wallet Integration**: MetaMask wallet connection and management
 
 ### User Roles
+
 - **Owner**: Can create listings, manage rentals, and interact with renters
 - **Renter**: Can browse listings, book rentals, and communicate with owners
 
 ## Database Schema (SQLite)
 
 ### Key Tables
+
 - `users`: User profiles and authentication data
 - `listings`: Vehicle listings with details and images
 - `rentals`: Rental transactions and status
@@ -85,12 +91,14 @@ chaindrive-fyp/
 ## API Patterns
 
 ### Request/Response Structure
+
 - RESTful API design with proper HTTP methods
 - Zod validation for request/response schemas
 - Session-based authentication with cookies
 - Error handling with consistent error responses
 
 ### Common Patterns
+
 ```typescript
 // Model pattern
 export const modelName = {
@@ -116,18 +124,21 @@ export const controllerName = async (req: Request, res: Response) => {
 ## Frontend Patterns
 
 ### Component Structure
+
 - Functional components with TypeScript
 - Custom hooks for data fetching and state management
 - Context providers for global state
 - Reusable UI components with proper prop types
 
 ### State Management
+
 - UserContext: Authentication and user data
 - WalletContext: Blockchain wallet management
 - NotificationContext: Real-time notifications
 - SocketContext: WebSocket connection management
 
 ### Routing Structure
+
 - Protected routes based on authentication
 - Role-based route access (owner/renter dashboards)
 - Lazy loading for better performance
@@ -135,15 +146,20 @@ export const controllerName = async (req: Request, res: Response) => {
 ## Smart Contract Integration
 
 ### Contract Details
+
 - **Name**: CarRentalUpgradeable
 - **Pattern**: OpenZeppelin upgradeable contracts
 - **Network**: Ethereum Sepolia testnet
 - **Functionality**: Rental agreements, payments, and dispute resolution
 
 ### Integration Pattern
+
 ```typescript
 // Contract connection
-const contract = CarRentalUpgradeable__factory.connect(CONTRACT_ADDRESS, signer);
+const contract = CarRentalUpgradeable__factory.connect(
+  CONTRACT_ADDRESS,
+  signer
+);
 
 // Transaction pattern
 const tx = await contract.functionName(params);
@@ -153,22 +169,25 @@ await tx.wait();
 ## Development Guidelines
 
 ### Code Style
+
 - Use TypeScript for type safety
 - Follow consistent naming conventions (camelCase for variables, PascalCase for components)
 - Implement proper error handling and validation
 - Use meaningful variable and function names
 
 ### UI/UX Design Patterns
+
 - **Modern Gradient Backgrounds**: Use `bg-gradient-to-br from-slate-50 to-blue-50` or similar for page backgrounds
 - **Card-based Design**: White cards with `rounded-2xl shadow-lg` for content containers
 - **Consistent Spacing**: Use Tailwind's spacing scale (4, 6, 8, 12, etc.)
 - **Interactive States**: Include hover effects, focus states, and smooth transitions
-- **Framer Motion**: Use for page transitions, loading states, and micro-interactions
-- **Icons**: Always use React Icons instead of inline SVG
-- **Status Indicators**: Color-coded badges with emojis for visual feedback
+- **Motion Animations**: Use motion library for page transitions, loading states, and micro-interactions
+- **Icons**: Always use React Icons instead of inline SVG or emojis
+- **Status Indicators**: Color-coded badges with React Icons for visual feedback (NO EMOJIS)
 - **Form Elements**: Rounded corners (`rounded-xl`), focus rings, and consistent padding
 
 ### Component Patterns
+
 - **Loading States**: Use enhanced Loader component with variants (spinner, dots, pulse, bars)
 - **Empty States**: Professional empty state designs with illustrations and action buttons
 - **Error Handling**: Beautiful error cards with retry functionality
@@ -176,18 +195,21 @@ await tx.wait();
 - **Button Styling**: Gradient backgrounds for primary actions, consistent padding and border radius
 
 ### File Organization
+
 - Keep related functionality together
 - Use index files for clean imports
 - Separate concerns (UI, logic, data)
 - Follow the established folder structure
 
 ### Database Queries
+
 - Use prepared statements for security
 - Implement proper error handling
 - Use transactions for related operations
 - Follow the SQL template literal pattern: `sql\`...\``
 
 ### API Development
+
 - Validate all inputs with Zod schemas
 - Use proper HTTP status codes
 - Implement consistent error responses
@@ -196,10 +218,12 @@ await tx.wait();
 ## Environment Configuration
 
 ### Client Environment Variables
+
 - `VITE_SERVER_URL`: Backend server URL
 - Contract addresses and blockchain configurations
 
 ### Server Environment Variables
+
 - Database connection strings
 - Email configuration for OTP
 - Session secrets
@@ -208,12 +232,13 @@ await tx.wait();
 ## Testing & Deployment
 
 ### Development Commands
+
 ```bash
 # Client
 npm run dev          # Start development server
 npm run build        # Build for production
 
-# Server  
+# Server
 npm run dev          # Start development server
 npm run build        # Compile TypeScript
 npx hardhat compile  # Compile smart contracts
@@ -229,8 +254,8 @@ npx hardhat compile  # Compile smart contracts
 6. **Real-time Updates**: Use Socket.io for live features
 7. **Blockchain Integration**: Handle wallet connections and transaction states
 8. **UI Consistency**: Follow established design patterns for all components
-9. **Icons**: Use React Icons library instead of inline SVG
-10. **Animations**: Implement Framer Motion for smooth user interactions
+9. **Icons**: Use React Icons library instead of inline SVG or emojis (NO EMOJIS ALLOWED)
+10. **Animations**: Implement Motion library for smooth user interactions
 11. **Form Design**: Consistent styling with proper validation feedback
 12. **Loading States**: Use appropriate loader variants for different contexts
 
@@ -245,6 +270,7 @@ npx hardhat compile  # Compile smart contracts
 - TypeScript is used throughout for type safety
 
 When providing code suggestions, please:
+
 1. Follow the existing patterns and conventions
 2. Include proper TypeScript types
 3. Implement appropriate error handling
@@ -252,8 +278,8 @@ When providing code suggestions, please:
 5. Consider security implications for authentication and data access
 6. Ensure blockchain interactions are properly handled
 7. Maintain consistency with the existing codebase style
-8. Use React Icons instead of inline SVG
+8. Use React Icons instead of inline SVG or emojis (NEVER use emojis)
 9. Follow the modern UI/UX design patterns
-10. Implement proper loading states and animations
+10. Implement proper loading states and animations using Motion library
 11. Ensure responsive design for all screen sizes
 12. Use consistent color schemes and spacing
