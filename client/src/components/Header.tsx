@@ -5,14 +5,13 @@ import { motion } from "motion/react";
 import React, { useState } from "react";
 import { FaBars, FaRegCommentDots, FaTimes } from "react-icons/fa";
 import { useQueryClient } from "react-query";
-import { Link, useNavigate } from "react-router-dom";
+import { Link } from "react-router-dom";
 import Button from "./Button";
 import Dropdown from "./Dropdown";
 import { NotificationDropdown } from "./NotificationDropdown";
 
 const Header: React.FC = () => {
   const queryClient = useQueryClient();
-  const navigate = useNavigate();
   const { user } = useUser();
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
 
@@ -134,13 +133,30 @@ const Header: React.FC = () => {
         className="fixed top-0 right-0 w-1/2 h-full bg-white shadow-lg z-50 md:hidden"
       >
         <div className="flex flex-col items-end space-y-6 p-6">
-          <button
-            className="self-end text-gray-600 hover:text-primary focus:outline-none"
-            onClick={() => setIsMobileMenuOpen(false)}
-            aria-label="Close menu"
-          >
-            <FaTimes className="text-2xl transition-transform transform hover:scale-110" />
-          </button>
+          <div className="flex items-center space-x-4 mt-4">
+            <Link
+              to="/chat"
+              className="bg-gray-200 cursor-pointer p-2 rounded-xl transition duration-300 ease-in-out hover:text-primary hover:bg-gray-300"
+              onClick={() => setIsMobileMenuOpen(false)}
+            >
+              <FaRegCommentDots className="text-xl" />
+            </Link>
+            <NotificationDropdown />
+            <img
+              src={imageUrl}
+              alt="Profile"
+              className="h-12 w-12 rounded-full cursor-pointer"
+              onClick={() => setIsMobileMenuOpen(false)}
+            />
+            <button
+              className="self-end text-gray-600 hover:text-primary focus:outline-none"
+              onClick={() => setIsMobileMenuOpen(false)}
+              aria-label="Close menu"
+            >
+              <FaTimes className="text-2xl transition-transform transform hover:scale-110" />
+            </button>
+          </div>
+
           <Link
             to={
               user.role === "owner" ? "/owner-dashboard" : "/renter-dashboard"
@@ -181,22 +197,7 @@ const Header: React.FC = () => {
           >
             Profile
           </Link>
-          <div className="flex items-center space-x-4 mt-4">
-            <Link
-              to="/chat"
-              className="bg-gray-200 cursor-pointer p-2 rounded-xl transition duration-300 ease-in-out hover:text-primary hover:bg-gray-300"
-              onClick={() => setIsMobileMenuOpen(false)}
-            >
-              <FaRegCommentDots className="text-xl" />
-            </Link>
-            <NotificationDropdown />
-            <img
-              src={imageUrl}
-              alt="Profile"
-              className="h-12 w-12 rounded-full cursor-pointer"
-              onClick={() => setIsMobileMenuOpen(false)}
-            />
-          </div>
+
           <Button onClick={handleLogout}>Logout</Button>
         </div>
       </motion.div>

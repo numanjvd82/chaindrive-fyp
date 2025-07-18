@@ -34,8 +34,8 @@ notificationRouter.get("/", (req: Request, res: Response) => {
   }
 });
 
-// Mark notifications as read
-notificationRouter.post("/mark-read", (req, res) => {
+// Mark all notifications as read
+notificationRouter.post("/mark-all-as-read", (req, res) => {
   // @ts-ignore
   const userId = req.userId;
   if (!userId) {
@@ -56,6 +56,50 @@ notificationRouter.post("/mark-read", (req, res) => {
       DELETE FROM Notifications WHERE user_id = ? AND is_read = 1
     `
     ).run(userId);
+
+    res.json({ success: true });
+  } catch (error: any) {
+    res.status(500).json({ error: error.message });
+  }
+});
+
+// Mark individual notification as read
+notificationRouter.post("/mark-read/:id", (req, res) => {
+  // @ts-ignore
+  const userId = req.userId;
+  const notificationId = parseInt(req.params.id);
+
+  console.log(notificationId);
+
+  if (!userId) {
+    res.status(401).json({ error: "Unauthorized" });
+    return;
+  }
+
+  if (!notificationId || isNaN(notificationId)) {
+    res.status(400).json({ error: "Invalid notification ID" });
+    return;
+  }
+
+  try {
+    // First verify the notification belongs to the user
+    const notification = db
+      .prepare(sql`SELECT id FROM Notifications WHERE id = ? AND user_id = ?`)
+      .get(notificationId, userId);
+
+    if (!notification) {
+      res.status(404).json({ error: "Notification not found" });
+      return;
+    }
+
+    // Mark as read and delete
+    db.prepare(
+      sql`UPDATE Notifications SET is_read = 1 WHERE id = ? AND user_id = ?`
+    ).run(notificationId, userId);
+
+    db.prepare(
+      sql`DELETE FROM Notifications WHERE id = ? AND user_id = ? AND is_read = 1`
+    ).run(notificationId, userId);
 
     res.json({ success: true });
   } catch (error: any) {

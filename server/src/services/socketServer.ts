@@ -48,89 +48,96 @@ export default function socketServer(server: http.Server) {
         }
       });
 
-    socket.on("fetch-messages", async (conversationId: number) => {
-      const messages = await messageModel.list({
-        conversationId,
-      });
-      socket.emit("messages", messages);
-    });
-
-    // Join a conversation room
-    socket.on("join-conversation", (conversationId: number) => {
-      const room = `conversation-${conversationId}`;
-
-      const rooms = Array.from(socket.rooms);
-      rooms.forEach((room) => {
-        if (room.startsWith("conversation-")) {
-          socket.leave(room);
-        }
-      });
-
-      socket.join(room);
-    });
-
-    // Handle sending messages
-    socket.on("send-message", async (message: Message) => {
-      const newMessage = await messageModel.add(message);
-      const room = `conversation-${message.conversationId}`;
-      io.to(room).emit("receive-message", newMessage);
-
-      // Notify the recipient
-      const conversation = await conversationModel.byId({
-        conversationId: message.conversationId,
-        userId,
-      });
-      if (!conversation) return;
-
-      const recipientId =
-        conversation.user1 === userId ? conversation.user2 : conversation.user1;
-      const isRecipientOnline = onlineUsersSocket.has(recipientId);
-      const recipeintSocketId = onlineUsersSocket.get(recipientId);
-
-      const truncatedMessage =
-        message.message.length > 50
-          ? message.message.substring(0, 50) + "..."
-          : message.message;
-
-      if (isRecipientOnline && recipeintSocketId) {
-        io.to(recipeintSocketId).emit("notification", {
-          type: "message",
-          content: truncatedMessage,
-          link: `/chat?conversationId=${message.conversationId}`,
+      socket.on("fetch-messages", async (conversationId: number) => {
+        const messages = await messageModel.list({
+          conversationId,
         });
-      } else {
+        socket.emit("messages", messages);
+      });
+
+      // Join a conversation room
+      socket.on("join-conversation", (conversationId: number) => {
+        const room = `conversation-${conversationId}`;
+
+        const rooms = Array.from(socket.rooms);
+        rooms.forEach((room) => {
+          if (room.startsWith("conversation-")) {
+            socket.leave(room);
+          }
+        });
+
+        socket.join(room);
+      });
+
+      // Handle sending messages
+      socket.on("send-message", async (message: Message) => {
+        const newMessage = await messageModel.add(message);
+        const room = `conversation-${message.conversationId}`;
+        io.to(room).emit("receive-message", newMessage);
+
+        // Notify the recipient
+        const conversation = await conversationModel.byId({
+          conversationId: message.conversationId,
+          userId,
+        });
+        if (!conversation) return;
+
+        const recipientId =
+          conversation.user1 === userId
+            ? conversation.user2
+            : conversation.user1;
+        const isRecipientOnline = onlineUsersSocket.has(recipientId);
+        const recipeintSocketId = onlineUsersSocket.get(recipientId);
+
+        const truncatedMessage =
+          message.message.length > 50
+            ? message.message.substring(0, 50) + "..."
+            : message.message;
+
         try {
-          insertNotification.run(
+          // Insert Notification in the db
+          const notificationId = insertNotification.run(
             recipientId,
             "message",
             truncatedMessage,
             `/chat?conversationId=${message.conversationId}`,
             null
-          );
+          ).lastInsertRowid as number;
+
+          if (isRecipientOnline && recipeintSocketId) {
+            io.to(recipeintSocketId).emit("notification", {
+              id: notificationId,
+              type: "message",
+              content: truncatedMessage,
+              link: `/chat?conversationId=${message.conversationId}`,
+              created_at: new Date().toISOString(),
+            });
+          } else {
+            // Pass as the notification is already inserted
+          }
         } catch (error) {
           console.error("Error inserting notification:", error);
         }
+      });
+
+      socket.on("disconnect", () => {
+        console.log(`User ${userId} disconnected, waiting to verify...`);
+        onlineUsersSocket.delete(userId);
+      });
+    });
+
+    // Background task: Remove inactive users every 10 seconds
+    setInterval(() => {
+      try {
+        removeInactiveUsers.run();
+        io.emit(
+          "userOnline",
+          getOnlineUsers.all().map((row: any) => row.user_id)
+        );
+      } catch (error) {
+        console.error("Error in background cleanup task:", error);
       }
-    });
-
-    socket.on("disconnect", () => {
-      console.log(`User ${userId} disconnected, waiting to verify...`);
-      onlineUsersSocket.delete(userId);
-    });
-  });
-
-  // Background task: Remove inactive users every 10 seconds
-  setInterval(() => {
-    try {
-      removeInactiveUsers.run();
-      io.emit(
-        "userOnline",
-        getOnlineUsers.all().map((row: any) => row.user_id)
-      );
-    } catch (error) {
-      console.error("Error in background cleanup task:", error);
-    }
-  }, 10000);
+    }, 10000);
   } catch (error) {
     console.error("Error initializing socket server:", error);
     throw error;

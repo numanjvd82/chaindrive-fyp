@@ -18,9 +18,9 @@ let _deleteNotification: any = null;
 
 function initializeStatements() {
   if (_insertNotification) return; // Already initialized
-  
+
   const db = getDb();
-  
+
   _insertNotification = db.prepare(sql`
     INSERT INTO Notifications (user_id, type, content, link, rentalId, created_at)
     VALUES (?, ?, ?, ?, ?, CURRENT_TIMESTAMP)

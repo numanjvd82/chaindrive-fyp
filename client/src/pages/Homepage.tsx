@@ -10,9 +10,7 @@ const handleSearch = (
   location: string,
   pickupDate: string,
   returnDate: string
-) => {
-  console.log("Search Details:", { location, pickupDate, returnDate });
-};
+) => {};
 
 export default function Home() {
   // const { user } = useUser();
