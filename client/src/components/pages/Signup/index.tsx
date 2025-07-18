@@ -11,9 +11,9 @@ import { PersonalInformation } from "./PersonalInfo";
 import { ReviewSection } from "./ReviewSection";
 import { RoleSelection } from "./RoleSelection";
 import { combinedSchema, FormValues } from "./schemas";
+import { FORM_STORAGE_KEY, loadFormData, saveFormData } from "@/lib/utils";
 
 const MAX_STEPS = 4;
-const FORM_STORAGE_KEY = "chaindrive-signup-form";
 
 const MultiStepForm: React.FC = () => {
   const navigate = useNavigate();
@@ -21,58 +21,14 @@ const MultiStepForm: React.FC = () => {
   const [initialData, setInitialData] = useState<Partial<FormValues>>({});
   const [isDataLoaded, setIsDataLoaded] = useState(false);
 
-  // Function to save form data to localStorage
-  const saveFormData = useCallback((data: Partial<FormValues>) => {
-    try {
-      // Filter out file objects as they can't be stringified
-      const dataToSave = Object.entries(data).reduce((acc, [key, value]) => {
-        if (key !== "idCardFront" && key !== "idCardBack" && key !== "selfie") {
-          acc[key as keyof Partial<FormValues>] = value;
-        }
-        return acc;
-      }, {} as Partial<FormValues>);
-      
-      localStorage.setItem(FORM_STORAGE_KEY, JSON.stringify({
-        ...dataToSave,
-        currentStep: step,
-        timestamp: new Date().toISOString(),
-      }));
-    } catch (error) {
-      console.error("Error saving form data to localStorage:", error);
-    }
-  }, [step]);
-
-  // Function to load form data from localStorage
-  const loadFormData = useCallback((): Partial<FormValues> => {
-    try {
-      const saved = localStorage.getItem(FORM_STORAGE_KEY);
-      if (saved) {
-        const parsedData = JSON.parse(saved);
-        // Check if data is not too old (24 hours)
-        const saveTime = new Date(parsedData.timestamp);
-        const now = new Date();
-        const hoursDiff = (now.getTime() - saveTime.getTime()) / (1000 * 60 * 60);
-        
-        if (hoursDiff < 24) {
-          setStep(parsedData.currentStep || 1);
-          return parsedData;
-        } else {
-          // Clear old data
-          localStorage.removeItem(FORM_STORAGE_KEY);
-        }
-      }
-    } catch (error) {
-      console.error("Error loading form data from localStorage:", error);
-    }
-    return {};
-  }, []);
+  
 
   // Load saved data on component mount
   useEffect(() => {
-    const savedData = loadFormData();
+    const savedData = loadFormData(setStep);
     setInitialData(savedData);
     setIsDataLoaded(true);
-  }, [loadFormData]);
+  }, []);
 
   const methods = useForm<FormValues>({
     resolver: zodResolver(combinedSchema),
@@ -126,11 +82,11 @@ const MultiStepForm: React.FC = () => {
     if (!isDataLoaded) return;
     
     const subscription = methods.watch((data) => {
-      saveFormData(data);
+      saveFormData(data, step);
     });
     
     return () => subscription.unsubscribe();
-  }, [isDataLoaded, methods, saveFormData]);
+  }, [isDataLoaded, methods, step]);
 
   const nextStep = async () => {
     let isValid = false;
@@ -192,15 +148,26 @@ const MultiStepForm: React.FC = () => {
         },
       });
       
-      // Clear saved form data on successful submission
+      // Clear saved form data immediately on successful submission
       localStorage.removeItem(FORM_STORAGE_KEY);
       
       toast.success(
         "Account created successfully! You will be redirected to login page.",
         {
-          onClose: () => navigate("/login"),
+          onClose: () => {
+            // Ensure localStorage is cleared and navigate
+            localStorage.removeItem(FORM_STORAGE_KEY);
+            navigate("/login");
+          },
+          autoClose: 3000,
         }
       );
+      
+      // Navigate after a short delay even if toast doesn't auto-close
+      setTimeout(() => {
+        navigate("/login");
+      }, 3500);
+      
     } catch (err: unknown) {
       const error = err as { response?: { data?: { message?: string } } };
       toast.error(error.response?.data?.message || "An error occurred during signup");
