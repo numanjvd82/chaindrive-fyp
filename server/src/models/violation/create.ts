@@ -145,7 +145,8 @@ export async function createViolation(
       const notifcationPayload = {
         userId: rental.renterId,
         type: "violation",
-        content: `A new violation has been reported for your rental of ${listing.title}. Please check your notifications for details.`,
+        content: `A new violation has been reported for your rental of ${listing.title}. Please check your rental for details. Click here to view.`,
+        link: `/rentals/${rental.id}`,
       };
       db.prepare(
         sql`

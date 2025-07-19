@@ -6,7 +6,7 @@ async function fetchViolationByRentalId(rentalId: number): Promise<Violation> {
   if (!rentalId) {
     throw new Error("Rental ID is required");
   }
-  const response = await axiosInstance.get(`/violations/rental/${rentalId}`);
+  const response = await axiosInstance.get(`/api/violations/${rentalId}`);
   return response.data;
 }
 
