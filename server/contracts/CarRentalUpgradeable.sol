@@ -4,8 +4,17 @@ pragma solidity ^0.8.20;
 import "@openzeppelin/contracts-upgradeable/proxy/utils/Initializable.sol";
 import "@openzeppelin/contracts-upgradeable/utils/ReentrancyGuardUpgradeable.sol";
 
+error RentalNotFound(string message);
+
 contract CarRentalUpgradeable is Initializable, ReentrancyGuardUpgradeable {
     address payable public chaindriveWallet;
+
+    struct TermsConfig {
+        uint256 lateFeePerHour; // 0.001 ETH per hour
+        uint256 maxLateFeeMultiplier; // 3x
+        uint256 damageAssessmentPeriod; // 48 hours
+        uint256 violationPenaltyRate; // 50% of security deposit
+    }
 
     struct Rental {
         uint256 id;
@@ -21,6 +30,12 @@ contract CarRentalUpgradeable is Initializable, ReentrancyGuardUpgradeable {
 
     mapping(uint256 => Rental) public rentals;
 
+    string constant termsAndConditions =
+        "1. LATE RETURN: Late fees apply for every hour past the agreed return time. "
+        "2. DAMAGE RESPONSIBILITY: Renter is fully responsible for any damage to the vehicle during rental period. "
+        "3. ILLEGAL ACTIVITIES: Any criminal or illegal activity using the rented vehicle makes the renter fully liable. "
+        "4. SECURITY DEPOSIT: May be partially or fully forfeited for violations or damages. ";
+
     event RentalInitiated(
         uint256 rentalId,
         address renter,
@@ -31,6 +46,12 @@ contract CarRentalUpgradeable is Initializable, ReentrancyGuardUpgradeable {
     event RentalCompleted(uint256 rentalId, address renter, address owner);
 
     event RentalCancelled(uint256 rentalId, address renter, address owner);
+
+    modifier onlyValidRental(uint256 rentalId) {
+        if (rentals[rentalId].renter == address(0))
+            revert RentalNotFound("Rental not found");
+        _;
+    }
 
     /// @custom:oz-upgrades-unsafe-allow constructor
     constructor() {
@@ -126,6 +147,40 @@ contract CarRentalUpgradeable is Initializable, ReentrancyGuardUpgradeable {
         require(sentRenter, "Security deposit refund failed");
 
         emit RentalCompleted(rentalId, rental.renter, rental.owner);
+    }
+
+    function getTermsAndConditions() external pure returns (string memory) {
+        return termsAndConditions;
+    }
+
+    function getTermsConfig() external pure returns (TermsConfig memory) {
+        return
+            TermsConfig({
+                lateFeePerHour: 0.001 ether,
+                maxLateFeeMultiplier: 3,
+                damageAssessmentPeriod: 48 hours,
+                violationPenaltyRate: 50
+            });
+    }
+
+    function calculateLateFee(
+        uint256 rentalId,
+        uint256 hoursLate
+    ) internal view returns (uint256) {
+        Rental storage rental = rentals[rentalId];
+        require(!rental.isCompleted, "Rental already completed");
+
+        TermsConfig memory terms = TermsConfig({
+            lateFeePerHour: 0.001 ether,
+            maxLateFeeMultiplier: 3,
+            damageAssessmentPeriod: 48 hours,
+            violationPenaltyRate: 50
+        });
+
+        uint256 lateFee = terms.lateFeePerHour * hoursLate;
+        uint256 maxLateFee = rental.rentalFee * terms.maxLateFeeMultiplier;
+
+        return lateFee > maxLateFee ? maxLateFee : lateFee;
     }
 
     function getBalance() external view returns (uint256) {

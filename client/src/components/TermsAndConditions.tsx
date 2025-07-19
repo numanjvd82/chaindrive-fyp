@@ -6,26 +6,31 @@ import {
   FiClock,
   FiShield,
   FiDollarSign,
+  FiLoader,
 } from "react-icons/fi";
+import { useContractTerms } from "@/hooks/useContractTerms";
+import { usePkrToEth } from "@/hooks/usePkrToEth";
+import { PriceDisplay } from "@/components/PriceDisplay";
 
 interface TermsAndConditionsProps {
   onAccept: () => void;
   onDecline: () => void;
   rentalFee: string;
-  lateFeePerHour: string;
   securityDeposit: string;
-  maxLateFeeMultiplier: number;
 }
 
 const TermsAndConditions: React.FC<TermsAndConditionsProps> = ({
   onAccept,
   onDecline,
   rentalFee,
-  lateFeePerHour,
   securityDeposit,
-  maxLateFeeMultiplier,
 }) => {
   const [isAccepted, setIsAccepted] = useState(false);
+  const {
+    data: contractTerms,
+    isLoading: isTermsLoading,
+    error: termsError,
+  } = useContractTerms();
 
   const handleAccept = () => {
     if (isAccepted) {
@@ -33,7 +38,115 @@ const TermsAndConditions: React.FC<TermsAndConditionsProps> = ({
     }
   };
 
-  const maxLateFee = (parseFloat(rentalFee) * maxLateFeeMultiplier).toFixed(4);
+  // Use contract data or fallback values
+  const lateFeePerHour = contractTerms?.termsConfig.lateFeePerHour || "0.001";
+  const maxLateFeeMultiplier =
+    contractTerms?.termsConfig.maxLateFeeMultiplier || 3;
+  const damageAssessmentPeriod =
+    contractTerms?.termsConfig.damageAssessmentPeriod || 48;
+  const violationPenaltyRate =
+    contractTerms?.termsConfig.violationPenaltyRate || 50;
+
+  // Calculate max late fee in ETH based on PKR rental fee
+  const { data: ethToPkrRate } = usePkrToEth();
+  const rentalFeeInEth = ethToPkrRate
+    ? (parseFloat(rentalFee) / ethToPkrRate).toFixed(6)
+    : "0";
+  const maxLateFee = (
+    parseFloat(rentalFeeInEth) * maxLateFeeMultiplier
+  ).toFixed(4);
+
+  // Show loading state
+  if (isTermsLoading) {
+    return (
+      <motion.div
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50"
+      >
+        <div className="bg-white rounded-2xl shadow-2xl p-8 max-w-md">
+          <div className="flex items-center justify-center gap-3">
+            <FiLoader className="animate-spin text-blue-600 text-xl" />
+            <span className="text-gray-700">Loading Terms & Conditions...</span>
+          </div>
+        </div>
+      </motion.div>
+    );
+  }
+
+  // Show error state
+  if (termsError) {
+    return (
+      <motion.div
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50"
+      >
+        <div className="bg-white rounded-2xl shadow-2xl p-8 max-w-md">
+          <div className="text-center">
+            <FiAlertTriangle className="text-red-500 text-3xl mx-auto mb-4" />
+            <h3 className="text-lg font-semibold text-gray-800 mb-2">
+              Unable to Load Terms
+            </h3>
+            <p className="text-gray-600 mb-4">
+              Please ensure your wallet is connected and try again.
+            </p>
+            <button
+              onClick={onDecline}
+              className="px-6 py-2 bg-gray-300 text-gray-700 rounded-lg hover:bg-gray-400 transition-colors"
+            >
+              Close
+            </button>
+          </div>
+        </div>
+      </motion.div>
+    );
+  }
+
+  if (!contractTerms || !contractTerms.termsAndConditions) {
+    return (
+      <motion.div
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50"
+      >
+        <div className="bg-white rounded-2xl shadow-2xl p-8 max-w-md">
+          <div className="text-center">
+            <FiAlertTriangle className="text-red-500 text-3xl mx-auto mb-4" />
+            <h3 className="text-lg font-semibold text-gray-800 mb-2">
+              Terms Not Available
+            </h3>
+            <p className="text-gray-600 mb-4">
+              The rental terms are currently unavailable. Please try again
+              later.
+            </p>
+            <button
+              onClick={onDecline}
+              className="px-6 py-2 bg-gray-300 text-gray-700 rounded-lg hover:bg-gray-400 transition-colors"
+            >
+              Close
+            </button>
+          </div>
+        </div>
+      </motion.div>
+    );
+  }
+
+  console.log(damageAssessmentPeriod);
+
+  const parsedTerms = (
+    (contractTerms.termsAndConditions || "").match(
+      /\d+\.\s[^]+?(?=\d+\.|$)/g
+    ) || []
+  )
+    .map((item) => {
+      // Extract number, title, and description
+      const match = item.match(/(\d+)\.\s([A-Z ]+):\s(.+)/);
+      if (!match) return null;
+      const [, number, title, description] = match;
+      return { number, title, description };
+    })
+    .filter(Boolean);
 
   return (
     <motion.div
@@ -65,30 +178,66 @@ const TermsAndConditions: React.FC<TermsAndConditionsProps> = ({
             <div className="grid md:grid-cols-2 gap-4">
               <div className="bg-white rounded-lg p-4 border border-blue-200">
                 <p className="text-sm text-gray-600">Rental Fee</p>
-                <p className="text-xl font-bold text-blue-600">
-                  {rentalFee} ETH
-                </p>
+                <PriceDisplay
+                  value={rentalFee}
+                  valueType="pkr"
+                  className="text-xl font-bold text-blue-600"
+                />
               </div>
               <div className="bg-white rounded-lg p-4 border border-blue-200">
                 <p className="text-sm text-gray-600">Security Deposit</p>
-                <p className="text-xl font-bold text-blue-600">
-                  {securityDeposit} ETH
-                </p>
+                <PriceDisplay
+                  value={securityDeposit}
+                  valueType="pkr"
+                  className="text-xl font-bold text-blue-600"
+                />
               </div>
               <div className="bg-white rounded-lg p-4 border border-orange-200">
                 <p className="text-sm text-gray-600">Late Fee (per hour)</p>
-                <p className="text-xl font-bold text-orange-600">
-                  {lateFeePerHour} ETH
-                </p>
+                <PriceDisplay
+                  value={lateFeePerHour}
+                  valueType="eth"
+                  className="text-xl font-bold text-orange-600"
+                />
               </div>
               <div className="bg-white rounded-lg p-4 border border-red-200">
                 <p className="text-sm text-gray-600">Maximum Late Fee</p>
-                <p className="text-xl font-bold text-red-600">
-                  {maxLateFee} ETH
-                </p>
+                <PriceDisplay
+                  value={maxLateFee}
+                  valueType="eth"
+                  className="text-xl font-bold text-red-600"
+                />
               </div>
             </div>
           </div>
+
+          {/* Smart Contract Terms */}
+          {parsedTerms !== null && (
+            <div className="bg-gradient-to-br from-indigo-50 to-purple-50 rounded-xl p-6 border border-indigo-200">
+              <h3 className="text-lg font-semibold text-indigo-800 mb-4 flex items-center gap-2">
+                <FiShield className="text-indigo-600" />
+                Smart Contract Terms
+              </h3>
+              <p className="text-gray-700 leading-relaxed">
+                {parsedTerms.map((term) => {
+                  if (!term) return null;
+                  return (
+                    <div key={term.number} className="mb-4">
+                      <h4 className="font-semibold text-indigo-800 mb-1">
+                        {term.number}. {term.title}
+                      </h4>
+                      <p className="text-gray-700">{term.description}</p>
+                    </div>
+                  );
+                })}
+              </p>
+              <div className="mt-4 text-sm text-indigo-600 bg-indigo-100 rounded-lg p-3">
+                <FiCheck className="inline mr-2" />
+                These terms are enforced automatically by blockchain smart
+                contract
+              </div>
+            </div>
+          )}
 
           {/* Terms Sections */}
           <div className="space-y-4">
@@ -111,7 +260,8 @@ const TermsAndConditions: React.FC<TermsAndConditionsProps> = ({
                   <FiAlertTriangle className="text-orange-500 mt-1 flex-shrink-0" />
                   Maximum late fee is capped at{" "}
                   <strong>
-                    {maxLateFeeMultiplier}x the rental fee ({maxLateFee} ETH)
+                    {maxLateFeeMultiplier}x the rental fee (see financial terms
+                    above)
                   </strong>
                 </li>
                 <li className="flex items-start gap-2">
@@ -140,8 +290,8 @@ const TermsAndConditions: React.FC<TermsAndConditionsProps> = ({
                 </li>
                 <li className="flex items-start gap-2">
                   <FiAlertTriangle className="text-red-500 mt-1 flex-shrink-0" />
-                  Car owners have 7 days after rental completion to report
-                  damages
+                  Car owners have {Math.floor(damageAssessmentPeriod / 3600)}{" "}
+                  hours after rental completion to report damages
                 </li>
                 <li className="flex items-start gap-2">
                   <FiAlertTriangle className="text-red-500 mt-1 flex-shrink-0" />
@@ -170,8 +320,8 @@ const TermsAndConditions: React.FC<TermsAndConditionsProps> = ({
                 </li>
                 <li className="flex items-start gap-2">
                   <FiAlertTriangle className="text-purple-500 mt-1 flex-shrink-0" />
-                  Legal violations result in 50% security deposit penalty plus
-                  any additional costs
+                  Legal violations result in {violationPenaltyRate}% security
+                  deposit penalty plus any additional costs
                 </li>
                 <li className="flex items-start gap-2">
                   <FiAlertTriangle className="text-purple-500 mt-1 flex-shrink-0" />

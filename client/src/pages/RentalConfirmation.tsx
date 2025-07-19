@@ -408,9 +408,7 @@ const RentalConfirmation: React.FC = () => {
           onAccept={handleAcceptTerms}
           onDecline={handleDeclineTerms}
           rentalFee={bookingData.totalPrice.toString()}
-          lateFeePerHour="50"
           securityDeposit={securityDeposit.toString()}
-          maxLateFeeMultiplier={3}
         />
       )}
     </div>

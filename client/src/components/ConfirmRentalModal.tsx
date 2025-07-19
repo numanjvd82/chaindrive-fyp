@@ -12,18 +12,18 @@ import { toast } from "react-toastify";
 import Button from "./Button";
 import DialogModal from "./DialogModal";
 import { motion } from "motion/react";
-import { 
-  FaCar, 
-  FaCalendarAlt, 
-  FaMoneyBillWave, 
-  FaEthereum, 
+import {
+  FaCar,
+  FaCalendarAlt,
+  FaMoneyBillWave,
+  FaEthereum,
   FaCheckCircle,
   FaTimes,
   FaUser,
   FaIdCard,
   FaMapMarkerAlt,
   FaStar,
-  FaRegStar
+  FaRegStar,
 } from "react-icons/fa";
 import Loader from "./Loader";
 
@@ -37,7 +37,8 @@ type Props = {
 export const ConfirmRentalModal = ({
   selectedRentalId,
   setSelectedRentalId,
-  selectedNotificationId, setSelectedNotificationId
+  selectedNotificationId,
+  setSelectedNotificationId,
 }: Props) => {
   const { confirmRental, isConfirmRentalLoading } = useConfirmRental();
   const { markIndividualAsRead } = useNotificationProvider();
@@ -66,7 +67,7 @@ export const ConfirmRentalModal = ({
   };
 
   const handleConfirmRental = async (rentalId: number) => {
-    if (!selectedNotificationId) return
+    if (!selectedNotificationId) return;
     try {
       await confirmRental({ rentalId });
       toast.success("Rental confirmed successfully!");
@@ -79,7 +80,7 @@ export const ConfirmRentalModal = ({
   };
 
   const handleCancelRental = async () => {
-    if (!selectedNotificationId) return
+    if (!selectedNotificationId) return;
     if (!signer || !provider || !account) {
       toast.error("Please connect your wallet to cancel the rental.");
       return;
@@ -189,7 +190,7 @@ export const ConfirmRentalModal = ({
           <Button
             onClick={handleCancelRental}
             disabled={isConfirmRentalLoading || isCancelRentalLoading}
-            className="flex-1 bg-red-100 hover:bg-red-200 text-red-700 py-3 rounded-xl font-semibold transition-all duration-300"
+            className="flex-1 bg-red-600 hover:bg-red-700 text-red-700 py-3 rounded-xl font-semibold transition-all duration-300"
           >
             <div className="flex items-center justify-center gap-2">
               <FaTimes />
@@ -212,7 +213,7 @@ export const ConfirmRentalModal = ({
     >
       <div className="space-y-6">
         {/* Vehicle Information */}
-        <motion.div 
+        <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           className="bg-gradient-to-br from-blue-50 to-indigo-50 rounded-2xl p-6 border border-blue-200"
@@ -221,18 +222,22 @@ export const ConfirmRentalModal = ({
             <div className="w-10 h-10 bg-blue-100 rounded-lg flex items-center justify-center">
               <FaCar className="text-blue-600" />
             </div>
-            <h3 className="text-lg font-bold text-gray-900">Vehicle Information</h3>
+            <h3 className="text-lg font-bold text-gray-900">
+              Vehicle Information
+            </h3>
           </div>
           <div className="bg-white rounded-xl p-4">
             <div className="flex items-center justify-between">
               <span className="font-medium text-gray-700">Vehicle</span>
-              <span className="font-semibold text-gray-900">{listing.title}</span>
+              <span className="font-semibold text-gray-900">
+                {listing.title}
+              </span>
             </div>
           </div>
         </motion.div>
 
         {/* Rental Details */}
-        <motion.div 
+        <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.1 }}
@@ -244,7 +249,7 @@ export const ConfirmRentalModal = ({
             </div>
             <h3 className="text-lg font-bold text-gray-900">Rental Details</h3>
           </div>
-          
+
           <div className="grid gap-3">
             <div className="flex items-center justify-between p-3 bg-white rounded-lg">
               <span className="font-medium text-gray-700 flex items-center gap-2">
@@ -273,7 +278,9 @@ export const ConfirmRentalModal = ({
                 <FaMoneyBillWave className="text-green-500" />
                 Rental Fee (PKR)
               </span>
-              <span className="font-bold text-green-600">PKR {rental.rentalFee}</span>
+              <span className="font-bold text-green-600">
+                PKR {rental.rentalFee}
+              </span>
             </div>
 
             <div className="flex items-center justify-between p-3 bg-white rounded-lg">
@@ -281,20 +288,24 @@ export const ConfirmRentalModal = ({
                 <FaEthereum className="text-indigo-500" />
                 Total in ETH
               </span>
-              <span className="font-bold text-indigo-600">{rental.totalEth} ETH</span>
+              <span className="font-bold text-indigo-600">
+                {rental.totalEth} ETH
+              </span>
             </div>
 
             <div className="flex items-center justify-between p-3 bg-gradient-to-r from-blue-100 to-purple-100 rounded-lg">
               <span className="font-medium text-gray-700">Status</span>
-              <span className={`px-3 py-1 rounded-full text-sm font-semibold ${
-                rental.status === 'pending' 
-                  ? 'bg-yellow-100 text-yellow-700' 
-                  : rental.status === 'active'
-                  ? 'bg-green-100 text-green-700'
-                  : rental.status === 'completed'
-                  ? 'bg-blue-100 text-blue-700'
-                  : 'bg-red-100 text-red-700'
-              }`}>
+              <span
+                className={`px-3 py-1 rounded-full text-sm font-semibold ${
+                  rental.status === "pending"
+                    ? "bg-yellow-100 text-yellow-700"
+                    : rental.status === "active"
+                    ? "bg-green-100 text-green-700"
+                    : rental.status === "completed"
+                    ? "bg-blue-100 text-blue-700"
+                    : "bg-red-100 text-red-700"
+                }`}
+              >
                 {rental.status.charAt(0).toUpperCase() + rental.status.slice(1)}
               </span>
             </div>
@@ -302,7 +313,7 @@ export const ConfirmRentalModal = ({
         </motion.div>
 
         {/* Renter Information */}
-        <motion.div 
+        <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.2 }}
@@ -312,7 +323,9 @@ export const ConfirmRentalModal = ({
             <div className="w-10 h-10 bg-purple-100 rounded-lg flex items-center justify-center">
               <FaUser className="text-purple-600" />
             </div>
-            <h3 className="text-lg font-bold text-gray-900">Renter Information</h3>
+            <h3 className="text-lg font-bold text-gray-900">
+              Renter Information
+            </h3>
           </div>
           <div className="bg-white rounded-xl p-4">
             {renterUser ? (
@@ -348,22 +361,30 @@ export const ConfirmRentalModal = ({
                     <FaMapMarkerAlt className="text-purple-600 w-4 h-4" />
                     <div>
                       <span className="text-sm text-gray-500">Location</span>
-                      <p className="font-medium text-gray-900">{renterUser.city}, {renterUser.state}</p>
+                      <p className="font-medium text-gray-900">
+                        {renterUser.city}, {renterUser.state}
+                      </p>
                     </div>
                   </div>
 
                   <div className="flex items-center gap-3 p-3 bg-gray-50 rounded-lg">
                     <FaCalendarAlt className="text-purple-600 w-4 h-4" />
                     <div>
-                      <span className="text-sm text-gray-500">Member Since</span>
-                      <p className="font-medium text-gray-900">{convertDateToString(renterUser.createdAt)}</p>
+                      <span className="text-sm text-gray-500">
+                        Member Since
+                      </span>
+                      <p className="font-medium text-gray-900">
+                        {convertDateToString(renterUser.createdAt)}
+                      </p>
                     </div>
                   </div>
                 </div>
               </div>
             ) : (
               <div className="text-center py-4">
-                <p className="text-gray-500">Renter information not available</p>
+                <p className="text-gray-500">
+                  Renter information not available
+                </p>
               </div>
             )}
           </div>
