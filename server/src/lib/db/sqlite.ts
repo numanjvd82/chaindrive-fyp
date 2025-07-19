@@ -7,6 +7,7 @@ import { locationTableInit } from "./locationTableInit";
 import { notificationTableInit } from "./notificationTableInit";
 import { otpTableInit } from "./otpTableInit";
 import { rentalTableInit } from "./rentalTableInit";
+import { violationTableInit } from "./violationTableInit";
 import { walletTableInit } from "./walletTableInit";
 
 export let sqliteInstance: DbType;
@@ -44,6 +45,7 @@ export async function runMigrations(): Promise<void> {
       listingTableInit(db);
       walletTableInit(db);
       rentalTableInit(db);
+      violationTableInit(db);
       deviceTableInit(db);
       locationTableInit(db);
       otpTableInit(db);
