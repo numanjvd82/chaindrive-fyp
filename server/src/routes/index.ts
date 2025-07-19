@@ -9,6 +9,7 @@ import notificationRouter from "./notification";
 import otpRouter from "./otp";
 import rentalRouter from "./rental";
 import userRouter from "./user";
+import violationRouter from "./violation";
 import walletRouter from "./wallet";
 
 const router = {
@@ -21,6 +22,7 @@ const router = {
   notification: notificationRouter,
   listing: listingRouter,
   rental: rentalRouter,
+  violation: violationRouter,
   device: deviceRouter,
   location: locationRouter,
   otp: otpRouter,

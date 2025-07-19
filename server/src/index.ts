@@ -11,7 +11,10 @@ import { ensureAuthenticated } from "./middlewares/session";
 import router from "./routes";
 import { mqttHandler } from "./services/mqttHandler";
 import socketServer from "./services/socketServer";
-import { checkDatabaseHealth, printHealthCheckReport } from "./utils/databaseHealth";
+import {
+  checkDatabaseHealth,
+  printHealthCheckReport,
+} from "./utils/databaseHealth";
 
 dotenv.config();
 
@@ -54,7 +57,7 @@ app.get("/api/health/database", async (req: Request, res: Response) => {
   } catch (error) {
     res.status(500).json({
       healthy: false,
-      error: error instanceof Error ? error.message : 'Unknown error',
+      error: error instanceof Error ? error.message : "Unknown error",
       timestamp: new Date().toISOString(),
     });
   }
@@ -73,6 +76,7 @@ app.use("/api/messages", router.message);
 app.use("/api/notifications", router.notification);
 app.use("/api/listings", router.listing);
 app.use("/api/rentals", router.rental);
+app.use("/api/violations", router.violation);
 app.use("/api/devices", router.device);
 app.use("/api/locations", router.location);
 
@@ -92,9 +96,11 @@ async function startServer() {
     console.log("Checking database health...");
     const healthCheck = await checkDatabaseHealth();
     printHealthCheckReport(healthCheck);
-    
+
     if (!healthCheck.isHealthy) {
-      throw new Error("Database health check failed. Please check the errors above.");
+      throw new Error(
+        "Database health check failed. Please check the errors above."
+      );
     }
 
     // Step 4: Initialize services that depend on database
@@ -116,12 +122,14 @@ async function startServer() {
   } catch (error) {
     console.error("Failed to start server:", error);
     console.error("Please check your database configuration and try again");
-    
+
     // If it's a database-related error, suggest running migrations
     if (error instanceof Error && error.message.includes("no such table")) {
-      console.error("It seems like database tables are missing. Try running: npm run migrate");
+      console.error(
+        "It seems like database tables are missing. Try running: npm run migrate"
+      );
     }
-    
+
     process.exit(1);
   }
 }
