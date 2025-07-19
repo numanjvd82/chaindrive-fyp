@@ -1,5 +1,6 @@
 import { Request, Response } from "express";
 import { violationModel } from "../../models/violation";
+import { rentalModel } from "../../models/rental";
 
 export const createViolation = async (req: Request, res: Response) => {
   // @ts-ignore
@@ -37,6 +38,25 @@ export const createViolation = async (req: Request, res: Response) => {
       return;
     }
 
+    // Get rental details to validate ownership and status
+    const rental = await rentalModel.getbyId(rentalIdNumber);
+    if (!rental) {
+      res.status(404).json({ error: "Rental not found" });
+      return;
+    }
+
+    // Check if the rental is finished
+    const isRentalFinished =
+      rental.status === "completed" ||
+      (rental.completedByOwner && rental.completedByRenter);
+
+    if (!isRentalFinished) {
+      res.status(400).json({
+        error: "Violations can only be reported after the rental is completed",
+      });
+      return;
+    }
+
     // Validate photos limit
     if (files && files.length > 4) {
       res.status(400).json({
@@ -45,10 +65,8 @@ export const createViolation = async (req: Request, res: Response) => {
       return;
     }
 
-    // Convert uploaded files to base64 strings (following the listing pattern)
-    const photos = files
-      ? files.map((file) => file.buffer.toString("base64"))
-      : undefined;
+    // Convert uploaded files to buffer
+    const photos = files ? files.map((file) => file.buffer) : undefined;
 
     const violation = await violationModel.create({
       rentalId: rentalIdNumber,

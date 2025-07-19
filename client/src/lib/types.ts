@@ -145,18 +145,3 @@ export type Violation = {
   createdAt: Date;
   updatedAt: Date;
 };
-
-export type CreateViolationInput = {
-  rentalId: number;
-  violationType: ViolationType;
-  expectedDamage?: string;
-  detailedQuery: string;
-  photos?: string[];
-  status?: ViolationStatus;
-};
-
-export type ListViolationsInput = {
-  rentalId?: number;
-  violationType?: ViolationType;
-  status?: ViolationStatus;
-};

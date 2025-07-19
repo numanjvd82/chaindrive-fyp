@@ -24,9 +24,11 @@ import {
   FaCircle,
   FaDollarSign,
   FaExclamationTriangle,
+  FaCamera,
 } from "react-icons/fa";
 import { toast } from "react-toastify";
 import ViolationReportingModal from "./ViolationReportingModal";
+import { useViolationByRentalId } from "@/hooks/useViolationById";
 
 type Props = {
   rental: RentalWithImages;
@@ -44,6 +46,11 @@ export const RentalDetailForOwner: React.FC<Props> = ({
     useCompleteRentalByOwner();
   const { confirmRental, isConfirmRentalLoading } = useConfirmRental();
   const { cancelRental, isCancelRentalLoading } = useCancelRental();
+  const { refetchViolation, violation } = useViolationByRentalId(rental.id);
+  const { signer, provider } = useWallet();
+  const { latestLocation, isLocationLoading } = useLatestLocation(
+    listing.expectedDeviceId || ""
+  );
 
   const handleConfirmRental = async () => {
     try {
@@ -92,11 +99,6 @@ export const RentalDetailForOwner: React.FC<Props> = ({
       toast.error("Error cancelling rental");
     }
   };
-
-  const { signer, provider } = useWallet();
-  const { latestLocation, isLocationLoading } = useLatestLocation(
-    listing.expectedDeviceId || ""
-  );
 
   const handleCompleteRentalByOwner = async () => {
     if (!signer || !provider) {
@@ -275,6 +277,53 @@ export const RentalDetailForOwner: React.FC<Props> = ({
           </motion.div>
         )}
 
+        {/* Violation Reports */}
+        {violation && (
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.35 }}
+            className="bg-white rounded-2xl shadow-lg p-6 mb-8"
+          >
+            <h2 className="text-2xl font-bold text-gray-900 mb-4 flex items-center gap-3">
+              <FaExclamationTriangle className="text-red-600" />
+              Violation Reports (1)
+            </h2>
+            <div className="space-y-4">
+              <div
+                key={violation.id}
+                className="border border-red-200 rounded-xl p-4 bg-red-50"
+              >
+                <div className="flex items-start justify-between mb-2">
+                  <div className="flex items-center gap-2">
+                    <span className="px-3 py-1 bg-red-100 text-red-800 rounded-full text-sm font-medium">
+                      {violation.violationType.replace("_", " ").toUpperCase()}
+                    </span>
+                    <span className="px-3 py-1 bg-gray-100 text-gray-800 rounded-full text-sm">
+                      {violation.status.toUpperCase()}
+                    </span>
+                  </div>
+                  <span className="text-sm text-gray-500">
+                    {dayjs(violation.createdAt).format("MMM D, YYYY")}
+                  </span>
+                </div>
+                <p className="text-gray-700 mb-2">{violation.detailedQuery}</p>
+                {violation.expectedDamage && (
+                  <p className="text-sm text-red-600">
+                    <strong>Expected Damage:</strong> {violation.expectedDamage}
+                  </p>
+                )}
+                {violation.photos && violation.photos.length > 0 && (
+                  <p className="text-sm text-gray-600 mt-2">
+                    <FaCamera className="inline-block mr-1" />
+                    {violation.photos.length} photo(s) attached
+                  </p>
+                )}
+              </div>
+            </div>
+          </motion.div>
+        )}
+
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
           {/* Rental Information */}
           <motion.div
@@ -434,18 +483,44 @@ export const RentalDetailForOwner: React.FC<Props> = ({
                   </Button>
                 )}
 
-                {rental.status === "active" && (
-                  <Button
-                    onClick={() => setIsViolationModalOpen(true)}
-                    variant="secondary"
-                    className="w-full bg-red-600 hover:bg-red-700 text-white py-3 rounded-xl shadow-lg hover:shadow-xl transition-all duration-300"
-                  >
-                    <div className="flex items-center justify-center gap-2">
-                      <FaExclamationTriangle className="w-4 h-4" />
-                      Report Violation
+                {/* Report Violation Button - Only show when rental is completed and no violation reported yet */}
+                {(rental.status === "completed" ||
+                  (rental.completedByOwner && rental.completedByRenter)) &&
+                  !violation && (
+                    <Button
+                      onClick={() => setIsViolationModalOpen(true)}
+                      variant="secondary"
+                      className="w-full bg-red-600 hover:bg-red-700 text-white py-3 rounded-xl shadow-lg hover:shadow-xl transition-all duration-300"
+                    >
+                      <div className="flex items-center justify-center gap-2">
+                        <FaExclamationTriangle className="w-4 h-4" />
+                        Report Violation
+                      </div>
+                    </Button>
+                  )}
+
+                {/* Show message when violation already reported */}
+                {(rental.status === "completed" ||
+                  (rental.completedByOwner && rental.completedByRenter)) &&
+                  violation && (
+                    <div className="w-full bg-gray-100 text-gray-600 py-3 px-4 rounded-xl text-center text-sm">
+                      <div className="flex items-center justify-center gap-2">
+                        <FaCheckCircle className="w-4 h-4 text-green-600" />
+                        Violation already reported for this rental
+                      </div>
                     </div>
-                  </Button>
-                )}
+                  )}
+
+                {/* Show message when rental is not yet completed */}
+                {rental.status !== "completed" &&
+                  !(rental.completedByOwner && rental.completedByRenter) && (
+                    <div className="w-full bg-blue-100 text-blue-700 py-3 px-4 rounded-xl text-center text-sm">
+                      <div className="flex items-center justify-center gap-2">
+                        <FaClock className="w-4 h-4" />
+                        Violations can only be reported after rental completion
+                      </div>
+                    </div>
+                  )}
               </div>
             </div>
           </motion.div>
@@ -456,7 +531,10 @@ export const RentalDetailForOwner: React.FC<Props> = ({
           isOpen={isViolationModalOpen}
           onClose={() => setIsViolationModalOpen(false)}
           rentalId={rental.id.toString()}
-          onReportSubmitted={refetchRentalDetail}
+          onReportSubmitted={() => {
+            refetchRentalDetail();
+            refetchViolation();
+          }}
         />
       </div>
     </div>

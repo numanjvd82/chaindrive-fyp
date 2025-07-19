@@ -1,8 +1,7 @@
 import { z } from "zod";
 import { getDbInstance } from "../../lib/db/sqlite";
 import { Violation, ViolationType, ViolationStatus } from "../../lib/types";
-import { notificationDbFunctions } from "../../services/notification";
-import { sql } from "../../utils/utils";
+import { convertBufferToBase64, sql } from "../../utils/utils";
 import { rentalModel } from "../rental";
 import { listingModel } from "../listing";
 
@@ -20,7 +19,10 @@ export const createViolationSchema = z.object({
   detailedQuery: z
     .string()
     .min(10, "Detailed query must be at least 10 characters"),
-  photos: z.array(z.string()).max(4, "Maximum 4 photos allowed").optional(),
+  photos: z
+    .array(z.instanceof(Buffer))
+    .max(4, "Maximum 4 photos allowed")
+    .optional(),
   status: z
     .enum([
       "pending",
@@ -75,12 +77,23 @@ function generateInsertQuery(input: CreateViolationInput): {
 export async function createViolation(
   input: CreateViolationInput
 ): Promise<Violation> {
-  const { insertNotification } = notificationDbFunctions;
   if (!input) throw new Error("Input is required");
 
   try {
     const parsedInput = createViolationSchema.parse(input);
     const db = getDbInstance();
+
+    let photos: string[] | undefined;
+
+    if (parsedInput.photos && parsedInput.photos.length > 0) {
+      // convert images to base64
+      photos = await Promise.all(
+        parsedInput.photos.map(async (photo, i: number) => {
+          const base64Image = convertBufferToBase64(photo);
+          return base64Image;
+        })
+      );
+    }
 
     // Validate photos array length if provided
     if (parsedInput.photos && parsedInput.photos.length > 4) {
@@ -129,17 +142,23 @@ export async function createViolation(
 
     if (rental) {
       // Notify the renter about the violation
-      await insertNotification({
+      const notifcationPayload = {
         userId: rental.renterId,
-        message: `You have a violation (${parsedInput.violationType.replace(
-          "_",
-          " "
-        )}) reported for your rental of ${
-          listing.title
-        } at ${rental.startDate.toLocaleDateString()}`,
         type: "violation",
-        isRead: false,
-      });
+        content: `A new violation has been reported for your rental of ${listing.title}. Please check your notifications for details.`,
+      };
+      db.prepare(
+        sql`
+    INSERT INTO Notifications (user_id, type, content, link, rentalId, created_at)
+    VALUES (?, ?, ?, ?, ?, CURRENT_TIMESTAMP)
+  `
+      ).run(
+        notifcationPayload.userId,
+        notifcationPayload.type,
+        notifcationPayload.content,
+        null,
+        rental.id
+      );
     }
 
     // Convert database result to proper Violation type
