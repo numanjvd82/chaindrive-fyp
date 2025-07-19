@@ -24,6 +24,7 @@ export const useRentalActions = ({
   const handleConfirmRental = async () => {
     try {
       await confirmRental({ rentalId: rental.id });
+      refetchRentalDetail();
     } catch (error: unknown) {
       console.error("Error confirming rental:", error);
     }

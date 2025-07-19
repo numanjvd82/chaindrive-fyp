@@ -205,6 +205,29 @@ export const ViolationReportingModal: React.FC<
           </div>
         </div>
 
+        {/* Expected Damage */}
+        <div>
+          <label
+            htmlFor="expectedDamage"
+            className="block text-sm font-medium text-gray-700 mb-2"
+          >
+            Expected Damage (if applicable)
+          </label>
+          <textarea
+            id="expectedDamage"
+            {...register("expectedDamage")}
+            placeholder="Describe the expected damage..."
+            className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent resize-none"
+            rows={4}
+            required
+          />
+          {errors.expectedDamage && (
+            <p className="text-red-500 text-sm mt-1">
+              {errors.expectedDamage.message}
+            </p>
+          )}
+        </div>
+
         {/* Violation Details */}
         <div>
           <label

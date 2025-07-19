@@ -157,7 +157,7 @@ export async function createViolation(
         notifcationPayload.userId,
         notifcationPayload.type,
         notifcationPayload.content,
-        null,
+        notifcationPayload.link,
         rental.id
       );
     }

@@ -151,6 +151,15 @@ export const NotificationDropdown = () => {
                 <p className="text-sm text-gray-600 leading-relaxed">
                   {notification.content}
                 </p>
+                {notification.link && (
+                  <Link
+                    to={notification.link}
+                    onClick={() => setIsOpen(false)}
+                    className="text-blue-600 hover:underline mt-2 block"
+                  >
+                    View Details
+                  </Link>
+                )}
               </div>
             </div>
           </motion.div>

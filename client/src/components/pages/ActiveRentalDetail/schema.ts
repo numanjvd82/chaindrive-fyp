@@ -9,6 +9,15 @@ export const ViolationReportSchema = z.object({
     "unauthorized_location",
     "other",
   ]),
+  expectedDamage: z
+    .string()
+    .min(10, {
+      message: "Expected damage must be at least 10 characters long",
+    })
+    .max(500, {
+      message: "Expected damage must be at most 500 characters long",
+    })
+    .optional(),
   detailedQuery: z
     .string()
     .min(10, {
