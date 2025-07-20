@@ -22,7 +22,7 @@ const Devices: React.FC = () => {
   const [isConnected, setIsConnected] = useState(false);
 
   const { createDevice, isCreateDeviceLoading } = useCreateDevice();
-  const { deleteDevice, isDeleteDeviceLoading } = useDeleteDevice();
+  const { deleteDevice } = useDeleteDevice();
 
   const connectESP32 = async () => {
     try {
