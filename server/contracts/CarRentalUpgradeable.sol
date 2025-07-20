@@ -29,6 +29,7 @@ contract CarRentalUpgradeable is Initializable, ReentrancyGuardUpgradeable {
     }
 
     mapping(uint256 => Rental) public rentals;
+    mapping(uint256 => uint256) public pendingLateFees;
 
     string constant termsAndConditions =
         "1. LATE RETURN: Late fees apply for every hour past the agreed return time. "
@@ -101,12 +102,28 @@ contract CarRentalUpgradeable is Initializable, ReentrancyGuardUpgradeable {
         }
     }
 
-    function completeRentalByOwner(uint256 rentalId) external {
+    function completeRentalByOwner(
+        uint256 rentalId,
+        uint256 hoursLate
+    ) external {
         Rental storage rental = rentals[rentalId];
         require(msg.sender == rental.owner, "Unauthorized");
         require(!rental.isCompleted, "Rental already completed");
 
         rental.ownerConfirmed = true;
+
+        // Calculate the late fee if applicable
+        uint256 lateFee = calculateLateFee(rentalId, hoursLate);
+
+        // Ensure lateFee does not exceed securityDeposit
+        if (lateFee > rental.securityDeposit) {
+            lateFee = rental.securityDeposit;
+        }
+
+        rental.securityDeposit -= lateFee; // Deduct late fee from security deposit
+
+        // Store pending late fee to be paid on complete
+        pendingLateFees[rentalId] = lateFee;
 
         if (rental.renterConfirmed) {
             _completeRental(rentalId);
@@ -132,6 +149,14 @@ contract CarRentalUpgradeable is Initializable, ReentrancyGuardUpgradeable {
     function _completeRental(uint256 rentalId) internal nonReentrant {
         Rental storage rental = rentals[rentalId];
         rental.isCompleted = true;
+
+        uint256 lateFee = pendingLateFees[rentalId];
+        if (lateFee > 0) {
+            // Transfer late fee to the owner
+            (bool sentLateFee, ) = rental.owner.call{value: lateFee}("");
+            require(sentLateFee, "Late fee transfer failed");
+            delete pendingLateFees[rentalId]; // Reset late fee after transfer
+        }
 
         (bool sentPlatform, ) = chaindriveWallet.call{
             value: rental.platformFee
@@ -166,7 +191,7 @@ contract CarRentalUpgradeable is Initializable, ReentrancyGuardUpgradeable {
     function calculateLateFee(
         uint256 rentalId,
         uint256 hoursLate
-    ) internal view returns (uint256) {
+    ) public view returns (uint256) {
         Rental storage rental = rentals[rentalId];
         require(!rental.isCompleted, "Rental already completed");
 

@@ -11,6 +11,8 @@ import { VehicleLocation } from "./components/VehicleLocation";
 import { ViolationReports } from "./components/ViolationReports";
 import { VehicleDetails } from "./components/VehicleDetails";
 import { ActionButtons } from "./components/ActionButtons";
+import { LateFeeDisplay } from "./components/LateFeeDisplay";
+import { LateFeeTestDisplay } from "./components";
 
 type Props = {
   rental: RentalWithImages;
@@ -41,6 +43,9 @@ export const RentalDetailForOwner: React.FC<Props> = ({
 
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         <CompletionStatus rental={rental} />
+
+        {/* Show late fee if applicable */}
+        <LateFeeDisplay rental={rental} />
 
         <VehicleLocation
           rentalStatus={rental.status}

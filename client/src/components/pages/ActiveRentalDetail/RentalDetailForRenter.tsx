@@ -10,6 +10,8 @@ import {
   ViolationReports,
   VehicleDetails,
   RenterActionButtons,
+  LateFeeDisplay,
+  LateFeeTestDisplay,
 } from "./components";
 
 type Props = {
@@ -38,6 +40,9 @@ export const RentalDetailForRenter: React.FC<Props> = ({
 
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         <RenterCompletionStatus rental={rental} />
+
+        {/* Show late fee if applicable */}
+        <LateFeeDisplay rental={rental} />
 
         {/* Show violation reports if any exist - renter can view but not create */}
         <ViolationReports violation={violation} />

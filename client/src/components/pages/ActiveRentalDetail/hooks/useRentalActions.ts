@@ -5,6 +5,8 @@ import { useCompleteRentalByOwner } from "@/hooks/useCompleteRentalByOwner";
 import { useCancelRental } from "@/hooks/useCancelRental";
 import { RentalWithImages } from "@/lib/types";
 import { toast } from "react-toastify";
+import dayjs from "dayjs";
+import { useLateFee } from "@/hooks/useLateFeeTest";
 
 interface UseRentalActionsProps {
   rental: RentalWithImages;
@@ -19,6 +21,8 @@ export const useRentalActions = ({
     useCompleteRentalByOwner();
   const { confirmRental, isConfirmRentalLoading } = useConfirmRental();
   const { cancelRental, isCancelRentalLoading } = useCancelRental();
+  const { hoursLate, lateFeeInEth, lateFeeInPkr, isLate, isLoading, error } =
+    useLateFee(rental, { testMode: true, testHoursLate: 1 });
   const { signer, provider } = useWallet();
 
   const handleConfirmRental = async () => {
@@ -77,7 +81,15 @@ export const useRentalActions = ({
     }
     try {
       const contract = getContractInstance(signer);
-      const tx = await contract.completeRentalByOwner(rental.id);
+      // Calculate how many hours the rental is late
+      // let lateHours = 0;
+      // if (dayjs().isAfter(dayjs(rental.endDate))) {
+      //   // lateHours = dayjs().diff(dayjs(rental.endDate), "hour");
+      //   toast.error(`Rental is ${lateHours} hours late.`);
+      //   // console.log(`Rental is ${lateHours} hours late.`);
+      // }
+
+      const tx = await contract.completeRentalByOwner(rental.id, hoursLate);
       toast.loading("Completing rental on the blockchain...");
       const receipt = await tx.wait();
 

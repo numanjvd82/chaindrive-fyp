@@ -4,6 +4,8 @@ export { VehicleLocation } from "./VehicleLocation";
 export { ViolationReports } from "./ViolationReports";
 export { VehicleDetails } from "./VehicleDetails";
 export { ActionButtons } from "./ActionButtons";
+export { LateFeeDisplay } from "./LateFeeDisplay";
+export { LateFeeTestDisplay } from "./LateFeeTestDisplay";
 
 // Renter-specific components
 export { RenterHeader } from "./RenterHeader";

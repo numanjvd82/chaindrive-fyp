@@ -101,7 +101,17 @@ const RentalConfirmation: React.FC = () => {
   const platformFee = bookingData.totalPrice * 0.2;
   const grandTotal = bookingData.totalPrice + securityDeposit + platformFee;
   const startDate = dayjs(bookingData.startDate).format("DD MMM YYYY HH:mm");
-  const endDate = dayjs(bookingData.endDate).format("DD MMM YYYY HH:mm");
+  // const endDate = dayjs(bookingData.endDate).format("DD MMM YYYY HH:mm");
+  // manipulate end date to be 2 min ahead of current time
+  let endDateWithBuffer = dayjs(bookingData.endDate);
+  const now = dayjs();
+  endDateWithBuffer = now
+    .add(2, "minute")
+    .set("second", 0)
+    .set("millisecond", 0);
+  const endDate = endDateWithBuffer.format("DD MMM YYYY HH:mm");
+
+  console.log(endDate);
 
   const handleInitiateRental = () => {
     if (!account || !provider || !signer) {
@@ -136,12 +146,14 @@ const RentalConfirmation: React.FC = () => {
     try {
       toast.loading("Creating rental...");
       // Now create rental in DB
+
       const rentalData = {
         listingId: rental.id,
         renterAddress: account as string,
         ownerAddress: ownerWallet.walletAddress,
         startDate: bookingData.startDate.toISOString(),
-        endDate: bookingData.endDate.toISOString(),
+        // endDate: bookingData.endDate.toISOString(),
+        endDate: endDateWithBuffer.toISOString(), // for testing late fee mechanism
         rentalFee: bookingData.totalPrice,
         securityDeposit,
         platformFee,
