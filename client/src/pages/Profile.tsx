@@ -1,13 +1,15 @@
-import Button from "@/components/Button";
+import React from "react";
+import { motion } from "motion/react";
+import { FaUser } from "react-icons/fa";
 import { AccountInfo } from "@/components/pages/Profile/AccountInfo";
 import IdCardImages from "@/components/pages/Profile/IdCardImages";
 import KycVerificationStatus from "@/components/pages/Profile/KycVerificationStatus";
+import { WalletManagement } from "@/components/pages/Profile/WalletManagement";
+import { ProfileActions } from "@/components/pages/Profile/ProfileActions";
 import Splash from "@/components/Splash";
 import { useListWallet } from "@/hooks/useListWallet";
-import { useStoreWallet } from "@/hooks/useStoreWallet";
 import { useToggleTwoFactor } from "@/hooks/useToggleTwoFactor";
 import { useUser } from "@/hooks/useUser";
-import { useWallet } from "@/hooks/useWallet";
 import { toast } from "react-toastify";
 
 const ProfilePage: React.FC = () => {
@@ -15,9 +17,6 @@ const ProfilePage: React.FC = () => {
   const { wallet, refetch } = useListWallet({
     id: user ? user.id : 0,
   });
-  const { account, connectWallet, provider, signer } = useWallet();
-  const { storeWallet, isLoadingStoreWallet } = useStoreWallet();
-
   const { isToggleTwoFactorLoading, toggleTwoFactor } = useToggleTwoFactor();
 
   if (loading) {
@@ -28,142 +27,64 @@ const ProfilePage: React.FC = () => {
     return null;
   }
 
-  const handleAddWallet = async () => {
-    if (!signer || !provider) return;
+  const handleToggleTwoFactor = async () => {
     try {
-      const address = await signer.getAddress();
-
-      await storeWallet(address);
+      await toggleTwoFactor({
+        enabled: !user.twoFactorEnabled,
+      });
+      fetchUser();
       toast.success(
-        "Wallet address stored successfully! You can now use it for transactions."
+        `Two-factor authentication ${
+          user.twoFactorEnabled ? "disabled" : "enabled"
+        } successfully!`
       );
-      refetch();
-    } finally {
-      // Pass
+    } catch {
+      toast.error(
+        "Failed to toggle two-factor authentication. Please try again."
+      );
     }
   };
 
   return (
-    <div className="p-8 space-y-8 bg-gray-100 min-h-screen">
-      <h1 className="text-3xl font-bold">Profile</h1>
-      <AccountInfo {...user} />
-      <KycVerificationStatus profileVerified={user.isVerified} />
-      <IdCardImages
-        idCardFront={user.idCardFront}
-        idCardBack={user.idCardBack}
-      />
+    <div className="min-h-screen bg-gradient-to-br from-slate-50 to-blue-50 p-4 sm:p-6 lg:p-8">
+      <div className="max-w-6xl mx-auto space-y-8">
+        {/* Header */}
+        <motion.div
+          initial={{ opacity: 0, y: -20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.5 }}
+          className="text-center space-y-4"
+        >
+          <div className="flex items-center justify-center space-x-3">
+            <div className="p-4 bg-gradient-to-br from-indigo-500 to-purple-600 rounded-2xl text-white shadow-lg">
+              <FaUser className="text-2xl" />
+            </div>
+            <h1 className="text-4xl font-bold text-gray-800">My Profile</h1>
+          </div>
+          <p className="text-gray-600 text-lg">
+            Manage your account settings and personal information
+          </p>
+        </motion.div>
 
-      <div className="p-6 bg-accent rounded-lg shadow-md space-y-4">
-        <h2 className="text-xl font-bold">Actions</h2>
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-          <Button>Change Password</Button>
-          <Button
-            isLoading={isToggleTwoFactorLoading}
-            onClick={async () => {
-              try {
-                await toggleTwoFactor({
-                  enabled: !user.twoFactorEnabled,
-                });
-                fetchUser();
-                toast.success(
-                  `Two-factor authentication ${
-                    user.twoFactorEnabled ? "disabled" : "enabled"
-                  } successfully!`
-                );
-              } finally {
-                // Pass
-              }
-            }}
-          >
-            {user.twoFactorEnabled ? "Disable 2FA" : "Enable 2FA"}
-          </Button>
+        {/* Profile Sections */}
+        <div className="space-y-8">
+          <AccountInfo {...user} />
+          <KycVerificationStatus profileVerified={user.isVerified} />
+          <IdCardImages
+            idCardFront={user.idCardFront}
+            idCardBack={user.idCardBack}
+          />
+          <WalletManagement
+            user={user}
+            wallet={wallet || null}
+            refetchWallet={refetch}
+          />
+          <ProfileActions
+            user={user}
+            isToggleTwoFactorLoading={isToggleTwoFactorLoading}
+            onToggleTwoFactor={handleToggleTwoFactor}
+          />
         </div>
-      </div>
-
-      <div className="p-6 bg-accent rounded-lg shadow-md space-y-4">
-        {wallet ? (
-          <>
-            <h2 className="text-xl font-bold text-gray-800">Payment Method</h2>
-            <p className="text-gray-600">
-              Your payment method is already added. You can update it if needed.
-            </p>
-            <div className="bg-gray-100 p-4 rounded-lg">
-              <p className="text-gray-800 font-mono text-sm">
-                <strong>Wallet Address:</strong> {wallet.walletAddress}
-              </p>
-              {wallet.walletAddress !== account ? (
-                <p className="text-red-500 font-mono text-sm mt-2">
-                  <strong>Warning:</strong> The wallet address does not match
-                  your connected wallet.
-                  <br />
-                  Please ensure you are using the correct wallet address.
-                  <br />
-                  If you have changed your wallet address, please update it
-                </p>
-              ) : (
-                <p className="text-green-500 font-mono text-sm mt-2">
-                  <strong>Success:</strong> The wallet address matches your
-                  connected wallet.
-                </p>
-              )}
-            </div>
-            {user.role === "owner" ? (
-              <Button
-                disabled={
-                  !account ||
-                  !signer ||
-                  !provider ||
-                  isLoadingStoreWallet ||
-                  wallet.walletAddress === account
-                }
-                variant="primary"
-                isLoading={isLoadingStoreWallet}
-                onClick={async () => handleAddWallet()}
-              >
-                Update Wallet Address
-              </Button>
-            ) : null}
-            {!account || !signer || !provider ? (
-              <Button onClick={connectWallet} variant="primary">
-                Connect Wallet
-              </Button>
-            ) : null}
-          </>
-        ) : (
-          <>
-            <h2 className="text-xl font-bold text-gray-800">
-              Add Payment Method
-            </h2>
-            <p className="text-gray-600">
-              To rent a car or use our services, please add a payment method.
-            </p>
-            <p className="text-gray-600">
-              You can add a payment method using your wallet address. Please
-              connect your wallet to proceed.
-            </p>
-            <div className="flex flex-col sm:flex-row gap-4">
-              <Button
-                disabled={!!(account || signer || provider)}
-                onClick={connectWallet}
-                variant="primary"
-              >
-                {account ? "Wallet Connected" : "Connect Wallet"}
-              </Button>
-              {user.role === "owner" ? (
-                <Button
-                  disabled={
-                    !account || !signer || !provider || isLoadingStoreWallet
-                  }
-                  variant="primary"
-                  isLoading={isLoadingStoreWallet}
-                  onClick={async () => handleAddWallet()}
-                >
-                  Store Wallet Address
-                </Button>
-              ) : null}
-            </div>
-          </>
-        )}
       </div>
     </div>
   );

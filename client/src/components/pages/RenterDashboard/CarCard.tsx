@@ -1,5 +1,4 @@
 import Button from "@/components/Button";
-import Divider from "@/components/Divider";
 import { AvailableRental, Listing } from "@/lib/types";
 import { FaRegSnowflake, FaStar } from "react-icons/fa";
 import { FiUser } from "react-icons/fi";
@@ -30,7 +29,6 @@ export const CarCard: React.FC<Listing> = (props) => {
   const rating = 4.5;
   const reviews = 120;
   const passengers = numOfSeats;
-  const airConditioning = true;
   const doors = 4;
   const transmission = transmissionType;
 
@@ -57,59 +55,91 @@ export const CarCard: React.FC<Listing> = (props) => {
   };
 
   return (
-    <div className="flex flex-col items-start w-80 border rounded-lg shadow-xl py-4 px-6 bg-white min-h-[450px]">
-      <div className="h-[200px] w-full flex justify-center">
+    <div className="group flex flex-col bg-white rounded-2xl shadow-lg hover:shadow-2xl transition-all duration-300 overflow-hidden border border-gray-100 hover:border-blue-200">
+      {/* Image Section */}
+      <div className="relative h-52 overflow-hidden">
         <img
           src={`data:image/jpeg;base64,${images[0]}`}
           alt={title}
-          className="rounded-lg h-full object-cover w-full"
+          className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"
         />
-      </div>
-      <div>
-        <h3 className="text-lg font-medium mt-4">{title}</h3>
-        <div className="flex items-center">
-          <FaStar className="text-xl mr-1 text-yellow-300" />
-          <span>
-            {rating.toFixed(1)}
-            <span className="text-gray-500"> ({reviews} reviews)</span>
-          </span>
+        <div className="absolute top-4 right-4 bg-white/90 backdrop-blur-sm rounded-full px-3 py-1 shadow-lg">
+          <span className="text-sm font-semibold text-gray-800">PKR {pricePerDay}/day</span>
         </div>
+        <div className="absolute inset-0 bg-gradient-to-t from-black/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
       </div>
-      <section className="text-sm text-gray-600 mt-3 space-y-1 w-full">
-        <div className="flex justify-between">
-          <div className="flex items-center">
-            <FiUser className="text-xl mr-1" />
-            <span>{passengers} Passengers</span>
-          </div>
-          <div className="flex items-center">
-            <TbManualGearbox className="text-xl mr-1" />
-            <span>{transmission}</span>
+
+      {/* Content Section */}
+      <div className="p-6 flex-1 flex flex-col">
+        {/* Title and Rating */}
+        <div className="mb-4">
+          <h3 className="text-xl font-bold text-gray-900 mb-2 group-hover:text-blue-600 transition-colors">
+            {title}
+          </h3>
+          <div className="flex items-center gap-2">
+            <div className="flex items-center">
+              <FaStar className="text-yellow-400 text-sm" />
+              <span className="text-sm font-medium text-gray-700 ml-1">
+                {rating.toFixed(1)}
+              </span>
+            </div>
+            <span className="text-sm text-gray-500">({reviews} reviews)</span>
           </div>
         </div>
-        <div className="flex justify-between">
-          <div className="flex items-center">
-            <FaRegSnowflake className="text-xl mr-1" />
-            <span>
-              {airConditioning ? "Air Conditioning" : "No Air Conditioning"}
-            </span>
+
+        {/* Features Grid */}
+        <div className="grid grid-cols-2 gap-3 mb-6 text-sm">
+          <div className="flex items-center gap-2 text-gray-600">
+            <div className="w-8 h-8 bg-blue-50 rounded-lg flex items-center justify-center">
+              <FiUser className="text-blue-600 text-sm" />
+            </div>
+            <span>{passengers} Seats</span>
           </div>
-          <div className="flex items-center">
-            <GiCarDoor className="text-xl mr-1" />
+          
+          <div className="flex items-center gap-2 text-gray-600">
+            <div className="w-8 h-8 bg-purple-50 rounded-lg flex items-center justify-center">
+              <TbManualGearbox className="text-purple-600 text-sm" />
+            </div>
+            <span>{transmission === "automatic" ? "Auto" : "M/T"}</span>
+          </div>
+          
+          <div className="flex items-center gap-2 text-gray-600">
+            <div className="w-8 h-8 bg-green-50 rounded-lg flex items-center justify-center">
+              <FaRegSnowflake className="text-green-600 text-sm" />
+            </div>
+            <span>A/C</span>
+          </div>
+          
+          <div className="flex items-center gap-2 text-gray-600">
+            <div className="w-8 h-8 bg-orange-50 rounded-lg flex items-center justify-center">
+              <GiCarDoor className="text-orange-600 text-sm" />
+            </div>
             <span>{doors} Doors</span>
           </div>
         </div>
-      </section>
-      <Divider />
-      <div className="flex justify-between w-full">
-        <p className="text-lg font-bold">Price</p>
-        <p>
-          <span className="text-lg font-bold">PKR{pricePerDay}</span>
-          <span className="text-sm text-gray-500"> /day</span>
-        </p>
+
+        {/* Divider */}
+        <div className="h-px bg-gradient-to-r from-transparent via-gray-200 to-transparent mb-4"></div>
+
+        {/* Price Section */}
+        <div className="flex items-center justify-between mb-4">
+          <div>
+            <p className="text-sm text-gray-500">Starting from</p>
+            <p className="text-2xl font-bold text-gray-900">
+              PKR {pricePerDay}
+              <span className="text-sm font-normal text-gray-500">/day</span>
+            </p>
+          </div>
+        </div>
+
+        {/* Action Button */}
+        <Button 
+          onClick={handleViewDetails} 
+          className="w-full bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white font-semibold py-3 rounded-xl transition-all duration-300 transform hover:scale-105 shadow-lg hover:shadow-xl"
+        >
+          View Details →
+        </Button>
       </div>
-      <Button onClick={handleViewDetails} className="mt-4 w-full">
-        Rent Now →
-      </Button>
     </div>
   );
 };

@@ -11,7 +11,9 @@ export function locationTableInit(db: Database) {
       latitude REAL NOT NULL,
       longitude REAL NOT NULL,
       device_id TEXT NOT NULL,
-      FOREIGN KEY (device_id) REFERENCES Devices (device_id) ON DELETE CASCADE
+      rental_id INTEGER NOT NULL,
+      FOREIGN KEY (device_id) REFERENCES Devices (device_id) ON DELETE CASCADE,
+      FOREIGN KEY (rental_id) REFERENCES Rentals (id) ON DELETE CASCADE 
     );
   `
   ).run();

@@ -1,5 +1,6 @@
 import { useFormContext } from "react-hook-form";
 import Input from "../../Input";
+import { FaUser } from "react-icons/fa";
 
 export const PersonalInformation: React.FC = () => {
   const {
@@ -8,10 +9,17 @@ export const PersonalInformation: React.FC = () => {
   } = useFormContext();
 
   return (
-    <div className="p-6 bg-white rounded-lg shadow-md">
-      <h2 className="text-xl font-semibold mb-2">Enter Personal Information</h2>
-      <p className="text-gray-600 mb-4">Tell Us About Yourself</p>
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+    <div className="bg-gradient-to-br from-blue-50 to-purple-50 rounded-2xl shadow-lg p-8">
+      <div className="w-16 h-16 bg-gradient-to-br from-blue-100 to-purple-100 rounded-2xl flex items-center justify-center mx-auto mb-4">
+        <FaUser className="w-8 h-8 text-blue-600" />
+      </div>
+      <h2 className="text-2xl font-bold text-gray-900 mb-2 text-center">
+        Personal Information
+      </h2>
+      <p className="text-gray-600 mb-6 text-center">
+        Tell us about yourself to get started
+      </p>
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
         <Input
           error={errors.firstName && String(errors.firstName.message)}
           label="First Name"
@@ -36,23 +44,23 @@ export const PersonalInformation: React.FC = () => {
           placeholder="Email"
           required
         />
-      </div>
-
-      <div className="mt-4">
         <Input
           error={errors.phone && String(errors.phone.message)}
           label="Phone Number"
           {...register("phone")}
-          type="number"
+          type="tel"
           placeholder="Phone Number"
           required
         />
+      </div>
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
         <Input
           error={errors.password && String(errors.password.message)}
           label="Password"
           {...register("password")}
           required
           type="password"
+          placeholder="Password"
         />
         <Input
           error={
@@ -62,6 +70,7 @@ export const PersonalInformation: React.FC = () => {
           {...register("confirmPassword")}
           type="password"
           required
+          placeholder="Confirm Password"
         />
       </div>
     </div>

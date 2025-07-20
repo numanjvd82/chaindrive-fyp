@@ -1,5 +1,6 @@
 import { Request, Response } from "express";
 import { listingModel } from "../../models/listing";
+import { availableRentalsFilterSchema } from "../../models/listing/availableRentals";
 
 export const availableRentals = async (req: Request, res: Response) => {
   // @ts-ignore
@@ -11,7 +12,10 @@ export const availableRentals = async (req: Request, res: Response) => {
   }
 
   try {
-    const listings = await listingModel.availableRentals();
+    // Parse filter parameters from query string
+    const filters = availableRentalsFilterSchema.parse(req.query);
+    
+    const listings = await listingModel.availableRentals(filters);
 
     res.status(200).json(listings);
   } catch (error: any) {

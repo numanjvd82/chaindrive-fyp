@@ -1,10 +1,10 @@
 import { NotificationContext } from "@/contexts/NotificationContext";
-import { useMarkAsReadNotification } from "@/hooks/useMarkAsReadNotification";
+import { useMarkAllAsReadNotification } from "@/hooks/useMarkAllAsReadNotification";
+import { useMarkIndividualNotificationAsRead } from "@/hooks/useMarkIndividualNotificationAsRead";
 import { useNotification } from "@/hooks/useNotification";
 import { useSocket } from "@/hooks/useSocket";
 import { Notification } from "@/lib/types";
 import { useContext, useEffect, useState } from "react";
-import { Link } from "react-router-dom";
 import { toast } from "react-toastify";
 
 export const NotificationProvider = ({
@@ -19,7 +19,9 @@ export const NotificationProvider = ({
     isLoading: isNotificationsLoading,
     refetch: refetchNotifications,
   } = useNotification();
-  const { markAsReadNotification } = useMarkAsReadNotification();
+  const { markAllAsReadNotification } = useMarkAllAsReadNotification();
+  const { markIndividualNotificationAsRead } =
+    useMarkIndividualNotificationAsRead();
 
   useEffect(() => {
     if (!isNotificationsLoading && data) {
@@ -30,26 +32,6 @@ export const NotificationProvider = ({
   useEffect(() => {
     const handleNotification = (notification: Notification) => {
       setNotifications((prev) => [notification, ...prev]);
-      if (location.pathname !== "/chat") {
-        toast.info(
-          <div className="flex flex-col">
-            {notification.link ? (
-              <Link to={notification.link}>
-                You have a new message. Click here to view it.
-                <blockquote className="text-sm text-gray-500 font-bold italic text-center">
-                  "{notification.content}"
-                </blockquote>
-              </Link>
-            ) : (
-              <span>You have a new message</span>
-            )}
-          </div>,
-          {
-            position: "top-right",
-            autoClose: 5000,
-          }
-        );
-      }
 
       const audio = new Audio("/notification.mp3");
       audio
@@ -68,12 +50,32 @@ export const NotificationProvider = ({
 
   const markAllAsRead = () => {
     setNotifications([]);
-    markAsReadNotification();
+    markAllAsReadNotification();
     refetchNotifications();
   };
 
+  const markIndividualAsRead = async (notificationId: number) => {
+    try {
+      // Remove from local state immediately for better UX
+      setNotifications((prev) => prev.filter((n) => n.id !== notificationId));
+
+      // Mark as read on the server
+      await markIndividualNotificationAsRead(notificationId);
+
+      // Optionally refetch to ensure sync
+      refetchNotifications();
+    } catch (error) {
+      console.error("Error marking notification as read:", error);
+      // Revert local state if API call failed
+      refetchNotifications();
+      toast.error("Failed to mark notification as read");
+    }
+  };
+
   return (
-    <NotificationContext.Provider value={{ notifications, markAllAsRead }}>
+    <NotificationContext.Provider
+      value={{ notifications, markAllAsRead, markIndividualAsRead }}
+    >
       {children}
     </NotificationContext.Provider>
   );

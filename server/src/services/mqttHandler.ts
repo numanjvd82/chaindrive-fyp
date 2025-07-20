@@ -36,12 +36,16 @@ export function mqttHandler() {
       const deviceId = parts[1];
 
       const device = await getDeviceById(deviceId);
+      console.log(
+        `Received message from device ${deviceId}:`,
+        message.toString()
+      );
       if (device) {
-        const activeRental = await getActiveRentalByDeviceId(device?.deviceId);
+        const activeRental = await getActiveRentalByDeviceId(device.deviceId);
 
         // Check if the device is assigned to an active rental
         if (!activeRental) {
-          console.error(
+          console.log(
             `No active rental found for device ${deviceId}. Ignoring message.`
           );
           return;
@@ -52,11 +56,19 @@ export function mqttHandler() {
         );
 
         const insertQuery = sql`
-          INSERT INTO Locations (timestamp, latitude, longitude, device_id)
-          VALUES (?, ?, ?, ?);
+          INSERT INTO Locations (timestamp, latitude, longitude, device_id, rental_id)
+          VALUES (?, ?, ?, ?, ?);
         `;
 
-        db.prepare(insertQuery).run(timestamp, latitude, longitude, deviceId);
+        console.log(activeRental);
+
+        db.prepare(insertQuery).run(
+          timestamp,
+          latitude,
+          longitude,
+          deviceId,
+          activeRental.id
+        );
         console.log(`Location saved for ${deviceId}`);
       } else {
         console.log(`Device ${deviceId} not assigned. Ignoring.`);

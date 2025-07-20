@@ -1,4 +1,5 @@
 import Button from "@/components/Button";
+import TermsAndConditions from "@/components/TermsAndConditions";
 import useAuthUser from "@/hooks/useAuthUser";
 import { useCreateRental } from "@/hooks/useCreateRental";
 import { useListWallet } from "@/hooks/useListWallet";
@@ -11,6 +12,17 @@ import { ethers } from "ethers";
 import React, { useState } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import { toast } from "react-toastify";
+import { motion } from "motion/react";
+import {
+  FaCreditCard,
+  FaEthereum,
+  FaWallet,
+  FaShieldAlt,
+  FaCalendarAlt,
+  FaCar,
+  FaCheckCircle,
+} from "react-icons/fa";
+import Loader from "@/components/Loader";
 
 type LocationState = {
   rental: AvailableRental;
@@ -23,11 +35,8 @@ type LocationState = {
 };
 
 const RentalConfirmation: React.FC = () => {
-  const [selectedPayment, setSelectedPayment] = useState<
-    "easypaisa" | "ethereum"
-  >("ethereum");
-
   const navigate = useNavigate();
+  const [showTermsModal, setShowTermsModal] = useState(false);
 
   const { user } = useAuthUser();
   const { account, provider, signer, connectWallet } = useWallet();
@@ -43,8 +52,17 @@ const RentalConfirmation: React.FC = () => {
 
   if (isEthInPkrLoading) {
     return (
-      <div className="bg-gray-100 min-h-screen flex items-center justify-center">
-        <p className="text-gray-500 text-lg">Loading conversion rate...</p>
+      <div className="min-h-screen bg-gradient-to-br from-slate-50 to-blue-50 flex items-center justify-center">
+        <motion.div
+          initial={{ opacity: 0, scale: 0.9 }}
+          animate={{ opacity: 1, scale: 1 }}
+          className="bg-white rounded-2xl shadow-lg p-8 text-center"
+        >
+          <Loader size="lg" variant="spinner" />
+          <p className="text-gray-600 mt-4 text-lg">
+            Loading conversion rate...
+          </p>
+        </motion.div>
       </div>
     );
   }
@@ -83,14 +101,19 @@ const RentalConfirmation: React.FC = () => {
   const platformFee = bookingData.totalPrice * 0.2;
   const grandTotal = bookingData.totalPrice + securityDeposit + platformFee;
   const startDate = dayjs(bookingData.startDate).format("DD MMM YYYY HH:mm");
-  const endDate = dayjs(bookingData.endDate).format("DD MMM YYYY HH:mm");
+  // const endDate = dayjs(bookingData.endDate).format("DD MMM YYYY HH:mm");
+  // manipulate end date to be 2 min ahead of current time
+  let endDateWithBuffer = dayjs(bookingData.endDate);
+  const now = dayjs();
+  endDateWithBuffer = now
+    .add(2, "minute")
+    .set("second", 0)
+    .set("millisecond", 0);
+  const endDate = endDateWithBuffer.format("DD MMM YYYY HH:mm");
 
-  const handleCreateRental = async () => {
-    if (selectedPayment === "easypaisa") {
-      toast.info("Easypaisa payment method is currently not supported.");
-      return;
-    }
+  console.log(endDate);
 
+  const handleInitiateRental = () => {
     if (!account || !provider || !signer) {
       toast.error("Please connect your wallet to proceed.");
       return;
@@ -106,15 +129,31 @@ const RentalConfirmation: React.FC = () => {
       return;
     }
 
+    // Show terms and conditions modal
+    setShowTermsModal(true);
+  };
+
+  const handleAcceptTerms = () => {
+    setShowTermsModal(false);
+    handleCreateRental();
+  };
+
+  const handleDeclineTerms = () => {
+    setShowTermsModal(false);
+  };
+
+  const handleCreateRental = async () => {
     try {
       toast.loading("Creating rental...");
       // Now create rental in DB
+
       const rentalData = {
         listingId: rental.id,
-        renterAddress: account,
+        renterAddress: account as string,
         ownerAddress: ownerWallet.walletAddress,
         startDate: bookingData.startDate.toISOString(),
-        endDate: bookingData.endDate.toISOString(),
+        // endDate: bookingData.endDate.toISOString(),
+        endDate: endDateWithBuffer.toISOString(), // for testing late fee mechanism
         rentalFee: bookingData.totalPrice,
         securityDeposit,
         platformFee,
@@ -134,7 +173,7 @@ const RentalConfirmation: React.FC = () => {
       toast.dismiss();
       toast.loading("Creating rental on blockchain...");
 
-      const rentalContract = getContractInstance(signer);
+      const rentalContract = getContractInstance(signer!);
 
       const rentalFeeEth = bookingData.totalPrice / ethInPkr;
       const securityDepositEth = securityDeposit / ethInPkr;
@@ -195,154 +234,195 @@ const RentalConfirmation: React.FC = () => {
           onClose: () => navigate(`/rental-successful/${createdRental.id}`),
         }
       );
-    } catch (err: any) {
+    } catch (err: unknown) {
       console.error("Error creating rental:", err);
       toast.dismiss(); // Clear loading if shown
-      toast.error(
-        err.response?.data.message ||
-          "Rental creation failed. Please try again."
-      );
+      const errorMessage =
+        err instanceof Error
+          ? err.message
+          : "Rental creation failed. Please try again.";
+      toast.error(errorMessage);
     }
   };
 
   return (
-    <div className="flex items-center  min-h-screen bg-gray-100">
-      <div className="basis-[550px] mx-auto p-6 bg-white rounded-lg shadow-md my-5">
-        <h1 className="text-2xl font-bold text-center mb-6 text-primary">
-          Pay & Get Your Ride!!
-        </h1>
+    <div className="min-h-screen bg-gradient-to-br from-slate-50 to-blue-50 flex items-center">
+      <motion.div
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        className="basis-[550px] mx-auto p-6 bg-white rounded-2xl shadow-lg my-5"
+      >
+        {/* Header */}
+        <div className="bg-gradient-to-r from-blue-600 to-purple-600 text-white p-6 rounded-xl mb-6 -mx-6 -mt-6">
+          <h1 className="text-2xl font-bold text-center flex items-center justify-center gap-2">
+            <FaCar className="w-6 h-6" />
+            Pay & Get Your Ride!!
+          </h1>
+          <p className="text-blue-100 text-center mt-1">
+            Complete your rental booking
+          </p>
+        </div>
 
-        <div className="border rounded-lg p-5 bg-gray-50 mb-8">
-          <h2 className="text-lg font-semibold mb-4">Booking Summary</h2>
+        {/* Booking Summary */}
+        <div className="bg-gradient-to-br from-gray-50 to-blue-50 rounded-2xl p-5 mb-8 border border-gray-200">
+          <h2 className="text-lg font-semibold mb-4 flex items-center gap-2">
+            <FaCalendarAlt className="text-blue-600" />
+            Booking Summary
+          </h2>
 
           <div className="space-y-3 mb-4 text-gray-700">
-            <div className="flex justify-between">
+            <div className="flex justify-between p-3 bg-white rounded-lg shadow-sm">
               <span className="font-medium">Start Date</span>
-              <span>{startDate}</span>
+              <span className="font-semibold">{startDate}</span>
             </div>
 
-            <div className="flex justify-between">
+            <div className="flex justify-between p-3 bg-white rounded-lg shadow-sm">
               <span className="font-medium">End Date</span>
-              <span>{endDate}</span>
+              <span className="font-semibold">{endDate}</span>
             </div>
 
-            <div className="flex justify-between">
-              <span className="font-medium">Rental Fee</span>
-              <span>
-                {bookingData.totalDays} days x PKR {rental.pricePerDay}/day ={" "}
-                {bookingData.totalPrice}
+            <div className="flex justify-between p-3 bg-white rounded-lg shadow-sm">
+              <span className="font-medium flex items-center gap-2">
+                <FaCar className="text-green-600" />
+                Rental Fee
               </span>
+              <div className="text-right">
+                <div className="font-semibold">
+                  PKR {bookingData.totalPrice}
+                </div>
+                <div className="text-sm text-gray-500">
+                  {bookingData.totalDays} days × PKR {rental.pricePerDay}/day
+                </div>
+              </div>
             </div>
 
-            <div className="flex justify-between">
-              <span className="font-medium">Security Deposit</span>
-              <span>PKR {securityDeposit} (40% of rental)</span>
+            <div className="flex justify-between p-3 bg-white rounded-lg shadow-sm">
+              <span className="font-medium flex items-center gap-2">
+                <FaShieldAlt className="text-orange-600" />
+                Security Deposit
+              </span>
+              <div className="text-right">
+                <div className="font-semibold">PKR {securityDeposit}</div>
+                <div className="text-sm text-gray-500">40% of rental fee</div>
+              </div>
             </div>
 
-            <div className="flex justify-between">
-              <span className="font-medium">Platform Fee</span>
-              <span>PKR {platformFee}</span>
+            <div className="flex justify-between p-3 bg-white rounded-lg shadow-sm">
+              <span className="font-medium flex items-center gap-2">
+                <FaCreditCard className="text-red-600" />
+                Platform Fee
+              </span>
+              <div className="text-right">
+                <div className="font-semibold">PKR {platformFee}</div>
+                <div className="text-sm text-gray-500">20% service fee</div>
+              </div>
             </div>
 
-            <div className="flex justify-between">
-              <span className="font-medium">Grand Total in ETH</span>
-              <span>
-                ETH {ethInPkr ? (grandTotal / ethInPkr).toFixed(6) : "..."}
+            <div className="flex justify-between p-3 bg-white rounded-lg shadow-sm">
+              <span className="font-medium flex items-center gap-2">
+                <FaEthereum className="text-indigo-600" />
+                Total in ETH
+              </span>
+              <span className="font-semibold">
+                {ethInPkr ? (grandTotal / ethInPkr).toFixed(6) : "..."} ETH
               </span>
             </div>
           </div>
 
           <div className="border-t border-gray-300 mt-4 pt-4">
-            <div className="flex justify-between font-bold text-lg">
-              <span>Total Amount</span>
-              <span className="text-primary">PKR {grandTotal}</span>
+            <div className="flex justify-between p-4 bg-gradient-to-r from-blue-600 to-purple-600 rounded-xl text-white">
+              <span className="text-lg font-bold">Grand Total</span>
+              <span className="text-xl font-bold">PKR {grandTotal}</span>
             </div>
           </div>
         </div>
 
+        {/* Payment Method */}
         <div className="mb-8">
-          <h2 className="text-lg font-semibold mb-4">Your payment method</h2>
+          <h2 className="text-lg font-semibold mb-4 flex items-center gap-2">
+            <FaWallet className="text-purple-600" />
+            Payment Method
+          </h2>
 
           <div className="space-y-4">
-            <div
-              className={`flex items-center p-3 border rounded-lg cursor-pointer ${
-                selectedPayment === "easypaisa"
-                  ? "border-blue-500 bg-blue-50"
-                  : "border-gray-300"
-              }`}
-              onClick={() => setSelectedPayment("easypaisa")}
-            >
-              <input
-                type="radio"
-                className="form-radio h-5 w-5 text-blue-600"
-                checked={selectedPayment === "easypaisa"}
-                onChange={() => setSelectedPayment("easypaisa")}
-              />
-              <label className="ml-3 flex-1">
-                <span className="block font-medium">Easypaisa wallet</span>
-                <span className="block text-gray-500">
-                  {user.phone.slice(0, 2) +
-                    "..." +
-                    user.phone.slice(user.phone.length - 3)}
-                </span>
-              </label>
-            </div>
-
-            <div className="flex items-center justify-center my-2">
-              <span className="px-2 text-gray-500">OR</span>
-            </div>
-
-            <div className="border-b border-gray-200 relative">
-              <div className="absolute inset-0 flex items-center justify-center">
-                <div className="px-2 bg-white text-gray-500">[_____]</div>
-              </div>
-            </div>
-
-            <div className="my-8">
-              {!account || !provider || !signer ? (
+            {!account || !provider || !signer ? (
+              <motion.div
+                whileHover={{ scale: 1.02 }}
+                whileTap={{ scale: 0.98 }}
+              >
                 <Button
-                  className="w-full py-3 text-lg font-semibold"
+                  className="w-full py-4 text-lg font-semibold bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 rounded-2xl shadow-lg"
                   onClick={connectWallet}
                 >
-                  Connect Wallet
+                  <div className="flex items-center justify-center gap-3">
+                    <FaWallet className="text-xl" />
+                    Connect Wallet
+                  </div>
                 </Button>
-              ) : (
-                <div
-                  className={`flex items-center p-3 border rounded-lg cursor-pointer  ${
-                    selectedPayment === "ethereum"
-                      ? "border-blue-500 bg-blue-50"
-                      : "border-gray-300"
-                  }`}
-                  onClick={() => setSelectedPayment("ethereum")}
-                >
-                  <input
-                    type="radio"
-                    className="form-radio h-5 w-5 text-blue-600"
-                    checked={selectedPayment === "ethereum"}
-                    onChange={() => setSelectedPayment("ethereum")}
-                  />
-                  <label className="ml-3 flex-1">
-                    <span className="block font-medium">Ethereum</span>
-                    <span className="block text-gray-500">
-                      {account?.slice(0, 5) +
+              </motion.div>
+            ) : (
+              <motion.div
+                whileHover={{ scale: 1.02 }}
+                whileTap={{ scale: 0.98 }}
+                className="relative p-4 border-2 border-blue-500 bg-blue-50 rounded-2xl shadow-lg"
+              >
+                <div className="flex items-center gap-4">
+                  <div className="w-6 h-6 rounded-full border-2 border-blue-500 bg-blue-500 flex items-center justify-center">
+                    <FaCheckCircle className="text-white text-sm" />
+                  </div>
+                  <div className="flex-1">
+                    <div className="flex items-center gap-2">
+                      <FaEthereum className="text-indigo-600" />
+                      <span className="font-semibold text-gray-900">
+                        Ethereum Wallet
+                      </span>
+                      <span className="px-2 py-1 bg-green-100 text-green-600 text-xs rounded-full font-medium">
+                        Connected
+                      </span>
+                    </div>
+                    <span className="text-gray-500">
+                      {account?.slice(0, 8) +
                         "..." +
-                        account?.slice(account.length - 4)}
+                        account?.slice(account.length - 6)}
                     </span>
-                  </label>
+                  </div>
                 </div>
-              )}
-            </div>
+              </motion.div>
+            )}
           </div>
         </div>
 
+        {/* Confirm Button */}
         <Button
-          disabled={isOwnerWalletLoading || isCreateRentalLoading}
-          onClick={handleCreateRental}
-          className="w-full py-3  font-bold rounded-lg"
+          disabled={
+            isOwnerWalletLoading ||
+            isCreateRentalLoading ||
+            !account ||
+            !provider ||
+            !signer
+          }
+          isLoading={isCreateRentalLoading}
+          onClick={handleInitiateRental}
+          className="w-full py-4 text-xl font-bold bg-gradient-to-r from-green-600 to-blue-600 hover:from-green-700 hover:to-blue-700 disabled:from-gray-400 disabled:to-gray-500 rounded-2xl shadow-lg transition-all duration-300"
         >
-          Confirm Payment
+          <div className="flex items-center justify-center gap-3">
+            <FaCheckCircle />
+            {!account || !provider || !signer
+              ? "Connect Wallet to Continue"
+              : "Confirm Payment & Book Now"}
+          </div>
         </Button>
-      </div>
+      </motion.div>
+
+      {/* Terms and Conditions Modal */}
+      {showTermsModal && (
+        <TermsAndConditions
+          onAccept={handleAcceptTerms}
+          onDecline={handleDeclineTerms}
+          rentalFee={bookingData.totalPrice.toString()}
+          securityDeposit={securityDeposit.toString()}
+        />
+      )}
     </div>
   );
 };

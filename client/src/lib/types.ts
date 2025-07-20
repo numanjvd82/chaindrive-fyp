@@ -115,4 +115,34 @@ export type Location = {
   latitude: number;
   longitude: number;
   timestamp: Date;
+  rentalId: number;
+};
+
+export type ViolationType =
+  | "late_return"
+  | "damage"
+  | "illegal_activity"
+  | "speeding"
+  | "unauthorized_location"
+  | "other";
+
+export type ViolationStatus =
+  | "pending"
+  | "investigating"
+  | "confirmed"
+  | "disputed"
+  | "resolved"
+  | "dismissed";
+
+export type Violation = {
+  id: number;
+  rentalId: number;
+  violationType: ViolationType;
+  expectedDamage?: string;
+  detailedQuery: string;
+  photos?: string[];
+  status: ViolationStatus;
+  reportedByUserId?: number;
+  createdAt: Date;
+  updatedAt: Date;
 };
