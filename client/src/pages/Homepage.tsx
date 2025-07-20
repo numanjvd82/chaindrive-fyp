@@ -6,11 +6,7 @@ import MainSearch from "@/components/pages/Homepage/MainSearch";
 import PopularRenterDeals from "@/components/pages/Homepage/PopularRenterDeals";
 import WhyChooseUs from "@/components/pages/Homepage/WhyChooseUs";
 
-const handleSearch = (
-  location: string,
-  pickupDate: string,
-  returnDate: string
-) => {};
+const handleSearch = () => {};
 
 export default function Home() {
   // const { user } = useUser();
