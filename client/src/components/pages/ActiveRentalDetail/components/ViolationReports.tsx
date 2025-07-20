@@ -1,15 +1,18 @@
 import { motion } from "motion/react";
 import { FaExclamationTriangle, FaCamera } from "react-icons/fa";
 import dayjs from "dayjs";
+import { Violation } from "@/lib/types";
 
 interface ViolationReportsProps {
-  violation: any;
+  violation: Violation | undefined;
 }
 
 export const ViolationReports: React.FC<ViolationReportsProps> = ({
   violation,
 }) => {
   if (!violation) return null;
+
+  console.log(violation.photos);
 
   return (
     <motion.div
@@ -44,10 +47,23 @@ export const ViolationReports: React.FC<ViolationReportsProps> = ({
             </p>
           )}
           {violation.photos && violation.photos.length > 0 && (
-            <p className="text-sm text-gray-600 mt-2">
-              <FaCamera className="inline-block mr-1" />
-              {violation.photos.length} photo(s) attached
-            </p>
+            <>
+              <p className="text-sm text-gray-600 mt-2">
+                <FaCamera className="inline-block mr-1" />
+                {violation.photos.length} photo(s) attached
+              </p>
+
+              <div className="mt-2 grid grid-cols-2 sm:grid-cols-3 gap-2">
+                {violation.photos.map((photo, index) => (
+                  <img
+                    key={index}
+                    src={`data:image/png;base64,${photo}`}
+                    alt={`Violation photo ${index + 1}`}
+                    className="w-full h-40 object-cover rounded-lg shadow-sm"
+                  />
+                ))}
+              </div>
+            </>
           )}
         </div>
       </div>

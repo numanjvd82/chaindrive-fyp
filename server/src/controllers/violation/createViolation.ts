@@ -68,12 +68,16 @@ export const createViolation = async (req: Request, res: Response) => {
     // Convert uploaded files to buffer
     const photos = files ? files.map((file) => file.buffer) : undefined;
 
+    const base64Photos = photos
+      ? photos.map((photo) => photo.toString("base64"))
+      : undefined;
+
     const violation = await violationModel.create({
       rentalId: rentalIdNumber,
       violationType,
       expectedDamage,
       detailedQuery,
-      photos,
+      photos: base64Photos,
       status,
       reportedByUserId: userId,
     });

@@ -70,6 +70,9 @@ export async function completeRentalFromRenter(
       if (completeResult.changes === 0) {
         throw new Error("Failed to mark rental as completed");
       }
+
+      // delete stored location from the db for this rental
+      db.prepare(sql`DELETE FROM Locations WHERE rental_id = ?`).run(rental.id);
     }
 
     return true;

@@ -6,15 +6,18 @@ import { useLatestLocation } from "@/hooks/useLatestLocation";
 interface VehicleLocationProps {
   rentalStatus: string;
   expectedDeviceId: string;
+  rentalId: number;
 }
 
 export const VehicleLocation: React.FC<VehicleLocationProps> = ({
   rentalStatus,
   expectedDeviceId,
+  rentalId,
 }) => {
-  const { latestLocation, isLocationLoading } = useLatestLocation(
-    expectedDeviceId || ""
-  );
+  const { latestLocation, isLocationLoading } = useLatestLocation({
+    deviceId: expectedDeviceId || "",
+    rentalId: rentalId,
+  });
 
   if (rentalStatus !== "active") return null;
 

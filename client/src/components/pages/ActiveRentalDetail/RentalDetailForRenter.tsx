@@ -11,7 +11,6 @@ import {
   VehicleDetails,
   RenterActionButtons,
   LateFeeDisplay,
-  LateFeeTestDisplay,
 } from "./components";
 
 type Props = {

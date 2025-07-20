@@ -1,7 +1,7 @@
 import { z } from "zod";
 import { getDbInstance } from "../../lib/db/sqlite";
 import { Violation, ViolationType, ViolationStatus } from "../../lib/types";
-import { convertBufferToBase64, sql } from "../../utils/utils";
+import { sql } from "../../utils/utils";
 import { rentalModel } from "../rental";
 import { listingModel } from "../listing";
 
@@ -19,10 +19,7 @@ export const createViolationSchema = z.object({
   detailedQuery: z
     .string()
     .min(10, "Detailed query must be at least 10 characters"),
-  photos: z
-    .array(z.instanceof(Buffer))
-    .max(4, "Maximum 4 photos allowed")
-    .optional(),
+  photos: z.array(z.string()).max(4, "Maximum 4 photos allowed").optional(),
   status: z
     .enum([
       "pending",
@@ -83,24 +80,12 @@ export async function createViolation(
     const parsedInput = createViolationSchema.parse(input);
     const db = getDbInstance();
 
-    let photos: string[] | undefined;
-
-    if (parsedInput.photos && parsedInput.photos.length > 0) {
-      // convert images to base64
-      photos = await Promise.all(
-        parsedInput.photos.map(async (photo, i: number) => {
-          const base64Image = convertBufferToBase64(photo);
-          return base64Image;
-        })
-      );
-    }
-
     // Validate photos array length if provided
     if (parsedInput.photos && parsedInput.photos.length > 4) {
       throw new Error("Maximum 4 photos allowed");
     }
 
-    // Generate dynamic insert query
+    // Generate dynamic insert query, pass photos as-is
     const { fields, values } = generateInsertQuery(parsedInput);
     const placeholders = fields.map(() => "?").join(", ");
 

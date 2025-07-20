@@ -38,14 +38,12 @@ export async function getActiveRentalByDeviceId(deviceId: string) {
     JOIN Listings ON Rentals.listing_id = Listings.id
     WHERE Listings.expected_device_id = ?
       AND Rentals.status = 'active'
-      AND datetime(Rentals.start_date) <= CURRENT_TIMESTAMP
-      AND datetime(Rentals.end_date) >= CURRENT_TIMESTAMP
     LIMIT 1
       `
       )
       .all(deviceId)
       .map((rental: any) => ({
-        id: rental.rental_id,
+        id: rental.id,
         listingId: rental.listing_id,
         renterId: rental.renter_id,
         renterAddress: rental.renter_address,

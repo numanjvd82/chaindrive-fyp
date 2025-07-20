@@ -12,7 +12,6 @@ import { ViolationReports } from "./components/ViolationReports";
 import { VehicleDetails } from "./components/VehicleDetails";
 import { ActionButtons } from "./components/ActionButtons";
 import { LateFeeDisplay } from "./components/LateFeeDisplay";
-import { LateFeeTestDisplay } from "./components";
 
 type Props = {
   rental: RentalWithImages;
@@ -50,6 +49,7 @@ export const RentalDetailForOwner: React.FC<Props> = ({
         <VehicleLocation
           rentalStatus={rental.status}
           expectedDeviceId={listing.expectedDeviceId || ""}
+          rentalId={rental.id}
         />
 
         <ViolationReports violation={violation} />

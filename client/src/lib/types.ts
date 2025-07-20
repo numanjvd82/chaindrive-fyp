@@ -115,6 +115,7 @@ export type Location = {
   latitude: number;
   longitude: number;
   timestamp: Date;
+  rentalId: number;
 };
 
 export type ViolationType =
