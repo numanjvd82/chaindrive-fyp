@@ -1,0 +1,30 @@
+services:
+  chaindrive-app:
+    build:
+      context: .
+    container_name: chaindrive-app
+    ports:
+      - "4000:4000"
+    environment:
+      # === Frontend ENV ===
+      - VITE_SERVER_URL=https://chaindrive.app
+
+      # === Backend ENV ===
+      - PORT=4000
+      - NODE_ENV=development
+      - CLIENT_URL=http://localhost:5173
+      - SESSION_SECRET_KEY=b25843cc3c0911bb38be90236d1d6ec9fa397bce10db323276ec6a3e911384bd
+      - ALCHEMY_RPC_URL=https://eth-sepolia.g.alchemy.com/v2/Z3H7OjCbPuCnWuNhH0yFjnwjBzFlbUMZ
+      - CHAINDRIVE_PRIVATE_WALLET_KEY=46621752e61a341f40a089224416f4375bb62c54edbaee1021386dca7c943b0b
+      - MQTT_USERNAME=esp32
+      - MQTT_PASSWORD=Esp3212345
+      - SMTP_EMAIL=naumanjaved556@gmail.com
+      - SMTP_PASS="erxy scvi uzil iswl"
+      - PROXY_ADDRESS=0x4Dc7FB5b43c34213684874286940358F7e740872
+
+    restart: always
+    volumes:
+      # Only persist database files if needed
+      - ./server/chaindrive.db:/app/server/chaindrive.db
+      - ./server/chaindrive.db-shm:/app/server/chaindrive.db-shm
+      - ./server/chaindrive.db-wal:/app/server/chaindrive.db-wal
