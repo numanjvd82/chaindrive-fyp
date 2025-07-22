@@ -52,10 +52,18 @@ export const login = async (req: Request, res: Response) => {
     // create a session if two-factor authentication is not enabled
     const sessionId = await sessionModel.createOne(user.id);
 
+    // For development, you might want to set the cookie like this:
+    // res.cookie("sessionId", sessionId, {
+    //   httpOnly: true,
+    //   secure: process.env.NODE_ENV === "production",
+    //   maxAge: sessionExpiry,
+    // });
+
+    // Production settings for cookies
     res.cookie("sessionId", sessionId, {
       httpOnly: true,
-      secure: process.env.NODE_ENV === "production",
-      maxAge: sessionExpiry,
+      secure: true, // MUST be true in production HTTPS
+      sameSite: "none", // REQUIRED for cross-origin cookies
     });
 
     res.status(200).json({ message: "Logged in successfully" });

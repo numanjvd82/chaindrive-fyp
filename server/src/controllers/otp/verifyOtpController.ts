@@ -43,10 +43,17 @@ WHERE email = ?
 
     const sessionId = await sessionModel.createOne(user.id);
 
+    // res.cookie("sessionId", sessionId, {
+    //   httpOnly: true,
+    //   secure: process.env.NODE_ENV === "production",
+    //   maxAge: sessionExpiry,
+    // });
+
+    // Production settings for cookies
     res.cookie("sessionId", sessionId, {
       httpOnly: true,
-      secure: process.env.NODE_ENV === "production",
-      maxAge: sessionExpiry,
+      secure: true, // MUST be true in production HTTPS
+      sameSite: "none", // REQUIRED for cross-origin cookies
     });
 
     res.status(200).json({ message: "Logged in successfully" });
