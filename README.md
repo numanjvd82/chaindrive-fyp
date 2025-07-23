@@ -2,6 +2,9 @@
 
 Chaindrive FYP is a full-stack car rental platform leveraging blockchain technology and IoT devices for secure, transparent, and real-time rental experiences. The project consists of a React + TypeScript + Vite frontend and a Node.js/Express backend, with a Solidity smart contract for decentralized payment handling.
 
+## Live App deployed on Digital Ocean VPS with Docker and Nginx
+https://chaindrive.netlify.app/
+
 ## Features
 
 - **Car Listings:** Users can list vehicles for rent, including details like model, price, location, and images.
